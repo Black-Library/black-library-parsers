@@ -1,7 +1,4 @@
-#ifndef SOURCEINFORMATION_H
-#define SOURCEINFORMATION_H
-
-#include <string>
+#include "../include/SourceInformation.h"
 
 namespace AO3 {
   std::string name = "Archive Of Our Own";
@@ -20,5 +17,3 @@ namespace SBF {
   std::string short_name = "SBF";
   std::string url = "forums.spacebattles.com";
 }
-
-#endif

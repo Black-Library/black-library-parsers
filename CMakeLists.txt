@@ -5,9 +5,11 @@ project(Parsers VERSION 0.1)
 set(CMAKE_CPP_STANDARD 11)
 set(CMAKE_CPP_STANDARD_REQUIRED True)
 
-configure_file(ParsersConfig.h.in ParsersConfig.h)
+configure_file(include/ParsersConfig.h.in include/ParsersConfig.h)
 
-add_executable(Parsers Tester.cpp)
+include_directories(include)
+include_directories(src)
 
-target_include_directories(Parsers PUBLIC
-  "${PROJECT_BINARY_DIR}")
+file(GLOB SOURCES "src/*.cpp")
+
+add_executable(Parsers src/Tester.cpp)
