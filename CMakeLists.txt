@@ -9,6 +9,9 @@ add_compile_options(-Wall -Wextra -Werror)
 set(CMAKE_CPP_STANDARD 11)
 set(CMAKE_CPP_STANDARD_REQUIRED True)
 
+find_package(curl REQUIRED)
+find_package(libxml REQUIRED)
+
 configure_file(include/ParsersConfig.h.in include/ParsersConfig.h)
 
 add_subdirectory(src)
