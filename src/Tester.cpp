@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     ParserAO3 parser;
-    parser.setUrl("https://archiveofourown.org/works/23088748");
+    // parser.setUrl("https://archiveofourown.org/works/23088748");
     parser.parse();
 
     curl_global_cleanup();
