@@ -15,3 +15,4 @@ set(CMAKE_CPP_STANDARD_REQUIRED True)
 configure_file(include/ParsersConfig.h.in include/ParsersConfig.h)
 
 add_subdirectory(src)
+add_subdirectory(external)
