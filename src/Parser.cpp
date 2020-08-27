@@ -1,4 +1,4 @@
-#include "../include/Parser.h"
+#include "Parser.h"
 
 Parser::Parser(std::string url) {
     this->url = url;

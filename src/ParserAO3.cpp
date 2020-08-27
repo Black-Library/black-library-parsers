@@ -1,4 +1,6 @@
-#include "../include/ParserAO3.h"
+#include "ParserAO3.h"
+
+namespace AO3 {
 
 ParserAO3::ParserAO3() {
 
@@ -40,3 +42,5 @@ void ParserAO3::parse() {
 void ParserAO3::parseChapter() {
 
 }
+
+} // namespace AO3

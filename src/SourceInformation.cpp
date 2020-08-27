@@ -1,4 +1,4 @@
-#include "../include/SourceInformation.h"
+#include "SourceInformation.h"
 
 namespace AO3 {
   std::string name = "Archive Of Our Own";
