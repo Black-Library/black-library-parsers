@@ -1,0 +1,9 @@
+FROM alpine:latest
+
+LABEL maintainer="bl"
+
+ARG docker_build_gid=1000
+ARG docker_build_uid=1000
+ARG docker_build_user=parser_user
+
+RUN echo test
