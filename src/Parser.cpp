@@ -73,8 +73,8 @@ void Parser::setLocalFilePath(std::string local_des) {
 }
 
 void Parser::parseUrl() {
-    if(url.find(AO3::url) != std::string::npos) {
-        source = AO3::name;
+    if(url.find(url) != std::string::npos) {
+        source = name;
     }
 }
 
