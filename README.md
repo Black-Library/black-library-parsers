@@ -1,5 +1,8 @@
 # Parser-FF-A03
 
+# Dependencies
+libxml2 is a required dependency
+
 # Building the project
 mkdir build
 
