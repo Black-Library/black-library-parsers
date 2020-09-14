@@ -1,4 +1,4 @@
-#include "../include/Parser.h"
+#include "Parser.h"
 
 Parser::Parser(std::string url) {
     this->url = url;
@@ -75,6 +75,10 @@ void Parser::setLocalFilePath(std::string local_des) {
 void Parser::parseUrl() {
     if(url.find(AO3::url) != std::string::npos) {
         source = AO3::name;
+    } else if (url.find(SBF::url) != std::string::npos) {
+        source = SBF::name;
+    } else if (url.find(FFN::url) != std::string::npos) {
+        source = FFN::name;
     }
 }
 

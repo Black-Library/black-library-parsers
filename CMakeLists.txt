@@ -6,12 +6,13 @@ set(BUILD_SHARED_LIBS ON)
 
 add_compile_options(-Wall -Wextra -Werror)
 
-set(CMAKE_CPP_STANDARD 11)
-set(CMAKE_CPP_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-find_package(curl REQUIRED)
-find_package(libxml REQUIRED)
+include(cmake/docker.cmake)
 
 configure_file(include/ParsersConfig.h.in include/ParsersConfig.h)
 
 add_subdirectory(src)
+
+add_docker_targets()

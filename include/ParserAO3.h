@@ -3,6 +3,8 @@
 
 #include "Parser.h"
 
+namespace AO3 {
+
 class ParserAO3 : public Parser {
 public:
     ParserAO3();
@@ -14,4 +16,7 @@ protected:
 
 private:
 };
+
+} // namespace AO3
+
 #endif
