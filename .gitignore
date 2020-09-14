@@ -37,3 +37,6 @@ install
 
 # IDE stuff
 .idea
+
+# Test files
+.html
