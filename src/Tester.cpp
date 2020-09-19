@@ -9,7 +9,8 @@
 
 int main(int argc, char* argv[]) {
 
-    if (argc > 0) {
+    // check to see if there are any extra arguments
+    if (argc > 1) {
         std::cout << "extra arguments ";
         for (int i = 0; i < argc; ++i) {
             std::cout << std::string(argv[i]);
@@ -24,5 +25,8 @@ int main(int argc, char* argv[]) {
     parser.parse();
 
     curl_global_cleanup();
+
+    std::cout << "Tester exit successful" << std::endl;
+
     return 0;
 }
