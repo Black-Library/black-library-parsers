@@ -21,11 +21,11 @@ RUN apk update && apk add --no-cache --upgrade \
     vim \
 
 # setup root user
-RUN echo "root:parser" | chpasswd
+RUN echo "root:library" | chpasswd
 
 # setup build user
 RUN adduser --disabled-password --uid $docker_build_uid $docker_build_user
-RUN echo "$docker_build_user:parser" | chpasswd
+RUN echo "$docker_build_user:library" | chpasswd
 
 # setup build environment
 RUN mkdir /build /source && chown $docker_build_user:$docker_build_user /build /source

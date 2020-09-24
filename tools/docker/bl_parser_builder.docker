@@ -23,8 +23,8 @@ RUN apt-get update && apt-get install --no-install-recommends --yes\
 # setup build user
 RUN groupadd --gid $docker_build_gid $docker_build_user
 RUN useradd --create-home --gid $docker_build_gid --uid $docker_build_uid --shell /bin/bash $docker_build_user
-RUN echo "$docker_build_user:parser" | chpasswd && \
-    echo "root:parser" | chpasswd
+RUN echo "$docker_build_user:library" | chpasswd && \
+    echo "root:library" | chpasswd
 RUN echo 'set -o vi' > /home/$docker_build_user/.bashrc
 
 RUN mkdir /build /source && chown $docker_build_user:$docker_build_user /build /source
