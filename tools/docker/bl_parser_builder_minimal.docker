@@ -1,0 +1,38 @@
+FROM alpine:latest
+
+LABEL maintainer="bl"
+
+ARG docker_build_gid=1000
+ARG docker_build_uid=1000
+ARG docker_build_user=parsers_user
+
+RUN echo test
+
+RUN apk update && apk add --no-cache --upgrade \
+    bash \
+    cmake \
+    curl \
+    git \
+    libsqlite3-dev \
+    libxml2-dev \
+    openssh-client \
+    python3 \
+    sqlite \
+    vim \
+
+# setup root user
+RUN echo "root:library" | chpasswd
+
+# setup build user
+RUN adduser --disabled-password --uid $docker_build_uid $docker_build_user
+RUN echo "$docker_build_user:library" | chpasswd
+
+# setup build environment
+RUN mkdir /build /source && chown $docker_build_user:$docker_build_user /build /source
+
+# build everything as a normal user.
+USER $docker_build_user
+
+# build parser in /build store source files in /source.
+WORKDIR /source
+COPY --chown=1000:1000 . ./parsers/

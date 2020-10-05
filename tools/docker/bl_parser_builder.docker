@@ -1,17 +1,18 @@
-FROM alpine:latest
+FROM ubuntu:xenial
 
 LABEL maintainer="bl"
 
 ARG docker_build_gid=1000
 ARG docker_build_uid=1000
-ARG docker_build_user=parser_user
+ARG docker_build_user=parsers_user
 
 RUN echo test
 
-RUN apk update && apk add \
+RUN apt-get update && apt-get install --no-install-recommends --yes\
     cmake \
     curl \
     git \
+    libsqlite3-dev \
     libxml2-dev \
     openssh-client \
     python3 \
@@ -22,14 +23,15 @@ RUN apk update && apk add \
 # setup build user
 RUN groupadd --gid $docker_build_gid $docker_build_user
 RUN useradd --create-home --gid $docker_build_gid --uid $docker_build_uid --shell /bin/bash $docker_build_user
-RUN echo "$docker_build_user:parser" | chpasswd && \
-    echo "root:parser" | chpasswd
+RUN echo "$docker_build_user:library" | chpasswd && \
+    echo "root:library" | chpasswd
 RUN echo 'set -o vi' > /home/$docker_build_user/.bashrc
+
+RUN mkdir /build /source && chown $docker_build_user:$docker_build_user /build /source
 
 # build everything as a normal user.
 USER $docker_build_user
 
 # build parser in /build store source files in /source.
-RUN mkdir /build /source && chown $docker_build_user:$docker_build_user /build /source
 WORKDIR /source
 COPY --chown=1000:1000 . ./parsers/
