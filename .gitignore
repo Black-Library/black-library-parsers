@@ -37,6 +37,7 @@ install
 
 # IDE stuff
 .idea
+.vscode
 
 # Test files
 .html

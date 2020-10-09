@@ -16,7 +16,8 @@
 
 #include "SourceInformation.h"
 
-class Parser {
+class Parser
+{
 public:
     Parser(std::string url);
     Parser() : Parser(""){};
