@@ -1,5 +1,5 @@
- #ifndef PARSER_AO3_H
-#define PARSER_AO3_H
+#ifndef __AO3_PARSER_AO3_H__
+#define __AO3_PARSER_AO3_H__
 
 #include "Parser.h"
 

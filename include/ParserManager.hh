@@ -31,10 +31,10 @@ private:
     void Init();
 
     ThreadPool pool_;
+    ParserFactory parser_factory_;
     std::queue<std::string> urls_;
     std::string config_;
     std::atomic_bool done_;
-    ParserFactory parser_factory_;
 };
 
 } // namespace librarycore

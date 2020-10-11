@@ -1,5 +1,5 @@
-#ifndef PARSER_FACTORY_H
-#define PARSER_FACTORY_H
+#ifndef __LIBRARYCORE_PARSER_FACTORY_HH__
+#define __LIBRARYCORE_PARSER_FACTORY_HH__
 
 #include <unordered_map>
 

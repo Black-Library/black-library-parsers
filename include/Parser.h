@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef __PARSER_H__
+#define __PARSER_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +24,7 @@ public:
     virtual ~Parser();
 
     virtual void Parse();
+    virtual Parser Copy();
     std::string CurlRequest(std::string url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
@@ -36,7 +37,7 @@ public:
     std::string GetLocalDes();
     std::string GetTitle();
 
-    virtual Parser Copy();
+
 
 protected:
     std::string source;
