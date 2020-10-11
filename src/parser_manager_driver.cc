@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    librarycore::ParserManager manager("");
+    librarycore::ParserManager manager(4, "");
 
     parser_manager = &manager;
 

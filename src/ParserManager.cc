@@ -11,9 +11,8 @@
 
 namespace librarycore {
 
-ParserManager::ParserManager(const std::string &config) :
-    parsers_(),
-    parser_ready_bit_(0),
+ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
+    pool_(num_threads),
     urls_(),
     config_(config),
     done_(true)
@@ -23,7 +22,7 @@ ParserManager::ParserManager(const std::string &config) :
 
 int ParserManager::Run()
 {
-    done_ = false;
+    done_ = true;
 
     while (!done_)
     {
@@ -42,14 +41,12 @@ int ParserManager::Run()
 
 int ParserManager::RunOnce()
 {
-    CheckParsersReady();
-    SendParsersUrls();
-
     return 0;
 }
 
 int ParserManager::Stop()
 {
+    
     done_ = true;
 
     return 0;
@@ -57,26 +54,19 @@ int ParserManager::Stop()
 
 void ParserManager::Init()
 {
-    // construct managed parsers
-    parsers_.emplace(AO3_0_PARSER, AO3::ParserAO3());
+    // TODO make this map results to result objects
+    std::vector<std::future<int>> results;
 
-    // set all bits ready
-    parser_ready_bit_.set();
-}
-
-void ParserManager::CheckParsersReady()
-{
-    for (size_t i = 0; i < _MANAGED_PARSER_COUNT; ++i)
-    {
-
+    for(int i = 0; i < 8; ++i) {
+        results.emplace_back(
+            pool_.enqueue([i] {
+                std::cout << "hello " << i << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::cout << "world " << i << std::endl;
+                return i*i;
+            })
+        );
     }
 }
-
-void ParserManager::SendParsersUrls()
-{
-    
-}
-
-
 
 } // namespace librarycore

@@ -6,19 +6,19 @@
 #define __LIBRARYCORE_PARSER_MANAGER_HH__
 
 #include <atomic>
-#include <bitset>
 #include <queue>
 #include <unordered_map>
 
+#include <ThreadPool.h>
+
 #include <Parser.h>
-#include <ParserWorker.h>
 
 namespace librarycore {
 
 class ParserManager
 {
 public:
-    explicit ParserManager(const std::string &config);
+    explicit ParserManager(const uint8_t &num_threads, const std::string &config);
 
     ParserManager &operator = (ParserManager &&) = default;
 
@@ -29,10 +29,7 @@ public:
 private:
     void Init();
 
-    void SendWorkersUrls();
-
-    std::unordered_map<managed_parsers_rep, Parser> parsers_;
-    std::bitset<_MANAGED_PARSER_COUNT> parser_ready_bit_;
+    ThreadPool pool_;
     std::queue<std::string> urls_;
     std::string config_;
     std::atomic_bool done_;
