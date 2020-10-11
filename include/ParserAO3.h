@@ -11,9 +11,9 @@ public:
     ParserAO3();
     ~ParserAO3();
 
-    void parse();
+    void Parse();
 protected:
-    void parseChapter();
+    void ParseChapter();
 
 private:
 };

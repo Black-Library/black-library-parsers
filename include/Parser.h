@@ -23,18 +23,18 @@ public:
     Parser() : Parser(""){};
     virtual ~Parser();
 
-    virtual void parse();
-    std::string curlRequest(std::string url);
-    xmlNode* getElementAttr(xmlNode* root, std::string attr, std::string value);
+    virtual void Parse();
+    std::string CurlRequest(std::string url);
+    xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
-    void setUrl(std::string url);
-    void setLocalFilePath(std::string local_des);
-    void parseUrl();
+    void SetUrl(std::string url);
+    void SetLocalFilePath(std::string local_des);
+    void ParseUrl();
 
-    std::string getUrl();
-    std::string getSource();
-    std::string getLocalDes();
-    std::string getTitle();
+    std::string GetUrl();
+    std::string GetSource();
+    std::string GetLocalDes();
+    std::string GetTitle();
 
 protected:
     std::string source;
@@ -45,5 +45,5 @@ protected:
 private:
 };
 
-size_t handleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
+size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
 #endif

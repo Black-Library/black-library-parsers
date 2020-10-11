@@ -4,7 +4,7 @@ Parser::Parser(std::string url)
 {
     this->url = url;
     this->local_des = "";
-    parseUrl();
+    ParseUrl();
 }
 
 Parser::~Parser()
@@ -12,12 +12,12 @@ Parser::~Parser()
 
 }
 
-void Parser::parse()
+void Parser::Parse()
 {
 
 }
 
-std::string Parser::curlRequest(std::string url)
+std::string Parser::CurlRequest(std::string url)
 {
     CURL* curl;
     CURLcode res;
@@ -32,7 +32,7 @@ std::string Parser::curlRequest(std::string url)
 
     std::string html_raw;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleCurlResponse);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, HandleCurlResponse);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &html_raw);
 
     res = curl_easy_perform(curl);
@@ -47,7 +47,7 @@ std::string Parser::curlRequest(std::string url)
     return html_raw;
 }
 
-xmlNode* Parser::getElementAttr(xmlNode* root, std::string attr, std::string value) {
+xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string value) {
     if (memcmp(root->name, "text", 4) == 0 || memcmp(root->name, "style", 5) == 0 ||
         memcmp(root->name, "script", 6) == 0)
     {
@@ -70,7 +70,7 @@ xmlNode* Parser::getElementAttr(xmlNode* root, std::string attr, std::string val
 
     while (current_node)
     {
-        xmlNode* node = getElementAttr(current_node, attr, value);
+        xmlNode* node = GetElementAttr(current_node, attr, value);
 
         if (node)
         {
@@ -83,18 +83,18 @@ xmlNode* Parser::getElementAttr(xmlNode* root, std::string attr, std::string val
     return NULL;
 }
 
-void Parser::setUrl(std::string url)
+void Parser::SetUrl(std::string url)
 {
     this->url = url;
-    parseUrl();
+    ParseUrl();
 }
 
-void Parser::setLocalFilePath(std::string local_des)
+void Parser::SetLocalFilePath(std::string local_des)
 {
     this->local_des = local_des;
 }
 
-void Parser::parseUrl()
+void Parser::ParseUrl()
 {
     if (url.find(AO3::url) != std::string::npos)
     {
@@ -110,28 +110,28 @@ void Parser::parseUrl()
     }
 }
 
-std::string Parser::getSource()
+std::string Parser::GetSource()
 {
     return source;
 }
 
-std::string Parser::getUrl()
+std::string Parser::GetUrl()
 {
     return url;
 }
 
-std::string Parser::getLocalDes()
+std::string Parser::GetLocalDes()
 {
     return local_des;
 }
 
-std::string Parser::getTitle()
+std::string Parser::GetTitle()
 {
     return title;
 }
 
 //Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
-size_t handleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
+size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
 {
     std::string* str = (std::string*) data;
     char* sptr = (char*) ptr;

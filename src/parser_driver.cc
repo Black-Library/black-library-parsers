@@ -23,12 +23,12 @@ int main(int argc, char* argv[])
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     AO3::ParserAO3 parser;
-    parser.setUrl("https://archiveofourown.org/works/505809");
-    parser.parse();
+    parser.SetUrl("https://archiveofourown.org/works/505809");
+    parser.Parse();
 
     Parser parser2;
-    parser2.setUrl("https://archiveofourown.org/works/505809");
-    parser2.parse();
+    parser2.SetUrl("https://archiveofourown.org/works/505809");
+    parser2.Parse();
 
     curl_global_cleanup();
 
