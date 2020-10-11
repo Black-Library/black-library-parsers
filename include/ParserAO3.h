@@ -5,14 +5,15 @@
 
 namespace AO3 {
 
-class ParserAO3 : public Parser {
+class ParserAO3 : public Parser
+{
 public:
     ParserAO3();
     ~ParserAO3();
 
-    void parse();
+    void Parse();
 protected:
-    void parseChapter();
+    void ParseChapter();
 
 private:
 };
