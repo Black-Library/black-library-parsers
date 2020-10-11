@@ -16,6 +16,7 @@
 
 #include "SourceInformation.h"
 
+namespace librarycore {
 class Parser
 {
 public:
@@ -49,4 +50,6 @@ private:
 };
 
 size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
+
+} // namespace librarycore
 #endif

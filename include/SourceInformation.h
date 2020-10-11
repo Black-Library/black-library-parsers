@@ -2,6 +2,7 @@
 #define SOURCEINFORMATION_H
 
 #include <string>
+namespace librarycore {
 
 namespace AO3 {
     extern std::string name;
@@ -21,4 +22,5 @@ namespace SBF {
     extern std::string url;
 } // namespace SBF
 
+} // namespace librarycore
 #endif
