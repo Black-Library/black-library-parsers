@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef __PARSER_H__
+#define __PARSER_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +16,7 @@
 
 #include "SourceInformation.h"
 
+namespace librarycore {
 class Parser
 {
 public:
@@ -24,6 +25,7 @@ public:
     virtual ~Parser();
 
     virtual void Parse();
+    virtual Parser Copy();
     std::string CurlRequest(std::string url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
@@ -36,6 +38,8 @@ public:
     std::string GetLocalDes();
     std::string GetTitle();
 
+
+
 protected:
     std::string source;
     std::string url;
@@ -46,4 +50,6 @@ private:
 };
 
 size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
+
+} // namespace librarycore
 #endif

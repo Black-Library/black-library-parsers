@@ -1,5 +1,7 @@
 #include <SourceInformation.h>
 
+namespace librarycore {
+
 namespace AO3 {
   std::string name = "Archive Of Our Own";
   std::string short_name = "AO3";
@@ -17,3 +19,5 @@ namespace SBF {
   std::string short_name = "SBF";
   std::string url = "forums.spacebattles.com";
 } // namespace SBF
+
+} //namespace libararycore

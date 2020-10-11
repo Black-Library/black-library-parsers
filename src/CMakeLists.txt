@@ -5,7 +5,7 @@ message("LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
 
 include(GNUInstallDirs)
 
-add_library(Parsers Parser.cc ParserAO3.cc ParserManager.cc SourceInformation.cc)
+add_library(Parsers Parser.cc ParserAO3.cc ParserFactory.cc ParserManager.cc SourceInformation.cc)
 target_link_libraries(Parsers ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
 target_include_directories(Parsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)
 

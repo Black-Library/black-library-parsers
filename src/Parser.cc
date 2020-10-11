@@ -1,5 +1,7 @@
 #include <Parser.h>
 
+namespace librarycore {
+
 Parser::Parser(std::string url)
 {
     this->url = url;
@@ -110,6 +112,14 @@ void Parser::ParseUrl()
     }
 }
 
+Parser Parser::Copy()
+{
+    Parser parser;
+    parser.SetUrl(this->GetUrl());
+    parser.SetLocalFilePath(this->GetLocalDes());
+    return parser;
+}
+
 std::string Parser::GetSource()
 {
     return source;
@@ -143,3 +153,5 @@ size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
 
     return size * nmemb;
 }
+
+} // namespace librarycore

@@ -1,6 +1,6 @@
 #include <ParserAO3.h>
 
-namespace AO3 {
+namespace librarycore::AO3 {
 
 ParserAO3::ParserAO3()
 {
@@ -50,4 +50,11 @@ void ParserAO3::ParseChapter()
 
 }
 
-} // namespace AO3
+Parser ParserAO3::Copy() {
+  ParserAO3 parser;
+  parser.SetUrl(this->GetUrl());
+  parser.SetLocalFilePath(this->GetLocalDes());
+  return parser;
+}
+
+} // namespace library::AO3
