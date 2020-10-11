@@ -12,6 +12,8 @@ public:
     ~ParserAO3();
 
     void Parse();
+    Parser Copy();
+
 protected:
     void ParseChapter();
 

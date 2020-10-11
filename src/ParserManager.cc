@@ -64,20 +64,13 @@ void ParserManager::Init()
             {
                 std::cout << "starting parser " << i << std::endl;
                 std::string url = "";
-                Parser parser = Parser(url);
-                std::string source = parser.GetSource();
-
-                auto search = parser_map_.find(source);
-                if (search == parser_map_.end())
+                Parser parser = parser_factory_.GetParser(url);
+                if(parser.GetUrl() == "")
                 {
-                    // TODO log to result objects
-                    std::cout << "parser not found" << i << std::endl;
-                    return -1;
+                  // TODO Return result object
+                  std::cout << "ERROR parser " << i << std::endl;
+                  return -1;
                 }
-
-                parser = search->second;
-                parser.SetUrl(url);
-
                 parser.Parse();
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));

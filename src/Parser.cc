@@ -110,6 +110,14 @@ void Parser::ParseUrl()
     }
 }
 
+Parser Parser::Copy()
+{
+  Parser parser;
+  parser.SetUrl(this->GetUrl());
+  parser.SetLocalFilePath(this->GetLocalDes());
+  return parser;
+}
+
 std::string Parser::GetSource()
 {
     return source;

@@ -1,3 +1,0 @@
-/**
- * ParserWorker.cc
- */

@@ -36,6 +36,8 @@ public:
     std::string GetLocalDes();
     std::string GetTitle();
 
+    virtual Parser Copy();
+
 protected:
     std::string source;
     std::string url;

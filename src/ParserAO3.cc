@@ -50,4 +50,11 @@ void ParserAO3::ParseChapter()
 
 }
 
+Parser ParserAO3::Copy() {
+  ParserAO3 parser;
+  parser.SetUrl(this->GetUrl());
+  parser.SetLocalFilePath(this->GetLocalDes());
+  return parser;
+}
+
 } // namespace AO3
