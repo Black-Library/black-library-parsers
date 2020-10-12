@@ -2,7 +2,18 @@
 #define SOURCEINFORMATION_H
 
 #include <string>
+
 namespace librarycore {
+
+typedef enum {
+    AO3_PARSER,
+    FFN_PARSER,
+    SBF_PARSER,
+
+    _NUM_PARSERS_TYPE
+} parser_t;
+
+typedef uint8_t parser_rep;
 
 namespace AO3 {
     extern std::string name;
