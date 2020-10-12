@@ -1,4 +1,4 @@
-#include <SourceInformation.h>
+#include <SourceInformation.hh>
 
 namespace librarycore {
 

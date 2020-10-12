@@ -1,4 +1,4 @@
-#include <Parser.h>
+#include <Parser.hh>
 
 namespace librarycore {
 
@@ -14,9 +14,17 @@ Parser::~Parser()
 
 }
 
-void Parser::Parse()
+Result Parser::Parse()
 {
+    return Result(1, "Super Class");
+}
 
+Result Parser::ParseChapter(int chap_num) {
+    return Result(1 + chap_num, "Super Class");
+}
+
+Result Parser::ParseChapter(std::string url) {
+    return Result(1, "Super Class" + url);
 }
 
 std::string Parser::CurlRequest(std::string url)

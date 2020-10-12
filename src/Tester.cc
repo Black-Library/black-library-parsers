@@ -2,10 +2,10 @@
     #include <curl/curl.h>
 }*/
 
-#include <Parser.h>
+#include <Parser.hh>
 //#include "ParsersConfig.h"
-
-#include <ParserAO3.h>
+#include <ParserAO3.hh>
+#include <ParserFFN.hh>
 
 int main(int argc, char* argv[]) {
 
@@ -20,9 +20,9 @@ int main(int argc, char* argv[]) {
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    AO3::ParserAO3 parser;
-    parser.setUrl("https://archiveofourown.org/works/505809");
-    parser.parse();
+    librarycore::FFN::ParserFFN parser;
+    parser.SetUrl("https://www.fanfiction.net/s/8019901");
+    parser.Parse();
 
     curl_global_cleanup();
 

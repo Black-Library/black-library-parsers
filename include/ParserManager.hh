@@ -11,7 +11,8 @@
 
 #include <ThreadPool.h>
 
-#include <Parser.h>
+#include <Parser.hh>
+#include <ParserAO3.hh>
 #include <ParserFactory.hh>
 
 namespace librarycore {

@@ -1,7 +1,7 @@
 #ifndef __LIBRARYCORE_AO3_PARSER_AO3_H__
 #define __LIBRARYCORE_AO3_PARSER_AO3_H__
 
-#include "Parser.h"
+#include <Parser.hh>
 
 namespace librarycore::AO3 {
 
@@ -11,11 +11,12 @@ public:
     ParserAO3();
     ~ParserAO3();
 
-    void Parse();
+    Result Parse();
     Parser Copy();
 
 protected:
-    void ParseChapter();
+    Result ParseChapter(int chap_num);
+    Result ParseChapter(std::string url);
 
 private:
 };

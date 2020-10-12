@@ -1,4 +1,4 @@
-#include <ParserAO3.h>
+#include <ParserAO3.hh>
 
 namespace librarycore::AO3 {
 
@@ -12,7 +12,7 @@ ParserAO3::~ParserAO3()
 
 }
 
-void ParserAO3::Parse()
+Result ParserAO3::Parse()
 {
     std::string url_adult = url + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
@@ -21,8 +21,7 @@ void ParserAO3::Parse()
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if(!doc)
     {
-        std::cout << "Unable to Parse" << std::endl;
-        return;
+        return Result(1, "Unable to Parse");
     }
 
     xmlNode* root_node = xmlDocGetRootElement(doc);
@@ -43,11 +42,20 @@ void ParserAO3::Parse()
     file = fopen(des.c_str(), "w+");
     xmlDocFormatDump(file, doc, 1);
     fclose(file);
+
+    xmlFreeDoc(doc);
+
+    return Result(0, "Success");
 }
 
-void ParserAO3::ParseChapter()
+Result ParserAO3::ParseChapter(int chap_num)
 {
+    return Result(1 + chap_num, "Not Avaliable");
+}
 
+Result ParserAO3::ParseChapter(std::string url)
+{
+    return Result(1, "Not Avaliable" + url);
 }
 
 Parser ParserAO3::Copy() {

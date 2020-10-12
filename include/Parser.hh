@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <atomic>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -14,7 +15,8 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SourceInformation.h"
+#include <Result.hh>
+#include <SourceInformation.hh>
 
 namespace librarycore {
 class Parser
@@ -24,7 +26,7 @@ public:
     Parser() : Parser(""){};
     virtual ~Parser();
 
-    virtual void Parse();
+    virtual Result Parse();
     virtual Parser Copy();
     std::string CurlRequest(std::string url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
@@ -38,9 +40,10 @@ public:
     std::string GetLocalDes();
     std::string GetTitle();
 
-
-
 protected:
+    virtual Result ParseChapter(int chap_num);
+    virtual Result ParseChapter(std::string url);
+
     std::string source;
     std::string url;
     std::string local_des;

@@ -3,9 +3,9 @@
 
 #include <unordered_map>
 
-#include <Parser.h>
-#include <ParserAO3.h>
-#include <ParserFFN.h>
+#include <Parser.hh>
+#include <ParserAO3.hh>
+#include <ParserFFN.hh>
 
 namespace librarycore {
 

@@ -5,8 +5,6 @@
 #include <chrono>
 #include <thread>
 
-#include <ParserAO3.h>
-
 #include <ParserManager.hh>
 
 namespace librarycore {
