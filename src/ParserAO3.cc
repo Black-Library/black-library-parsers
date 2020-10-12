@@ -1,6 +1,8 @@
 #include <ParserAO3.hh>
 
-namespace librarycore::AO3 {
+namespace librarycore {
+
+namespace AO3 {
 
 ParserAO3::ParserAO3()
 {
@@ -65,4 +67,6 @@ Parser ParserAO3::Copy() {
   return parser;
 }
 
-} // namespace library::AO3
+} // namespace AO3
+
+} // namespace librarycore

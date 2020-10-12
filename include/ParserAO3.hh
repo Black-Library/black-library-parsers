@@ -3,7 +3,9 @@
 
 #include <Parser.hh>
 
-namespace librarycore::AO3 {
+namespace librarycore {
+
+namespace AO3 {
 
 class ParserAO3 : public Parser
 {
@@ -21,6 +23,8 @@ protected:
 private:
 };
 
-} // namespace librarycore::AO3
+} // namespace AO3
+
+} // namespace librarycore
 
 #endif

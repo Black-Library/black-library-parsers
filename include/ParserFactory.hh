@@ -12,12 +12,12 @@ namespace librarycore {
 class ParserFactory
 {
 public:
-   ParserFactory();
-   ~ParserFactory();
+    ParserFactory();
+    ~ParserFactory();
 
-   Parser GetParser(std::string url);
+    Parser GetParser(std::string url);
 protected:
-   std::unordered_map<std::string, Parser> parser_map_;
+    std::unordered_map<parser_rep, Parser> parser_map_;
 
 private:
 };

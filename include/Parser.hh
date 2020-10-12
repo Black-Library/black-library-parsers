@@ -35,19 +35,19 @@ public:
     void SetLocalFilePath(std::string local_des);
     void ParseUrl();
 
-    std::string GetUrl();
-    std::string GetSource();
     std::string GetLocalDes();
     std::string GetTitle();
+    std::string GetUrl();
+    parser_rep GetSource();
 
 protected:
     virtual Result ParseChapter(int chap_num);
     virtual Result ParseChapter(std::string url);
 
-    std::string source;
-    std::string url;
     std::string local_des;
     std::string title;
+    std::string url;
+    parser_rep source;
 
 private:
 };

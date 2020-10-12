@@ -1,11 +1,11 @@
-# Parser-FF-A03
+# Parser-FF-SB-A03
 
 # Dependencies
 curl and libxml2 are required dependencies
 
-To make the docker container in which the application is intended to run on, follow/run the install_docker_deps.sh file
+To make the docker container in which the application is intended to be run on, follow/run the install_docker_deps.sh file
 
-Other build system dependencies can be added/reviewd in the install_build_deps.sh file
+Other build system dependencies can be added/reviewed in the install_build_deps.sh file
 
 # Building the project
 mkdir build
@@ -22,4 +22,10 @@ make install -j`nproc` -Cbuild
 
 After following the instructions under `Building the project`, run
 
-make bl-parsers-builder to make an ubuntu docker image or make bl-parsers-builder-minimal to try the test minimal image
+make -Cbuild bl-parsers-builder to make an ubuntu docker image or make -Cbuild bl-parsers-builder-minimal to try the test minimal image
+
+# Syntax guidelines
+
+We will (loosely) follow the google cpp style guide for this project
+
+https://google.github.io/styleguide/cppguide.html

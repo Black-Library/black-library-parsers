@@ -108,15 +108,15 @@ void Parser::ParseUrl()
 {
     if (url.find(AO3::url) != std::string::npos)
     {
-        source = AO3::name;
-    }
-    else if (url.find(SBF::url) != std::string::npos)
-    {
-        source = SBF::name;
+        source = AO3_PARSER;
     }
     else if (url.find(FFN::url) != std::string::npos)
     {
-        source = FFN::name;
+        source = FFN_PARSER;
+    }
+    else if (url.find(SBF::url) != std::string::npos)
+    {
+        source = SBF_PARSER;
     }
 }
 
@@ -128,7 +128,7 @@ Parser Parser::Copy()
     return parser;
 }
 
-std::string Parser::GetSource()
+parser_rep Parser::GetSource()
 {
     return source;
 }
