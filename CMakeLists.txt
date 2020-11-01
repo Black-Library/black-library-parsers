@@ -6,7 +6,7 @@ set(BUILD_SHARED_LIBS ON)
 
 add_compile_options(-Wall -Wextra -Werror)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 include(cmake/docker.cmake)
