@@ -110,6 +110,11 @@ void Parser::ParseUrl()
     {
         source = SBF_PARSER;
     }
+    // TODO make this extensible
+    for (size_t i = 0; i < _NUM_PARSERS_TYPE, ++i)
+    {
+        
+    }
 }
 
 Parser Parser::Copy()

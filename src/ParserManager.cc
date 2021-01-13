@@ -13,6 +13,7 @@ namespace librarycore {
 
 ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
     pool_(num_threads),
+    parser_factory_(),
     urls_(),
     config_(config),
     done_(true)
