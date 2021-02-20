@@ -2,10 +2,10 @@
 
 namespace librarycore {
 
-Parser::Parser(std::string url)
+Parser::Parser(const std::string &url)
 {
-    this->url = url;
-    this->local_des = "";
+    this->url_ = url;
+    this->local_des_ = "";
     ParseUrl();
 }
 
@@ -87,28 +87,28 @@ xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string val
 
 void Parser::SetUrl(std::string url)
 {
-    this->url = url;
+    this->url_ = url;
     ParseUrl();
 }
 
-void Parser::SetLocalFilePath(std::string local_des)
+void Parser::SetLocalFilePath(std::string local_des_)
 {
-    this->local_des = local_des;
+    this->local_des_ = local_des_;
 }
 
 void Parser::ParseUrl()
 {
-    if (url.find(AO3::url) != std::string::npos)
+    if (url_.find(AO3::url) != std::string::npos)
     {
-        source = AO3_PARSER;
+        source_ = AO3_PARSER;
     }
-    else if (url.find(FFN::url) != std::string::npos)
+    else if (url_.find(FFN::url) != std::string::npos)
     {
-        source = FFN_PARSER;
+        source_ = FFN_PARSER;
     }
-    else if (url.find(SBF::url) != std::string::npos)
+    else if (url_.find(SBF::url) != std::string::npos)
     {
-        source = SBF_PARSER;
+        source_ = SBF_PARSER;
     }
 }
 
@@ -122,22 +122,22 @@ Parser Parser::Copy()
 
 parser_rep Parser::GetSource()
 {
-    return source;
+    return source_;
 }
 
 std::string Parser::GetUrl()
 {
-    return url;
+    return url_;
 }
 
 std::string Parser::GetLocalDes()
 {
-    return local_des;
+    return local_des_;
 }
 
 std::string Parser::GetTitle()
 {
-    return title;
+    return title_;
 }
 
 //Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c

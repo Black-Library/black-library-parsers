@@ -14,6 +14,12 @@ namespace FFN {
   std::string url = "fanfiction.net";
 } // namespace FFN
 
+namespace RR {
+  std::string name = "Royal Road";
+  std::string short_name = "RR";
+  std::string url = "royalroad.com";
+} // namespace RR
+
 namespace SBF {
   std::string name = "SpaceBattles Forums";
   std::string short_name = "SBF";

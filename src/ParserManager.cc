@@ -6,8 +6,7 @@
 #include <thread>
 
 #include <ParserAO3.h>
-
-#include <ParserManager.hh>
+#include <ParserManager.h>
 
 namespace librarycore {
 
@@ -46,8 +45,15 @@ int ParserManager::RunOnce()
 
 int ParserManager::Stop()
 {
-    // check to make sure pool_ does not leak memory
+    // TODO: check to make sure pool_ does not leak memory
     done_ = true;
+
+    return 0;
+}
+
+int ParserManager::AddUrl(const std::string &url)
+{
+    urls_.emplace(url);
 
     return 0;
 }

@@ -1,9 +1,9 @@
 /**
- * ParserManager.hh
+ * ParserManager.h
  */
 
-#ifndef __LIBRARYCORE_PARSER_MANAGER_HH__
-#define __LIBRARYCORE_PARSER_MANAGER_HH__
+#ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_MANAGER_H__
+#define __BLACK_LIBRARY_CORE_PARSERS_PARSER_MANAGER_H__
 
 #include <atomic>
 #include <queue>
@@ -12,9 +12,13 @@
 #include <ThreadPool.h>
 
 #include <Parser.h>
-#include <ParserFactory.hh>
+#include <ParserFactory.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 class ParserManager
 {
@@ -27,6 +31,8 @@ public:
     int RunOnce();
     int Stop();
 
+    int AddUrl(const std::string &url);
+
 private:
     void Init();
 
@@ -37,6 +43,8 @@ private:
     std::atomic_bool done_;
 };
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library
 
 #endif

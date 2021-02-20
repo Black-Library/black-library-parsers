@@ -38,8 +38,8 @@ void ParserAO3::Parse()
     xmlNode* workskin = GetElementAttr(next, "id", "workskin");
     xmlDocSetRootElement(doc, workskin);
 
-    std::string title = url.substr(url.find_last_of("/") + 1, url.length() - 1);
-    std::string des = local_des + title + ".html";
+    std::string title_ = url.substr(url.find_last_of("/") + 1, url.length() - 1);
+    std::string des = local_des_ + title_ + ".html";
 
     FILE* file;
     file = fopen(des.c_str(), "w+");

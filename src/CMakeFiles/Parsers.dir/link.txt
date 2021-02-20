@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC   -shared -Wl,-soname,libParsers.so -o libParsers.so CMakeFiles/Parsers.dir/Parser.cc.o CMakeFiles/Parsers.dir/ParserAO3.cc.o CMakeFiles/Parsers.dir/ParserFactory.cc.o CMakeFiles/Parsers.dir/ParserManager.cc.o CMakeFiles/Parsers.dir/SourceInformation.cc.o /usr/lib/x86_64-linux-gnu/libcurl.so /usr/lib/x86_64-linux-gnu/libxml2.so -lpthread 

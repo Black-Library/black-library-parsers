@@ -3,7 +3,8 @@
 }*/
 
 #include <signal.h>
-#include <ParserManager.hh>
+
+#include <ParserManager.h>
 
 librarycore::ParserManager *parser_manager;
 
@@ -34,6 +35,8 @@ int main(int argc, char* argv[])
     librarycore::ParserManager manager(4, "");
 
     parser_manager = &manager;
+
+    parser_manager->AddUrl("https://archiveofourown.org/works/505809");
 
     parser_manager->Run();
 

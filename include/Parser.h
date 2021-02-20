@@ -1,5 +1,9 @@
-#ifndef __PARSER_H__
-#define __PARSER_H__
+/**
+ * Parser.h
+ */
+
+#ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
+#define __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,11 +20,16 @@
 
 #include "SourceInformation.h"
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
+
 class Parser
 {
 public:
-    Parser(std::string url);
+    Parser(const std::string &url);
     Parser() : Parser(""){};
     virtual ~Parser();
 
@@ -30,7 +39,7 @@ public:
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
     void SetUrl(std::string url);
-    void SetLocalFilePath(std::string local_des);
+    void SetLocalFilePath(std::string local_des_);
     void ParseUrl();
 
     std::string GetLocalDes();
@@ -39,15 +48,18 @@ public:
     parser_rep GetSource();
 
 protected:
-    std::string local_des;
-    std::string title;
-    std::string url;
-    parser_rep source;
+    std::string local_des_;
+    std::string title_;
+    std::string url_;
+    parser_rep source_;
 
 private:
 };
 
 size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library
+
 #endif

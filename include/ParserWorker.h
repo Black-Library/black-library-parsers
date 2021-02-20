@@ -1,9 +1,9 @@
 /**
- * ParserWorker.hh
+ * ParserWorker.h
  */
 
-#ifndef __LIBRARYCORE_PARSER_Worker_HH__
-#define __LIBRARYCORE_PARSER_Worker_HH__
+#ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_WORKER_H__
+#define __BLACK_LIBRARY_CORE_PARSERS_PARSER_WORKER_H__
 
 #include <atomic>
 #include <bitset>
@@ -14,7 +14,11 @@
 
 #include <Parser.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 class ParserWorker
 {
@@ -31,6 +35,8 @@ private:
     std::atomic_bool done_;
 };
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library
 
 #endif
