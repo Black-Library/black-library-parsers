@@ -1,6 +1,14 @@
+/**
+ * SourceInformation.cc
+ */
+
 #include <SourceInformation.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 namespace AO3 {
   std::string name = "Archive Of Our Own";
@@ -26,4 +34,6 @@ namespace SBF {
   std::string url = "forums.spacebattles.com";
 } // namespace SBF
 
-} //namespace libararycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library

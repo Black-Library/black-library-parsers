@@ -8,7 +8,11 @@
 #include <ParserAO3.h>
 #include <ParserManager.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
     pool_(num_threads),
@@ -87,4 +91,6 @@ void ParserManager::Init()
     }
 }
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library

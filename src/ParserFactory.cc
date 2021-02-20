@@ -1,10 +1,14 @@
 /**
- * PaserFactory.cc
+ * ParserFactory.cc
  */
 
 #include <ParserFactory.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 ParserFactory::ParserFactory()
 {
@@ -35,4 +39,6 @@ Parser ParserFactory::GetParser(const std::string &url)
     return parser;
 }
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library

@@ -1,3 +1,7 @@
+/**
+ * parser_manager_driver.cc
+ */
+
 /*extern "C" {
     #include <curl/curl.h>
 }*/
@@ -6,7 +10,7 @@
 
 #include <ParserManager.h>
 
-librarycore::ParserManager *parser_manager;
+black_library::core::parsers::ParserManager *parser_manager;
 
 void SigHandler(int sig)
 {
@@ -32,7 +36,7 @@ int main(int argc, char* argv[])
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    librarycore::ParserManager manager(4, "");
+    black_library::core::parsers::ParserManager manager(4, "");
 
     parser_manager = &manager;
 

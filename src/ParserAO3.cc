@@ -1,6 +1,14 @@
+/**
+ * ParserAO3.cc
+ */
+
 #include <ParserAO3.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 namespace AO3 {
 
@@ -61,4 +69,6 @@ Parser ParserAO3::Copy() {
 
 } // namespace AO3
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library

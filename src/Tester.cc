@@ -1,3 +1,7 @@
+/**
+ * Tester.cc
+ */
+
 /*extern "C" {
     #include <curl/curl.h>
 }*/
@@ -20,7 +24,7 @@ int main(int argc, char* argv[]) {
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    AO3::ParserAO3 parser;
+    black_library::core::parsers::AO3::ParserAO3 parser;
     parser.setUrl("https://archiveofourown.org/works/505809");
     parser.parse();
 

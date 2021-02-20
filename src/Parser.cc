@@ -1,6 +1,14 @@
+/**
+ * Parser.cc
+ */
+
 #include <Parser.h>
 
-namespace librarycore {
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
 
 Parser::Parser(const std::string &url)
 {
@@ -154,4 +162,6 @@ size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
     return size * nmemb;
 }
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library
