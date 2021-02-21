@@ -7,9 +7,7 @@
 
 #include <unordered_map>
 
-#include <Parser.h>
-#include <ParserAO3.h>
-#include <ParserFFN.h>
+#include "Parser.h"
 
 namespace black_library {
 

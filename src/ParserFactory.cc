@@ -4,6 +4,9 @@
 
 #include <ParserFactory.h>
 
+#include "ParserAO3.h"
+#include "ParserFFN.h"
+
 namespace black_library {
 
 namespace core {
