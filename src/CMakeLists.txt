@@ -8,7 +8,7 @@ include(GNUInstallDirs)
 add_library(Parsers
     Parser.cc
     ParserAO3.cc
-    ParserFFN.cc
+    # ParserFFN.cc
     ParserFactory.cc
     ParserManager.cc
     SourceInformation.cc

@@ -73,7 +73,7 @@ void ParserManager::Init()
             pool_.enqueue([this, i]
             {
                 std::cout << "starting parser " << i << std::endl;
-                std::string url = "";
+                std::string url = "fanfiction.net/s/123456";
                 Parser parser = parser_factory_.GetParser(url);
                 if(parser.GetUrl() == "")
                 {

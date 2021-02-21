@@ -15,10 +15,8 @@ namespace parsers {
 
 ParserFactory::ParserFactory()
 {
-    AO3::ParserAO3 parserAO3;
-    FFN::ParserFFN parserFFN;
-    this->parser_map_.emplace(AO3_PARSER, parserAO3);
-    this->parser_map_.emplace(FFN_PARSER, parserFFN);
+    InitParserMap();
+    InitParserUrlMap();
 }
 
 ParserFactory::~ParserFactory()
@@ -62,6 +60,26 @@ Parser ParserFactory::GetParser(const std::string &url)
     Parser parser = itr->second.Copy();
     parser.SetUrl(url);
     return parser;
+}
+
+int ParserFactory::InitParserMap()
+{
+    AO3::ParserAO3 parserAO3;
+    // FFN::ParserFFN parserFFN;
+    this->parser_map_.emplace(AO3_PARSER, parserAO3);
+    // this->parser_map_.emplace(FFN_PARSER, parserFFN);
+
+    return 0;
+}
+
+int ParserFactory::InitParserUrlMap()
+{
+    for (auto it = parser_map_.begin(); it != parser_map_.end(); ++it)
+    {
+        parser_url_map_.emplace(it->first, );
+    }
+
+    return 0;
 }
 
 } // namespace parsers
