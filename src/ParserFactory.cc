@@ -28,16 +28,38 @@ ParserFactory::~ParserFactory()
 
 Parser ParserFactory::GetParser(const std::string &url)
 {
-    Parser parser(url);
-    std::unordered_map<parser_rep, Parser>::iterator itr = parser_map_.find(parser.GetSource());
+    auto parser_type = _NUM_PARSERS_TYPE;
+    if (url.find(AO3::url) != std::string::npos)
+    {
+        parser_type = AO3_PARSER;
+    }
+    else if (url.find(FFN::url) != std::string::npos)
+    {
+        parser_type = FFN_PARSER;
+    }
+    else if (url.find(SBF::url) != std::string::npos)
+    {
+        parser_type = SBF_PARSER;
+    }
+    else if (url.find(RR::url) != std::string::npos)
+    {
+        parser_type = RR_PARSER;
+    }
+    else 
+    {
+        std::cout << "Error, ParserFactory could not match parser url" << std::endl;
+        return Parser(_NUM_PARSERS_TYPE);
+    }
+
+    std::unordered_map<parser_rep, Parser>::iterator itr = parser_map_.find(parser_type);
 
     if (itr == parser_map_.end())
     {
         std::cout << "Error, ParserFactory could not match parser" << std::endl;
-        return Parser("");
+        return Parser(_NUM_PARSERS_TYPE);
     }
 
-    parser = itr->second.Copy();
+    Parser parser = itr->second.Copy();
     parser.SetUrl(url);
     return parser;
 }

@@ -10,11 +10,9 @@ namespace core {
 
 namespace parsers {
 
-Parser::Parser(const std::string &url)
+Parser::Parser(parser_rep parser_type)
 {
-    this->url_ = url;
-    this->local_des_ = "";
-    ParseUrl();
+    this->source_ = parser_type;
 }
 
 Parser::~Parser()
@@ -27,16 +25,16 @@ void Parser::Parse()
 
 }
 
-std::string Parser::CurlRequest(std::string url)
+std::string Parser::CurlRequest(const std::string &url)
 {
     CURL* curl;
     CURLcode res;
 
     curl = curl_easy_init();
 
-    if(!curl)
+    if (!curl)
     {
-        std::cout << "Problems" << std::endl;
+        std::cout << "Error: curl did not initialize" << std::endl;
         return "";
     }
 
@@ -93,38 +91,25 @@ xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string val
     return NULL;
 }
 
+void Parser::SetSource(parser_rep source)
+{
+    this->source_ = source;
+}
+
 void Parser::SetUrl(std::string url)
 {
     this->url_ = url;
-    ParseUrl();
 }
 
-void Parser::SetLocalFilePath(std::string local_des_)
+void Parser::SetLocalFilePath(std::string local_des)
 {
-    this->local_des_ = local_des_;
-}
-
-void Parser::ParseUrl()
-{
-    if (url_.find(AO3::url) != std::string::npos)
-    {
-        source_ = AO3_PARSER;
-    }
-    else if (url_.find(FFN::url) != std::string::npos)
-    {
-        source_ = FFN_PARSER;
-    }
-    else if (url_.find(SBF::url) != std::string::npos)
-    {
-        source_ = SBF_PARSER;
-    }
+    this->local_des_ = local_des;
 }
 
 Parser Parser::Copy()
 {
     Parser parser;
-    parser.SetUrl(this->GetUrl());
-    parser.SetLocalFilePath(this->GetLocalDes());
+    parser.SetSource(this->GetSource());
     return parser;
 }
 

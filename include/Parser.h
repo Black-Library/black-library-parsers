@@ -29,18 +29,18 @@ namespace parsers {
 class Parser
 {
 public:
-    Parser(const std::string &url);
-    Parser() : Parser(""){};
+    Parser(parser_rep parser_type);
+    Parser() : Parser(_NUM_PARSERS_TYPE){};
     virtual ~Parser();
 
     virtual void Parse();
     virtual Parser Copy();
-    std::string CurlRequest(std::string url);
+    std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
+    void SetSource(parser_rep source);
     void SetUrl(std::string url);
     void SetLocalFilePath(std::string local_des_);
-    void ParseUrl();
 
     std::string GetLocalDes();
     std::string GetTitle();

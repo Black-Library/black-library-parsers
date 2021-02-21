@@ -14,7 +14,7 @@ namespace AO3 {
 
 ParserAO3::ParserAO3()
 {
-
+    source_ = AO3_PARSER;
 }
 
 ParserAO3::~ParserAO3()
