@@ -96,12 +96,17 @@ void Parser::SetSource(parser_rep source)
     this->source_ = source;
 }
 
-void Parser::SetUrl(std::string url)
+void Parser::SetSourceUrl(const std::string &url)
+{
+    this->source_url_ = url;
+}
+
+void Parser::SetUrl(const std::string &url)
 {
     this->url_ = url;
 }
 
-void Parser::SetLocalFilePath(std::string local_des)
+void Parser::SetLocalFilePath(const std::string &local_des)
 {
     this->local_des_ = local_des;
 }
@@ -110,17 +115,8 @@ Parser Parser::Copy()
 {
     Parser parser;
     parser.SetSource(this->GetSource());
+    parser.SetSourceUrl(this->GetSourceUrl());
     return parser;
-}
-
-parser_rep Parser::GetSource()
-{
-    return source_;
-}
-
-std::string Parser::GetUrl()
-{
-    return url_;
 }
 
 std::string Parser::GetLocalDes()
@@ -128,9 +124,24 @@ std::string Parser::GetLocalDes()
     return local_des_;
 }
 
+parser_rep Parser::GetSource()
+{
+    return source_;
+}
+
+std::string Parser::GetSourceUrl()
+{
+    return source_url_;
+}
+
 std::string Parser::GetTitle()
 {
     return title_;
+}
+
+std::string Parser::GetUrl()
+{
+    return url_;
 }
 
 //Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c

@@ -13,6 +13,22 @@ namespace core {
 
 namespace parsers {
 
+namespace {
+
+// C++ wrapper around strstr()
+bool ContainsString(const std::string &haystack, const std::string &needle)
+{
+    // C-style compare is fastest
+    if (strstr(haystack.c_str(), needle.c_str()) == NULL)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+} // namespace
+
 ParserFactory::ParserFactory()
 {
     InitParserMap();
@@ -24,42 +40,43 @@ ParserFactory::~ParserFactory()
 
 }
 
-Parser ParserFactory::GetParser(const std::string &url)
+ParserFactoryResult ParserFactory::GetParser(const std::string &url)
 {
-    auto parser_type = _NUM_PARSERS_TYPE;
-    if (url.find(AO3::url) != std::string::npos)
+    ParserFactoryResult result;
+    parser_rep parser_type = _NUM_PARSERS_TYPE;
+
+    bool url_found = false;
+
+    for (auto it = parser_url_map_.begin(); it != parser_url_map_.end(); ++it)
     {
-        parser_type = AO3_PARSER;
-    }
-    else if (url.find(FFN::url) != std::string::npos)
-    {
-        parser_type = FFN_PARSER;
-    }
-    else if (url.find(SBF::url) != std::string::npos)
-    {
-        parser_type = SBF_PARSER;
-    }
-    else if (url.find(RR::url) != std::string::npos)
-    {
-        parser_type = RR_PARSER;
-    }
-    else 
-    {
-        std::cout << "Error, ParserFactory could not match parser url" << std::endl;
-        return Parser(_NUM_PARSERS_TYPE);
+        if (ContainsString(url, it->first))
+        {
+            parser_type = it->second;
+            url_found = true;
+            break;
+        }
     }
 
-    std::unordered_map<parser_rep, Parser>::iterator itr = parser_map_.find(parser_type);
-
-    if (itr == parser_map_.end())
+    if (!url_found)
     {
-        std::cout << "Error, ParserFactory could not match parser" << std::endl;
-        return Parser(_NUM_PARSERS_TYPE);
+        result.has_error = true;
+        result.result_error.error_string = "Error: ParserFactory could not match url\n";
+        return result;
     }
 
-    Parser parser = itr->second.Copy();
-    parser.SetUrl(url);
-    return parser;
+    auto parser_map_itr = parser_map_.find(parser_type);
+
+    if (parser_map_itr == parser_map_.end())
+    {
+        result.has_error = true;
+        result.result_error.error_string = "Error: ParserFactory could not match parser\n";
+        return result;
+    }
+
+    // TODO: check if the .Copy method is necessary
+    result.parser_result = parser_map_itr->second.Copy();
+    result.parser_result.SetUrl(url);
+    return result;
 }
 
 int ParserFactory::InitParserMap()
@@ -76,7 +93,7 @@ int ParserFactory::InitParserUrlMap()
 {
     for (auto it = parser_map_.begin(); it != parser_map_.end(); ++it)
     {
-        parser_url_map_.emplace(it->first, );
+        parser_url_map_.emplace(it->second.GetSourceUrl(), it->first);
     }
 
     return 0;

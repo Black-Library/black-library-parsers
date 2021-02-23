@@ -27,25 +27,25 @@ typedef uint8_t parser_rep;
 namespace AO3 {
     extern std::string name;
     extern std::string short_name;
-    extern std::string url;
+    extern std::string source_url;
 } // namespace AO3
 
 namespace FFN {
     extern std::string name;
     extern std::string short_name;
-    extern std::string url;
+    extern std::string source_url;
 } // namespace FFN
 
 namespace RR {
     extern std::string name;
     extern std::string short_name;
-    extern std::string url;
+    extern std::string source_url;
 } // namespace RR
 
 namespace SBF {
     extern std::string name;
     extern std::string short_name;
-    extern std::string url;
+    extern std::string source_url;
 } // namespace SBF
 
 } // namespace parsers

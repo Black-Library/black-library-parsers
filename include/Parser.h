@@ -39,17 +39,20 @@ public:
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
     void SetSource(parser_rep source);
-    void SetUrl(std::string url);
-    void SetLocalFilePath(std::string local_des_);
+    void SetSourceUrl(const std::string &url);
+    void SetUrl(const std::string &url);
+    void SetLocalFilePath(const std::string &local_des);
 
     std::string GetLocalDes();
+    parser_rep GetSource();
+    std::string GetSourceUrl();
     std::string GetTitle();
     std::string GetUrl();
-    parser_rep GetSource();
 
 protected:
     std::string local_des_;
     std::string title_;
+    std::string source_url_;
     std::string url_;
     parser_rep source_;
 

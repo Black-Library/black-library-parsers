@@ -15,20 +15,30 @@ namespace core {
 
 namespace parsers {
 
+struct ParserFactoryResultError {
+    std::string error_string;
+};
+
+struct ParserFactoryResult {
+    Parser parser_result;
+    ParserFactoryResultError result_error;
+    bool has_error = false;
+};
+
 class ParserFactory
 {
 public:
     ParserFactory();
     ~ParserFactory();
 
-    Parser GetParser(const std::string &url);
+    ParserFactoryResult GetParser(const std::string &url);
 
 protected:
     int InitParserMap();
     int InitParserUrlMap();
 
     std::unordered_map<parser_rep, Parser> parser_map_;
-    std::unordered_map<parser_rep, std::string> parser_url_map_;
+    std::unordered_map<std::string, parser_rep> parser_url_map_;
 
 private:
 };

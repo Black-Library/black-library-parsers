@@ -3,6 +3,7 @@
  */
 
 #include <chrono>
+#include <sstream>
 #include <thread>
 
 #include <ParserAO3.h>
@@ -65,29 +66,41 @@ int ParserManager::AddUrl(const std::string &url)
 void ParserManager::Init()
 {
     // TODO make this map results to result objects
-    std::vector<std::future<int>> results;
+    std::vector<std::future<ParserManagerResult>> results;
 
-    for(int i = 0; i < 8; ++i)
+    for(size_t i = 0; i < 8; ++i)
     {
         results.emplace_back(
             pool_.enqueue([this, i]
             {
-                std::cout << "starting parser " << i << std::endl;
+                ParserManagerResult result;
+                std::stringstream ss;
+                ss << "Starting parser manager slot " << i << std::endl;
                 std::string url = "fanfiction.net/s/123456";
-                Parser parser = parser_factory_.GetParser(url);
-                if(parser.GetUrl() == "")
+                ParserFactoryResult factory_result = parser_factory_.GetParser(url);
+                if (factory_result.has_error)
                 {
-                  // TODO Return result object
-                  std::cout << "ERROR parser " << i << std::endl;
-                  return -1;
+                  ss << factory_result.result_error.error_string;
+                  result.has_error = true;
+                  ss << "Error: parser manager slot " << i << " factory failed" << std::endl;
+                  result.io_result = ss.str();
+                  return result;
                 }
-                parser.Parse();
+                factory_result.parser_result.Parse();
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
-                std::cout << "stopping parser " << i << std::endl;
-                return 0;
+                ss << "stopping parser manager slot " << i << std::endl;
+                result.io_result = ss.str();
+                return result;
             })
         );
+    }
+
+    for (auto & res : results)
+    {
+        res.wait();
+        ParserManagerResult result = res.get(); 
+        std::cout << result.io_result << std::endl;
     }
 }
 
