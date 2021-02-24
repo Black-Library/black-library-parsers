@@ -77,7 +77,7 @@ void ParserManager::Init()
                 ss << "Starting parser manager slot " << i << std::endl;
                 std::string url = "archiveofourown.org";
                 ParserFactoryResult factory_result = parser_factory_.GetParser(url);
-                ss << "Source: " << factory_result.parser_result.GetSource() << std::endl;
+                ss << "Parser type: " << GetParserName(factory_result.parser_result.GetParserType()) << std::endl;
                 if (factory_result.has_error)
                 {
                   ss << factory_result.result_error.error_string;

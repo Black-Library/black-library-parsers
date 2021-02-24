@@ -39,13 +39,13 @@ public:
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
-    void SetSource(parser_rep source);
+    void SetParserType(parser_rep source);
     void SetSourceUrl(const std::string &url);
     void SetUrl(const std::string &url);
     void SetLocalFilePath(const std::string &local_des);
 
     std::string GetLocalDes();
-    parser_rep GetSource();
+    parser_rep GetParserType();
     std::string GetSourceUrl();
     std::string GetTitle();
     std::string GetUrl();
@@ -55,7 +55,7 @@ protected:
     std::string title_;
     std::string source_url_;
     std::string url_;
-    parser_rep source_;
+    parser_rep parser_type_;
 
 private:
 };

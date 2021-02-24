@@ -12,7 +12,7 @@ namespace parsers {
 
 Parser::Parser(parser_rep parser_type)
 {
-    this->source_ = parser_type;
+    this->parser_type_ = parser_type;
 }
 
 Parser::~Parser()
@@ -91,9 +91,9 @@ xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string val
     return NULL;
 }
 
-void Parser::SetSource(parser_rep source)
+void Parser::SetParserType(parser_rep parser_type)
 {
-    this->source_ = source;
+    this->parser_type_ = parser_type;
 }
 
 void Parser::SetSourceUrl(const std::string &url)
@@ -114,7 +114,7 @@ void Parser::SetLocalFilePath(const std::string &local_des)
 Parser Parser::Copy()
 {
     Parser parser;
-    parser.SetSource(this->GetSource());
+    parser.SetParserType(this->GetParserType());
     parser.SetSourceUrl(this->GetSourceUrl());
     return parser;
 }
@@ -124,9 +124,9 @@ std::string Parser::GetLocalDes()
     return local_des_;
 }
 
-parser_rep Parser::GetSource()
+parser_rep Parser::GetParserType()
 {
-    return source_;
+    return parser_type_;
 }
 
 std::string Parser::GetSourceUrl()

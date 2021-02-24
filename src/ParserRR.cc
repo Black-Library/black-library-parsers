@@ -1,8 +1,8 @@
 /**
- * ParserFFN.cc
+ * ParserRR.cc
  */
 
-#include <ParserFFN.h>
+#include <ParserRR.h>
 
 namespace black_library {
 
@@ -10,22 +10,21 @@ namespace core {
 
 namespace parsers {
 
-namespace FFN {
+namespace RR {
 
-ParserFFN::ParserFFN()
+ParserRR::ParserRR()
 {
-    parser_type_ = FFN_PARSER;
-    source_url_ = FF::source_url;
+    parser_type_ = RR_PARSER;
+    source_url_ = RR::source_url;
 }
 
-ParserFFN::~ParserFFN()
+ParserRR::~ParserRR()
 {
 
 }
 
-void ParserFFN::Parse()
+void ParserRR::Parse()
 {
-
     std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
 
@@ -57,12 +56,12 @@ void ParserFFN::Parse()
     fclose(file);
 }
 
-void ParserFFN::ParseChapter()
+void ParserRR::ParseChapter()
 {
 
 }
 
-} // namespace FFN
+} // namespace RR
 
 } // namespace parsers
 } // namespace core

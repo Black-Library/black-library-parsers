@@ -14,8 +14,8 @@ namespace AO3 {
 
 ParserAO3::ParserAO3()
 {
-    source_ = AO3_PARSER;
-    source_url_ = source_url;
+    parser_type_ = AO3_PARSER;
+    source_url_ = AO3::source_url;
 }
 
 ParserAO3::~ParserAO3()
@@ -25,7 +25,7 @@ ParserAO3::~ParserAO3()
 
 void ParserAO3::Parse()
 {
-    std::string url_adult = source_url_ + "?view_full_work=true&view_adult=true";
+    std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
 
     xmlDoc* doc = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
@@ -47,7 +47,7 @@ void ParserAO3::Parse()
     xmlNode* workskin = GetElementAttr(next, "id", "workskin");
     xmlDocSetRootElement(doc, workskin);
 
-    std::string title_ = source_url_.substr(source_url_.find_last_of("/") + 1, source_url_.length() - 1);
+    std::string title_ = url_.substr(url_.find_last_of("/") + 1, url_.length() - 1);
     std::string des = local_des_ + title_ + ".html";
 
     FILE* file;
