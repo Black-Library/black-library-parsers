@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/parser_driver.dir/parser_driver.cc.o  -o parser_driver -Wl,-rpath,/home/changb/black-library/black-library-parsers/src: libParsers.so /usr/lib/x86_64-linux-gnu/libcurl.so /usr/lib/x86_64-linux-gnu/libxml2.so -lpthread 

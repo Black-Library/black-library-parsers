@@ -6,7 +6,6 @@
 #include <sstream>
 #include <thread>
 
-#include <ParserAO3.h>
 #include <ParserManager.h>
 
 namespace black_library {
@@ -76,8 +75,9 @@ void ParserManager::Init()
                 ParserManagerResult result;
                 std::stringstream ss;
                 ss << "Starting parser manager slot " << i << std::endl;
-                std::string url = "fanfiction.net/s/123456";
+                std::string url = "archiveofourown.org";
                 ParserFactoryResult factory_result = parser_factory_.GetParser(url);
+                ss << "Source: " << factory_result.parser_result.GetSource() << std::endl;
                 if (factory_result.has_error)
                 {
                   ss << factory_result.result_error.error_string;
@@ -86,7 +86,7 @@ void ParserManager::Init()
                   result.io_result = ss.str();
                   return result;
                 }
-                factory_result.parser_result.Parse();
+                // factory_result.parser_result.Parse();
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 ss << "stopping parser manager slot " << i << std::endl;

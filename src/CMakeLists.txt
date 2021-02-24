@@ -7,6 +7,7 @@ include(GNUInstallDirs)
 
 add_library(Parsers
     Parser.cc
+    ParserCommon.cc
     ParserAO3.cc
     # ParserFFN.cc
     ParserFactory.cc
@@ -15,7 +16,7 @@ add_library(Parsers
     )
 
 target_link_libraries(Parsers ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
-target_include_directories(Parsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(Parsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
 
 install(
   TARGETS Parsers

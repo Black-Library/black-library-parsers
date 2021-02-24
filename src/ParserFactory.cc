@@ -75,6 +75,10 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
 
     // TODO: check if the .Copy method is necessary
     result.parser_result = parser_map_itr->second.Copy();
+
+    result.parser_result.SetSource(_NUM_PARSERS_TYPE);
+    std::cout << GetParserName(result.parser_result.GetSource()) << std::endl;
+
     result.parser_result.SetUrl(url);
     return result;
 }

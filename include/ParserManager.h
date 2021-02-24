@@ -20,13 +20,9 @@ namespace core {
 
 namespace parsers {
 
-struct ParserManagerResultError {
-    std::string error_string;
-};
-
 struct ParserManagerResult {
     std::string io_result;
-    ParserManagerResultError result_error;
+    std::string error_string;
     bool has_error = false;
 };
 

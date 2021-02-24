@@ -18,6 +18,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include "ParserCommon.h"
 #include "SourceInformation.h"
 
 namespace black_library {
@@ -34,7 +35,7 @@ public:
     virtual ~Parser();
 
     virtual void Parse();
-    virtual Parser Copy();
+    Parser Copy();
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
