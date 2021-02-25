@@ -57,6 +57,16 @@ void ParserFFN::Parse()
     fclose(file);
 }
 
+std::string ParserFFN::ParseTitle()
+{
+    return "";
+}
+
+std::string ParserFFN::ParseAuthor()
+{
+    return "";
+}
+
 void ParserFFN::ParseChapter()
 {
 

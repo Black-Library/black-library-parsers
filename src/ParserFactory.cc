@@ -6,6 +6,7 @@
 
 #include "ParserAO3.h"
 #include "ParserFFN.h"
+#include "ParserRR.h"
 
 namespace black_library {
 

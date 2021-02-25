@@ -56,6 +56,16 @@ void ParserRR::Parse()
     fclose(file);
 }
 
+std::string ParserRR::ParseTitle()
+{
+    return "";
+}
+
+std::string ParserRR::ParseAuthor()
+{
+    return "";
+}
+
 void ParserRR::ParseChapter()
 {
 

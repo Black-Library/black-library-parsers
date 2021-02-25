@@ -8,11 +8,13 @@ include(GNUInstallDirs)
 add_library(Parsers
     Parser.cc
     ParserCommon.cc
-    ParserAO3.cc
-    # ParserFFN.cc
     ParserFactory.cc
     ParserManager.cc
     SourceInformation.cc
+
+    ParserAO3.cc
+    # ParserFFN.cc
+    ParserRR.cc
     )
 
 target_link_libraries(Parsers ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)

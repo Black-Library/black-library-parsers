@@ -56,6 +56,16 @@ void ParserAO3::Parse()
     fclose(file);
 }
 
+std::string ParserAO3::ParseTitle()
+{
+    return "";
+}
+
+std::string ParserAO3::ParseAuthor()
+{
+    return "";
+}
+
 void ParserAO3::ParseChapter()
 {
 

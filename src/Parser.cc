@@ -144,6 +144,16 @@ std::string Parser::GetUrl()
     return url_;
 }
 
+std::string Parser::ParseTitle()
+{
+    return "no title";
+}
+
+std::string Parser::ParseAuthor()
+{
+    return "no author";
+}
+
 //Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
 size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
 {
