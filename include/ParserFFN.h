@@ -25,6 +25,8 @@ public:
     Parser Copy();
 
 protected:
+    std::string ParseTitle();
+    std::string ParseAuthor();
     void ParseChapter();
 
 private:

@@ -24,6 +24,8 @@ public:
     void Parse();
 
 protected:
+    std::string ParseTitle();
+    std::string ParseAuthor();
     void ParseChapter();
 
 private:

@@ -35,6 +35,7 @@ public:
     virtual ~Parser();
 
     virtual void Parse();
+
     Parser Copy();
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
@@ -51,6 +52,9 @@ public:
     std::string GetUrl();
 
 protected:
+    virtual std::string ParseTitle();
+    virtual std::string ParseAuthor();
+
     std::string local_des_;
     std::string title_;
     std::string source_url_;
