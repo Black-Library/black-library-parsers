@@ -56,6 +56,14 @@ void ParserAO3::Parse()
     fclose(file);
 }
 
+Parser ParserAO3::Copy()
+{
+    ParserAO3 parser;
+    parser.SetParserType(this->GetParserType());
+    parser.SetSourceUrl(this->GetSourceUrl());
+    return parser;
+}
+
 std::string ParserAO3::ParseTitle()
 {
     return "";

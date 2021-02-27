@@ -77,6 +77,9 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
     // TODO: check if the .Copy method is necessary
     result.parser_result = parser_map_itr->second.Copy();
 
+    std::cout << "Got " << GetParserName(result.parser_result.GetParserType()) << std::endl;
+    result.parser_result.Parse();
+
     result.parser_result.SetUrl(url);
     return result;
 }
@@ -88,8 +91,19 @@ int ParserFactory::InitParserMap()
     RR::ParserRR parserRR;
     parser_map_.emplace(AO3_PARSER, parserAO3);
     // parser_map_.emplace(FFN_PARSER, parserFFN);
-    parser_map_.emplace(RR_PARSER, parserRR);
-    
+    parser_map_.emplace(RR_PARSER, RR::ParserRR());
+
+    std::cout << "first parser\n" << std::endl;
+
+    auto iter = parser_map_.find(RR_PARSER);
+
+    auto parser_got = iter->second;
+
+    std::cout << "Parser source url: " << parser_got.GetSourceUrl() << std::endl;
+    std::cout << "Parser type: " << GetParserName(parser_got.GetParserType()) << std::endl;
+    std::cout << "second parser\n" << std::endl;
+    parser_got.Parse();
+    std::cout << "end parser test\n" << std::endl;
 
     return 0;
 }

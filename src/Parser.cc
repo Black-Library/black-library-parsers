@@ -12,7 +12,7 @@ namespace parsers {
 
 Parser::Parser(parser_rep parser_type)
 {
-    this->parser_type_ = parser_type;
+    parser_type_ = parser_type;
 }
 
 Parser::~Parser()
@@ -114,7 +114,6 @@ void Parser::SetLocalFilePath(const std::string &local_des)
 Parser Parser::Copy()
 {
     Parser parser;
-    parser.SetParserType(this->GetParserType());
     parser.SetSourceUrl(this->GetSourceUrl());
     return parser;
 }

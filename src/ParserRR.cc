@@ -25,35 +25,59 @@ ParserRR::~ParserRR()
 
 void ParserRR::Parse()
 {
+    std::cout << "foo" << std::endl;
     std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
+    std::string author;
+    std::string title;
 
-    xmlDoc* doc = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
+    xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    if(!doc)
+    if(doc_tree == NULL)
     {
-        std::cout << "Unable to Parse" << std::endl;
+        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
         return;
     }
 
-    xmlNode* root_node = xmlDocGetRootElement(doc);
-    xmlNode* next = root_node->children;
+    xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
+    xmlNodePtr current_node = root_node->children;
 
-    while (memcmp(next->name, "body", 4))
+    while (current_node != NULL)
     {
-        next = next->next;
+        if (!strcmp((char *)current_node->name, "name"))
+        {
+            author = std::string((char *)xmlNodeListGetString(doc_tree, current_node->xmlChildrenNode, 1));
+        }
+        // else if (!strcmp(current_node->name, "name") && (current_node->ns == ns))
+        // {
+
+        // }
+
+        current_node = current_node->next;
     }
 
-    xmlNode* workskin = GetElementAttr(next, "id", "workskin");
-    xmlDocSetRootElement(doc, workskin);
+    std::cout << "\tAuthor: " << author << std::endl;
 
-    std::string title_ = url_.substr(url_.find_last_of("/") + 1, url_.length() - 1);
-    std::string des = local_des_ + title_ + ".html";
+    // xmlNodePtr workskin = GetElementAttr(next, "id", "workskin");
+    // xmlDocSetRootElement(doc_tree, workskin);
 
-    FILE* file;
-    file = fopen(des.c_str(), "w+");
-    xmlDocFormatDump(file, doc, 1);
-    fclose(file);
+    // std::string des = local_des_ + "/" + title + ".html";
+
+    // FILE* file;
+    // file = fopen(des.c_str(), "w+");
+    // xmlDocFormatDump(file, doc_tree, 1);
+
+    xmlFreeDoc(doc_tree);
+
+    // fclose(file);
+}
+
+Parser ParserRR::Copy()
+{
+    std::cout << "ParserRR Copy" << std::endl;
+    ParserRR parser;
+    parser.SetSourceUrl(this->GetSourceUrl());
+    return parser;
 }
 
 std::string ParserRR::ParseTitle()

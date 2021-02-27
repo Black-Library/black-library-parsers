@@ -35,8 +35,8 @@ public:
     virtual ~Parser();
 
     virtual void Parse();
+    virtual Parser Copy();
 
-    Parser Copy();
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 

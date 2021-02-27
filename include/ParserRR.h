@@ -22,6 +22,7 @@ public:
     ~ParserRR();
 
     void Parse();
+    Parser Copy();
 
 protected:
     std::string ParseTitle();
