@@ -67,7 +67,7 @@ void ParserManager::Init()
     // TODO make this map results to result objects
     std::vector<std::future<ParserManagerResult>> results;
 
-    for(size_t i = 0; i < 2; ++i)
+    for(size_t i = 0; i < 1; ++i)
     {
         results.emplace_back(
             pool_.enqueue([this, i]

@@ -55,6 +55,10 @@ protected:
     virtual std::string ParseTitle();
     virtual std::string ParseAuthor();
 
+    std::string GenerateXmlDocTreeString(xmlNode *root_node);
+    std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
+    std::string GetSpaceString(size_t num_tabs);
+
     std::string local_des_;
     std::string title_;
     std::string source_url_;

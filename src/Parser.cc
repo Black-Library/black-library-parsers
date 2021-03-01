@@ -2,6 +2,8 @@
  * Parser.cc
  */
 
+#include <sstream>
+
 #include <Parser.h>
 
 namespace black_library {
@@ -146,6 +148,50 @@ std::string Parser::ParseTitle()
 std::string Parser::ParseAuthor()
 {
     return "no author";
+}
+
+// based on http://www.xmlsoft.org/examples/tree1.c
+std::string Parser::GenerateXmlDocTreeString(xmlNode *root_node)
+{
+    return GenerateXmlDocTreeStringHelper(root_node, 0);
+}
+
+std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth)
+{
+    std::stringstream ss;
+    xmlNode *cur_node = NULL;
+
+    for (cur_node = root_node; cur_node; cur_node = cur_node->next)
+    {
+        if (cur_node->type == XML_ELEMENT_NODE)
+        {
+            ss << GetSpaceString(depth) << "node type: Element, name: " << cur_node->name << std::endl;
+        }
+        if (cur_node->type == XML_ATTRIBUTE_NODE)
+        {
+            ss << GetSpaceString(depth) << "node type: Attribute, name: " << cur_node->name << std::endl;
+        }
+        if (cur_node->type == XML_TEXT_NODE)
+        {
+            ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << std::endl;
+        }
+
+        ss << GenerateXmlDocTreeStringHelper(cur_node->children, depth + 1);
+    }
+
+    return ss.str();
+}
+
+std::string Parser::GetSpaceString(size_t num_tabs)
+{
+    std::string tab_string = "";
+
+    for (size_t i = 0; i < num_tabs; ++i)
+    {
+        tab_string += "    ";
+    }
+
+    return tab_string;
 }
 
 //Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
