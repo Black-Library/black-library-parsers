@@ -15,11 +15,6 @@ Parser::Parser(parser_rep parser_type)
     parser_type_ = parser_type;
 }
 
-Parser::~Parser()
-{
-
-}
-
 void Parser::Parse()
 {
 

@@ -75,7 +75,8 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
     }
 
     // TODO: check if the .Copy method is necessary
-    result.parser_result = parser_map_itr->second.Copy();
+
+    result.parser_result = (*parser_map_itr->second).Copy();
 
     std::cout << "Got " << GetParserName(result.parser_result.GetParserType()) << std::endl;
     result.parser_result.Parse();
@@ -86,12 +87,16 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
 
 int ParserFactory::InitParserMap()
 {
-    AO3::ParserAO3 parserAO3;
-    // FFN::ParserFFN parserFFN;
-    RR::ParserRR parserRR;
-    parser_map_.emplace(AO3_PARSER, parserAO3);
-    // parser_map_.emplace(FFN_PARSER, parserFFN);
-    parser_map_.emplace(RR_PARSER, RR::ParserRR());
+    auto parserAO3 = std::make_shared<AO3::ParserAO3>();
+    auto parserRR = std::make_shared<RR::ParserRR>();
+
+    std::shared_ptr<Parser> AO3_shadow = std::static_pointer_cast<Parser>(parserAO3);
+    std::shared_ptr<Parser> RR_shadow = std::static_pointer_cast<Parser>(parserRR);
+
+    parser_map_.emplace(AO3_PARSER, AO3_shadow);
+    parser_map_.emplace(RR_PARSER, RR_shadow);
+
+    parserRR->Parse();
 
     std::cout << "first parser\n" << std::endl;
 
@@ -99,10 +104,30 @@ int ParserFactory::InitParserMap()
 
     auto parser_got = iter->second;
 
-    std::cout << "Parser source url: " << parser_got.GetSourceUrl() << std::endl;
-    std::cout << "Parser type: " << GetParserName(parser_got.GetParserType()) << std::endl;
-    std::cout << "second parser\n" << std::endl;
-    parser_got.Parse();
+    std::shared_ptr<RR::ParserRR> rr_parser = std::make_shared<RR::ParserRR>();
+    std::shared_ptr<Parser> normal_parser;
+
+    std::cout << "static cast\n" << std::endl;
+
+    normal_parser = std::static_pointer_cast<Parser>(rr_parser);
+    normal_parser->Parse();
+
+    std::cout << "dynamic cast\n" << std::endl;
+
+    auto downcasted = std::dynamic_pointer_cast<RR::ParserRR>(normal_parser);
+    downcasted->Parse();
+
+    std::cout << "static cast from map\n" << std::endl;
+
+    auto static_cast_from_map = std::static_pointer_cast<Parser>(parser_got);
+    static_cast_from_map->Parse();
+
+    // std::cout << "Parser iter: " << GetParserName(iter->first) << std::endl;
+
+    // std::cout << "Parser source url: " << parser_got.GetSourceUrl() << std::endl;
+    // std::cout << "Parser type: " << GetParserName(parser_got.GetParserType()) << std::endl;
+    // std::cout << "second parser\n" << std::endl;
+    // parser_got.Parse();
     std::cout << "end parser test\n" << std::endl;
 
     return 0;
@@ -112,7 +137,7 @@ int ParserFactory::InitParserUrlMap()
 {
     for (auto it = parser_map_.begin(); it != parser_map_.end(); ++it)
     {
-        parser_url_map_.emplace(it->second.GetSourceUrl(), it->first);
+        parser_url_map_.emplace((*it->second).GetSourceUrl(), it->first);
     }
 
     return 0;

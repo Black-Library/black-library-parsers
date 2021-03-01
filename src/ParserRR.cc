@@ -18,11 +18,6 @@ ParserRR::ParserRR()
     source_url_ = RR::source_url;
 }
 
-ParserRR::~ParserRR()
-{
-
-}
-
 void ParserRR::Parse()
 {
     std::cout << "foo" << std::endl;

@@ -19,7 +19,6 @@ class ParserRR : public Parser
 {
 public:
     ParserRR();
-    ~ParserRR();
 
     void Parse();
     Parser Copy();

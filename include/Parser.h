@@ -32,7 +32,7 @@ class Parser
 public:
     Parser(parser_rep parser_type);
     Parser() : Parser(_NUM_PARSERS_TYPE){};
-    virtual ~Parser();
+    virtual ~Parser() = default;
 
     virtual void Parse();
     virtual Parser Copy();

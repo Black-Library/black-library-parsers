@@ -5,6 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_FACTORY_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_FACTORY_H__
 
+#include <memory>
 #include <unordered_map>
 
 #include "Parser.h"
@@ -37,7 +38,7 @@ protected:
     int InitParserMap();
     int InitParserUrlMap();
 
-    std::unordered_map<parser_rep, Parser> parser_map_;
+    std::unordered_map<parser_rep, std::shared_ptr<Parser>> parser_map_;
     std::unordered_map<std::string, parser_rep> parser_url_map_;
 
 private:
