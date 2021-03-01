@@ -67,13 +67,6 @@ void ParserManager::Init()
     // TODO make this map results to result objects
     std::vector<std::future<ParserManagerResult>> results;
 
-    ParserFactoryResult result_0 = parser_factory_.GetParser("https://www.royalroad.com/fiction/21220/mother-of-learning");
-    if (result_0.has_error)
-    {
-        std::cout << "Error: error" << std::endl;
-    }
-    result_0.parser_result.Parse();
-
     for(size_t i = 0; i < 2; ++i)
     {
         results.emplace_back(
@@ -84,16 +77,17 @@ void ParserManager::Init()
                 ss << "Starting parser manager slot " << i << std::endl;
                 std::string url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
                 ParserFactoryResult factory_result = parser_factory_.GetParser(url);
-                ss << "Parser type: " << GetParserName(factory_result.parser_result.GetParserType()) << std::endl;
+                ss << factory_result.io_string;
+                ss << "Parser type: " << GetParserName(factory_result.parser_result->GetParserType()) << std::endl;
                 if (factory_result.has_error)
                 {
-                  ss << factory_result.result_error.error_string;
+                  ss << factory_result.error_string;
                   result.has_error = true;
                   ss << "Error: parser manager slot " << i << " factory failed" << std::endl;
                   result.io_result = ss.str();
                   return result;
                 }
-                factory_result.parser_result.Parse();
+                factory_result.parser_result->Parse();
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 ss << "stopping parser manager slot " << i << std::endl;

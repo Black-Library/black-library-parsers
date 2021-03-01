@@ -20,8 +20,7 @@ ParserRR::ParserRR()
 
 void ParserRR::Parse()
 {
-    std::cout << "foo" << std::endl;
-    std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
+    std::string url_adult = url_;
     std::string result = CurlRequest(url_adult);
     std::string author;
     std::string title;

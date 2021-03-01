@@ -16,13 +16,10 @@ namespace core {
 
 namespace parsers {
 
-struct ParserFactoryResultError {
-    std::string error_string;
-};
-
 struct ParserFactoryResult {
-    Parser parser_result;
-    ParserFactoryResultError result_error;
+    std::shared_ptr<Parser> parser_result;
+    std::string io_string;
+    std::string error_string;
     bool has_error = false;
 };
 

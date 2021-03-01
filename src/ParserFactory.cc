@@ -2,6 +2,8 @@
  * ParserFactory.cc
  */
 
+#include <sstream>
+
 #include <ParserFactory.h>
 
 #include "ParserAO3.h"
@@ -32,6 +34,7 @@ bool ContainsString(const std::string &haystack, const std::string &needle)
 
 ParserFactory::ParserFactory()
 {
+    std::cout << "Initialize ParserFactory" << std::endl;
     InitParserMap();
     InitParserUrlMap();
 }
@@ -44,6 +47,7 @@ ParserFactory::~ParserFactory()
 ParserFactoryResult ParserFactory::GetParser(const std::string &url)
 {
     ParserFactoryResult result;
+    std::stringstream ss;
     parser_rep parser_type = _NUM_PARSERS_TYPE;
 
     bool url_found = false;
@@ -54,6 +58,7 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
         {
             parser_type = it->second;
             url_found = true;
+            ss << "Matched url: " << url << " with: " << it->first << std::endl;
             break;
         }
     }
@@ -61,7 +66,8 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
     if (!url_found)
     {
         result.has_error = true;
-        result.result_error.error_string = "Error: ParserFactory could not match url\n";
+        result.error_string = "Error: ParserFactory could not match url\n";
+        result.io_string = ss.str();
         return result;
     }
 
@@ -70,18 +76,19 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
     if (parser_map_itr == parser_map_.end())
     {
         result.has_error = true;
-        result.result_error.error_string = "Error: ParserFactory could not match parser\n";
+        result.error_string = "Error: ParserFactory could not match parser\n";
+        result.io_string = ss.str();
         return result;
     }
 
-    // TODO: check if the .Copy method is necessary
+    result.parser_result = parser_map_itr->second;
 
-    result.parser_result = (*parser_map_itr->second).Copy();
+    ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType()) << std::endl;
 
-    std::cout << "Got " << GetParserName(result.parser_result.GetParserType()) << std::endl;
-    result.parser_result.Parse();
+    result.parser_result->SetUrl(url);
 
-    result.parser_result.SetUrl(url);
+    result.io_string = ss.str();
+
     return result;
 }
 
@@ -127,11 +134,15 @@ int ParserFactory::InitParserMap()
     // parser_got.Parse();
     std::cout << "end parser test\n" << std::endl;
 
+    std::cout << "Initialized Parser map with " << parser_map_.size() << " elements" << std::endl;
+
     return 0;
 }
 
 int ParserFactory::InitParserUrlMap()
 {
+    std::cout << "Initialize Parser url map with " << parser_map_.size() << " elements" << std::endl;
+
     for (auto it = parser_map_.begin(); it != parser_map_.end(); ++it)
     {
         parser_url_map_.emplace((*it->second).GetSourceUrl(), it->first);
