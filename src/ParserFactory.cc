@@ -90,11 +90,8 @@ int ParserFactory::InitParserMap()
     auto parserAO3 = std::make_shared<AO3::ParserAO3>();
     auto parserRR = std::make_shared<RR::ParserRR>();
 
-    std::shared_ptr<Parser> AO3_shadow = std::static_pointer_cast<Parser>(parserAO3);
-    std::shared_ptr<Parser> RR_shadow = std::static_pointer_cast<Parser>(parserRR);
-
-    parser_map_.emplace(AO3_PARSER, AO3_shadow);
-    parser_map_.emplace(RR_PARSER, RR_shadow);
+    parser_map_.emplace(AO3_PARSER, std::static_pointer_cast<Parser>(parserAO3));
+    parser_map_.emplace(RR_PARSER, std::static_pointer_cast<Parser>(parserRR));
 
     parserRR->Parse();
 
