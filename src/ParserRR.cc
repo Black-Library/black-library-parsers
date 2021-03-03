@@ -20,6 +20,7 @@ ParserRR::ParserRR()
 
 void ParserRR::Parse()
 {
+    std::cout << "Start ParserRR Parse" << std::endl;
     std::string url_adult = url_;
     std::string result = CurlRequest(url_adult);
     std::string author = "unknown author";
@@ -37,8 +38,21 @@ void ParserRR::Parse()
     xmlNodePtr current_node = root_node->children;
 
     std::string doc_string = GenerateXmlDocTreeString(current_node);
-
     std::cout << doc_string << std::endl;
+
+    // xmlOutputBufferPtr outputbuf;
+    // outputbuf = (xmlOutputBufferPtr) xmlMalloc(sizeof(xmlOutputBuffer));
+    // if (outputbuf == NULL)
+    // {
+    //     std::cout << "Error: failed to allocate buffer" << std::endl;
+    //     xmlFree(outputbuf);
+    //     return;
+    // }
+    // memset(outputbuf, 0, (sizeof(xmlOutputBuffer)));
+
+    // xmlNodeDumpOutput(outputbuf, doc_tree, current_node, 1, 0, "UTF-8");
+    // xmlFree(outputbuf);
+
 
     while (current_node != NULL)
     {
