@@ -173,7 +173,13 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
         }
         if (cur_node->type == XML_TEXT_NODE)
         {
-            ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << std::endl;
+            std::string content_string = "unknown content";
+            xmlChar *content = xmlNodeGetContent(cur_node);
+            if (content != NULL)
+            {
+                content_string = std::string((char *)content);
+            }
+            ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << ", Content: " << content_string << std::endl;
         }
 
         ss << GenerateXmlDocTreeStringHelper(cur_node->children, depth + 1);
