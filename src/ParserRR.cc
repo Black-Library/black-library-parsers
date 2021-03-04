@@ -56,21 +56,24 @@ void ParserRR::Parse()
 
     while (current_node != NULL)
     {
-        if (!strcmp((char *)current_node->name, "mark"))
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"mark"))
         {
             xmlChar *xmlCharHolder = xmlNodeListGetString(doc_tree, current_node->xmlChildrenNode, 1);
             author = std::string((char *)xmlCharHolder);
             xmlFree(xmlCharHolder);
         }
-        // else if (!strcmp(current_node->name, "name") && (current_node->ns == ns))
-        // {
-
-        // }
+        else if (!xmlStrcmp(current_node->name, (const xmlChar *)"title"))
+        {
+            xmlChar *xmlCharHolder = xmlNodeListGetString(doc_tree, current_node->xmlChildrenNode, 1);
+            title = std::string((char *)xmlCharHolder);
+            xmlFree(xmlCharHolder);
+        }
 
         current_node = current_node->next;
     }
 
     std::cout << "\tAuthor: " << author << std::endl;
+    std::cout << "\tTitle: " << title << std::endl;
 
     // xmlNodePtr workskin = GetElementAttr(next, "id", "workskin");
     // xmlDocSetRootElement(doc_tree, workskin);

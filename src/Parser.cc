@@ -179,6 +179,7 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
             {
                 content_string = std::string((char *)content);
             }
+            xmlFree(content);
             ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << ", Content: " << content_string << std::endl;
         }
 
