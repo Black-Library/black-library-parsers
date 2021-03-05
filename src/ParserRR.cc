@@ -25,6 +25,7 @@ void ParserRR::Parse()
     std::string result = CurlRequest(url_adult);
     std::string author = "unknown author";
     std::string title = "RR_Parser_base_name";
+    bool start_found = false;
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -40,19 +41,25 @@ void ParserRR::Parse()
     std::string doc_string = GenerateXmlDocTreeString(current_node);
     std::cout << doc_string << std::endl;
 
-    // xmlOutputBufferPtr outputbuf;
-    // outputbuf = (xmlOutputBufferPtr) xmlMalloc(sizeof(xmlOutputBuffer));
-    // if (outputbuf == NULL)
-    // {
-    //     std::cout << "Error: failed to allocate buffer" << std::endl;
-    //     xmlFree(outputbuf);
-    //     return;
-    // }
-    // memset(outputbuf, 0, (sizeof(xmlOutputBuffer)));
+    while (current_node != NULL)
+    {
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"head"))
+        {
+            start_found = true;
+            current_node = current_node->children;
+            break;
+        }
 
-    // xmlNodeDumpOutput(outputbuf, doc_tree, current_node, 1, 0, "UTF-8");
-    // xmlFree(outputbuf);
+        current_node = current_node->next;
+    }
 
+    if (!start_found)
+    {
+        std::cout << "Could not find start, exiting" << std::endl;
+        return;
+    }
+
+    int element_counter = 0;
 
     while (current_node != NULL)
     {
@@ -68,12 +75,18 @@ void ParserRR::Parse()
             title = std::string((char *)xmlCharHolder);
             xmlFree(xmlCharHolder);
         }
+        else if (!xmlStrcmp(current_node->name, (const xmlChar *)"head"))
+        {
+            title = "head";
+        }
 
         current_node = current_node->next;
+        ++element_counter;
     }
 
     std::cout << "\tAuthor: " << author << std::endl;
     std::cout << "\tTitle: " << title << std::endl;
+    std::cout << "\tElement_counter: " << element_counter << std::endl;
 
     // xmlNodePtr workskin = GetElementAttr(next, "id", "workskin");
     // xmlDocSetRootElement(doc_tree, workskin);
