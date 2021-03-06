@@ -167,14 +167,16 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
         xmlAttrPtr attribute = cur_node->properties;
         while (attribute)
         {
-            xmlChar *content = xmlNodeListGetString(cur_node->doc, attribute->children, 1);
-            if (content != NULL)
+            const xmlChar *attr_name = attribute->name;
+            xmlChar *attr_content = xmlNodeListGetString(cur_node->doc, attribute->children, 1);
+            if (attr_name !=NULL && attr_content != NULL)
             {
-                attribute_content_string += std::string((char *) content);
+                attribute_content_string += std::string((char *) attr_name) + ": " + std::string((char *) attr_content) + " ";
             }
-            xmlFree(content);
+            xmlFree(attr_content);
             attribute = attribute->next;
         }
+        xmlFree(attribute);
 
         if (cur_node->type == XML_ELEMENT_NODE)
         {

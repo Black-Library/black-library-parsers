@@ -24,7 +24,8 @@ void ParserRR::Parse()
     std::string url_adult = url_;
     std::string result = CurlRequest(url_adult);
     std::string author = "unknown author";
-    std::string title = "RR_Parser_base_name";
+    std::string title = "RR_Parser_base_title";
+    std::string nickname;
     bool start_found = false;
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
@@ -63,16 +64,39 @@ void ParserRR::Parse()
 
     while (current_node != NULL)
     {
-        if (!xmlStrcmp(current_node->name, (const xmlChar *)"mark"))
+        if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
         {
-            xmlChar *xmlCharHolder = xmlNodeListGetString(doc_tree, current_node->xmlChildrenNode, 1);
-            author = std::string((char *)xmlCharHolder);
-            xmlFree(xmlCharHolder);
+            xmlAttrPtr attribute = current_node->properties;
+            while (attribute)
+            {
+                if (!xmlStrcmp(attribute->name, (const xmlChar *) "property"))
+                {
+                    xmlChar *attr_content = xmlNodeListGetString(current_node->doc, attribute->children, 1);
+                    if (attr_content != NULL)
+                    {
+                        if (!xmlStrcmp(attr_content, (const xmlChar *) "books:author"))
+                        {
+                            xmlAttrPtr author_attr = attribute->next;
+                            if (author_attr != NULL)
+                            {
+                                if (!xmlStrcmp(author_attr->name, (const xmlChar *) "content"))
+                                {
+                                    author = std::string((char *)author_attr->children->content);
+                                }
+                            }
+                            // no need for a xmlFree here, it is handled in the next loop
+                        }
+                    }
+                    xmlFree(attr_content);
+                }
+                attribute = attribute->next;
+            }
+            xmlFree(attribute);
         }
         else if (!xmlStrcmp(current_node->name, (const xmlChar *)"title"))
         {
             xmlChar *xmlCharHolder = xmlNodeListGetString(doc_tree, current_node->xmlChildrenNode, 1);
-            title = std::string((char *)xmlCharHolder);
+            nickname = std::string((char *)xmlCharHolder);
             xmlFree(xmlCharHolder);
         }
         else if (!xmlStrcmp(current_node->name, (const xmlChar *)"head"))
@@ -84,8 +108,9 @@ void ParserRR::Parse()
         ++element_counter;
     }
 
-    std::cout << "\tAuthor: " << author << std::endl;
     std::cout << "\tTitle: " << title << std::endl;
+    std::cout << "\tAuthor: " << author << std::endl;
+    std::cout << "\tNickname: " << nickname << std::endl;
     std::cout << "\tElement_counter: " << element_counter << std::endl;
 
     // xmlNodePtr workskin = GetElementAttr(next, "id", "workskin");
