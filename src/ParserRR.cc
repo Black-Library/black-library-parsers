@@ -86,6 +86,20 @@ void ParserRR::Parse()
                             }
                             // no need for a xmlFree here, it is handled in the next loop
                         }
+                        else if (!xmlStrcmp(attr_content, (const xmlChar *) "og:url"))
+                        {
+                            xmlAttrPtr title_attr = attribute->next;
+                            if (title_attr != NULL)
+                            {
+                                if (!xmlStrcmp(title_attr->name, (const xmlChar *) "content"))
+                                {
+                                    std::string unprocessed_title = std::string((char *)title_attr->children->content);
+                                    
+                                    size_t found = unprocessed_title.find_last_of("/\\");
+                                    title = unprocessed_title.substr(found + 1, unprocessed_title.size());
+                                }
+                            }
+                        }
                     }
                     xmlFree(attr_content);
                 }
@@ -112,9 +126,6 @@ void ParserRR::Parse()
     std::cout << "\tAuthor: " << author << std::endl;
     std::cout << "\tNickname: " << nickname << std::endl;
     std::cout << "\tElement_counter: " << element_counter << std::endl;
-
-    // xmlNodePtr workskin = GetElementAttr(next, "id", "workskin");
-    // xmlDocSetRootElement(doc_tree, workskin);
 
     std::string des = local_des_ + title + ".html";
 
