@@ -26,7 +26,8 @@ void ParserRR::Parse()
     std::string author = "unknown author";
     std::string title = "RR_Parser_base_title";
     std::string nickname;
-    bool start_found = false;
+    bool head_found = false;
+    bool body_found = false;
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -42,11 +43,12 @@ void ParserRR::Parse()
     std::string doc_string = GenerateXmlDocTreeString(current_node);
     std::cout << doc_string << std::endl;
 
+    // TODO make this a separate function that finds top-level sections
     while (current_node != NULL)
     {
         if (!xmlStrcmp(current_node->name, (const xmlChar *)"head"))
         {
-            start_found = true;
+            head_found = true;
             current_node = current_node->children;
             break;
         }
@@ -54,9 +56,9 @@ void ParserRR::Parse()
         current_node = current_node->next;
     }
 
-    if (!start_found)
+    if (!head_found)
     {
-        std::cout << "Could not find start, exiting" << std::endl;
+        std::cout << "Could not find head, exiting" << std::endl;
         return;
     }
 
@@ -107,16 +109,6 @@ void ParserRR::Parse()
             }
             xmlFree(attribute);
         }
-        else if (!xmlStrcmp(current_node->name, (const xmlChar *)"title"))
-        {
-            xmlChar *xmlCharHolder = xmlNodeListGetString(doc_tree, current_node->xmlChildrenNode, 1);
-            nickname = std::string((char *)xmlCharHolder);
-            xmlFree(xmlCharHolder);
-        }
-        else if (!xmlStrcmp(current_node->name, (const xmlChar *)"head"))
-        {
-            title = "head";
-        }
 
         current_node = current_node->next;
         ++element_counter;
@@ -126,6 +118,37 @@ void ParserRR::Parse()
     std::cout << "\tAuthor: " << author << std::endl;
     std::cout << "\tNickname: " << nickname << std::endl;
     std::cout << "\tElement_counter: " << element_counter << std::endl;
+
+    // reset current node ptr to root node children
+    current_node = root_node->children;
+
+    while (current_node != NULL)
+    {
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"body"))
+        {
+            body_found = true;
+            current_node = current_node->children;
+            break;
+        }
+        current_node = current_node->next;
+    }
+
+    if (!body_found)
+    {
+        std::cout << "Could not find index, exiting" << std::endl;
+        return;
+    }
+
+    element_counter = 0;
+
+    while (current_node != NULL)
+    {
+        current_node = current_node->next;
+        ++element_counter;
+    }
+
+    std::cout << "\tElement_counter: " << element_counter << std::endl;
+
 
     std::string des = local_des_ + title + ".html";
 
