@@ -79,28 +79,20 @@ void ParserRR::Parse()
                         if (!xmlStrcmp(attr_content, (const xmlChar *) "books:author"))
                         {
                             xmlAttrPtr author_attr = attribute->next;
-                            if (author_attr != NULL)
-                            {
-                                if (!xmlStrcmp(author_attr->name, (const xmlChar *) "content"))
-                                {
-                                    author = std::string((char *)author_attr->children->content);
-                                }
-                            }
-                            // no need for a xmlFree here, it is handled in the next loop
+                            xmlAttributePayload attr_result = GetXmlAttributeContentByName(author_attr, "content");
+                            if (attr_result.is_null)
+                                continue;
+                            author = attr_result.result;
                         }
                         else if (!xmlStrcmp(attr_content, (const xmlChar *) "og:url"))
                         {
                             xmlAttrPtr title_attr = attribute->next;
-                            if (title_attr != NULL)
-                            {
-                                if (!xmlStrcmp(title_attr->name, (const xmlChar *) "content"))
-                                {
-                                    std::string unprocessed_title = std::string((char *)title_attr->children->content);
-                                    
-                                    size_t found = unprocessed_title.find_last_of("/\\");
-                                    title = unprocessed_title.substr(found + 1, unprocessed_title.size());
-                                }
-                            }
+                            xmlAttributePayload attr_result = GetXmlAttributeContentByName(title_attr, "content");
+                            if (attr_result.is_null)
+                                continue;
+                            std::string unprocessed_title = attr_result.result;
+                            size_t found = unprocessed_title.find_last_of("/\\");
+                            title = unprocessed_title.substr(found + 1, unprocessed_title.size());
                         }
                     }
                     xmlFree(attr_content);

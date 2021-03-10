@@ -226,6 +226,24 @@ std::string Parser::GetSpaceString(size_t num_tabs)
     return tab_string;
 }
 
+xmlAttributePayload Parser::GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name)
+{
+    xmlAttributePayload attr_result;
+
+    if (attribute_ptr == NULL)
+    {
+        attr_result.is_null = true;
+        return attr_result;
+    }
+
+    if (!xmlStrcmp(attribute_ptr->name, (const xmlChar *) name.c_str()))
+    {
+        attr_result.result = std::string((char *)attribute_ptr->children->content);
+    }
+
+    return attr_result;
+}
+
 //Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
 size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
 {
