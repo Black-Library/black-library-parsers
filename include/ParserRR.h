@@ -27,6 +27,7 @@ protected:
     std::string ParseTitle();
     std::string ParseAuthor();
     void ParseChapter();
+    void FindChapterNodes(xmlNode *root_node);
 
 private:
 };

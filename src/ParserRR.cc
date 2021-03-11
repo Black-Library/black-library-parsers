@@ -131,16 +131,7 @@ void ParserRR::Parse()
         return;
     }
 
-    element_counter = 0;
-
-    while (current_node != NULL)
-    {
-        current_node = current_node->next;
-        ++element_counter;
-    }
-
-    std::cout << "\tElement_counter: " << element_counter << std::endl;
-
+    FindChapterNodes(current_node);
 
     std::string des = local_des_ + title + ".html";
 
@@ -175,6 +166,35 @@ std::string ParserRR::ParseAuthor()
 void ParserRR::ParseChapter()
 {
 
+}
+
+void ParserRR::FindChapterNodes(xmlNode *root_node)
+{
+    xmlNode *cur_node = NULL;
+    for (cur_node = root_node; cur_node; cur_node = cur_node->next)
+    {
+        if (cur_node->type == XML_ELEMENT_NODE)
+        {
+            if (!xmlStrcmp(cur_node->name, (const xmlChar *)"tbody"))
+            {
+                xmlNode *index_node = NULL;
+                int index_counter = 0;
+                for (index_node = cur_node; index_node; index_node = index_node->next)
+                {
+                    ++index_counter;
+                }
+                std::cout << "Index counter: " << index_counter << std::endl;
+            }
+        }
+        else if (cur_node->type == XML_ATTRIBUTE_NODE)
+        {
+            
+        }
+        else if (cur_node->type == XML_TEXT_NODE)
+        {
+        }
+        FindChapterNodes(cur_node->children);
+    }
 }
 
 } // namespace RR
