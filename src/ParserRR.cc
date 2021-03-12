@@ -179,9 +179,14 @@ void ParserRR::FindChapterNodes(xmlNode *root_node)
             {
                 xmlNode *index_node = NULL;
                 int index_counter = 0;
-                for (index_node = cur_node; index_node; index_node = index_node->next)
+                for (index_node = cur_node->children; index_node; index_node = index_node->next)
                 {
-                    ++index_counter;
+                    if (index_node->type == XML_ELEMENT_NODE)
+                    {
+                        RR_index_entry index_entry;
+                        index_entries_.emplace_back(index_entry);
+                        ++index_counter;
+                    }
                 }
                 std::cout << "Index counter: " << index_counter << std::endl;
             }
