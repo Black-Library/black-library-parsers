@@ -20,6 +20,7 @@ namespace RR {
 struct RR_index_entry {
     std::string data_url;
     std::string chapter_name;
+    uint16_t index_num;
     // TODO add date added
 };
 

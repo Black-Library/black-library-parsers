@@ -178,17 +178,20 @@ void ParserRR::FindChapterNodes(xmlNode *root_node)
             if (!xmlStrcmp(cur_node->name, (const xmlChar *)"tbody"))
             {
                 xmlNode *index_node = NULL;
-                int index_counter = 0;
+                uint16_t index_num = 0;
                 for (index_node = cur_node->children; index_node; index_node = index_node->next)
                 {
                     if (index_node->type == XML_ELEMENT_NODE)
                     {
-                        RR_index_entry index_entry;
+                        RR_index_entry index_entry = ExtractIndexEntry(index_node);
+                        index_entry.index_num = index_num;
                         index_entries_.emplace_back(index_entry);
-                        ++index_counter;
+                        ++index_num;
                     }
                 }
-                std::cout << "Index counter: " << index_counter << std::endl;
+                std::cout << "Index entries: " << index_entries_.size() << std::endl;
+                std::cout << "Index num: " << index_num << std::endl;
+
             }
         }
         else if (cur_node->type == XML_ATTRIBUTE_NODE)
@@ -200,6 +203,68 @@ void ParserRR::FindChapterNodes(xmlNode *root_node)
         }
         FindChapterNodes(cur_node->children);
     }
+}
+
+RR_index_entry ExtractIndexEntry(xmlNode *root_node)
+{
+    xmlNode *cur_node = NULL;
+    xmlNode *data_url_node = NULL;
+    xmlNode *title_node = NULL;
+    RR_index_entry index_entry;
+
+    for (cur_node = root_node->children; cur_node; cur_node = cur_node->next)
+    {
+        if (cur_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(cur_node->name, (const xmlChar *)"td"))
+        {
+            for (data_url_node = cur_node->children; data_url_node; data_url_node = data_url_node->next)
+            {
+                if (data_url_node->type != XML_ELEMENT_NODE)
+                    continue;
+
+                if (!xmlStrcmp(data_url_node->name, (const xmlChar *)"a"))
+                {
+                    // get data url
+                    xmlAttrPtr attribute = data_url_node->properties;
+                    while (attribute)
+                    {
+                        if (!xmlStrcmp(attribute->name, (const xmlChar *) "href"))
+                        {
+                            xmlChar *attr_content = xmlNodeListGetString(data_url_node->doc, attribute->children, 1);
+                            if (attr_content != NULL)
+                            {
+                                xmlAttributePayload attr_result = GetXmlAttributeContentByName(attr_content, "href");
+                                if (attr_result.is_null)
+                                    continue;
+                                index_entry.data_url = attr_result.result;
+                            }
+                            xmlFree(attr_content);
+                        }
+                        attribute = attribute->next;
+                    }
+                    xmlFree(attribute);
+
+                    // get title
+                    for (title_node = data_url_node->children; title_node; title_node = title_node->next)
+                    {
+                        if (title_node->type != XML_TEXT_NODE)
+                            continue;
+
+                        xmlChar *content = xmlNodeGetContent(title_node);
+                        if (content != NULL)
+                        {
+                            index_entry.chapter_name = std::string((char *)content);
+                        }
+                        xmlFree(content);
+                    }
+                }
+            }
+        }
+    }
+
+    return index_entry;
 }
 
 } // namespace RR
