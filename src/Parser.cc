@@ -195,15 +195,11 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
             xmlChar *content = xmlNodeGetContent(cur_node);
             if (content != NULL)
             {
-                content_string = std::string((char *)content);
+                std::string unclean = std::string((char *)content);
+                content_string = TrimWhitespace(unclean);
             }
             xmlFree(content);
             string_size = content_string.size();
-            if (content_string == "\n    ")
-            {
-                content_string = "empty content";
-                string_size = 0;
-            }
             ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << 
             ", Attributes: " << attribute_content_string << ", Content: " << content_string << ", Size: " << string_size << std::endl;
         }
@@ -244,7 +240,22 @@ xmlAttributePayload Parser::GetXmlAttributeContentByName(xmlAttrPtr &attribute_p
     return attr_result;
 }
 
-//Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
+std::string Parser::TrimWhitespace(const std::string& target_string)
+{
+    auto leading_pos = target_string.find_first_not_of(" \t\r\n");
+    auto trailing_pos = target_string.find_last_not_of(" \t\r\n");
+    if (leading_pos == std::string::npos)
+    {
+        leading_pos = 0;
+    }
+    if (trailing_pos == std::string::npos)
+    {
+        trailing_pos = target_string.size() - leading_pos;
+    }
+    return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
+}
+
+// Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
 size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
 {
     std::string* str = (std::string*) data;

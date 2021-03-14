@@ -45,7 +45,6 @@ public:
 
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
-    xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
     void SetParserType(parser_rep source);
     void SetSourceUrl(const std::string &url);
@@ -65,6 +64,9 @@ protected:
     std::string GenerateXmlDocTreeString(xmlNode *root_node);
     std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
     std::string GetSpaceString(size_t num_tabs);
+    xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
+
+    std::string TrimWhitespace(const std::string &target_string);
 
     std::string local_des_;
     std::string title_;

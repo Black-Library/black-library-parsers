@@ -2,6 +2,8 @@
  * ParserRR.cc
  */
 
+#include <sstream>
+
 #include <ParserRR.h>
 
 namespace black_library {
@@ -105,6 +107,7 @@ void ParserRR::Parse()
         current_node = current_node->next;
         ++element_counter;
     }
+    xmlFree(current_node);
 
     std::cout << "\tTitle: " << title << std::endl;
     std::cout << "\tAuthor: " << author << std::endl;
@@ -131,7 +134,18 @@ void ParserRR::Parse()
         return;
     }
 
+    std::cout << "find chapter nodes" << std::endl;
+
     FindChapterNodes(current_node);
+
+    std::cout << "found chapter nodes" << std::endl;
+
+    std::stringstream ss;
+    for (auto const& item : index_entries_)
+    {
+        ss << "Index: " << item.index_num << " - URL: " << item.data_url << " - Name: " << item.chapter_name << std::endl;
+    }
+    std::cout << ss.str() << std::endl;
 
     std::string des = local_des_ + title + ".html";
 
@@ -189,9 +203,6 @@ void ParserRR::FindChapterNodes(xmlNode *root_node)
                         ++index_num;
                     }
                 }
-                std::cout << "Index entries: " << index_entries_.size() << std::endl;
-                std::cout << "Index num: " << index_num << std::endl;
-
             }
         }
         else if (cur_node->type == XML_ATTRIBUTE_NODE)
@@ -203,13 +214,14 @@ void ParserRR::FindChapterNodes(xmlNode *root_node)
         }
         FindChapterNodes(cur_node->children);
     }
+    xmlFree(cur_node);
 }
 
-RR_index_entry ExtractIndexEntry(xmlNode *root_node)
+RR_index_entry ParserRR::ExtractIndexEntry(xmlNode *root_node)
 {
     xmlNode *cur_node = NULL;
     xmlNode *data_url_node = NULL;
-    xmlNode *title_node = NULL;
+    xmlNode *chapter_name_node = NULL;
     RR_index_entry index_entry;
 
     for (cur_node = root_node->children; cur_node; cur_node = cur_node->next)
@@ -235,34 +247,42 @@ RR_index_entry ExtractIndexEntry(xmlNode *root_node)
                             xmlChar *attr_content = xmlNodeListGetString(data_url_node->doc, attribute->children, 1);
                             if (attr_content != NULL)
                             {
-                                xmlAttributePayload attr_result = GetXmlAttributeContentByName(attr_content, "href");
-                                if (attr_result.is_null)
-                                    continue;
-                                index_entry.data_url = attr_result.result;
+                                index_entry.data_url = std::string((char *)attr_content);
                             }
                             xmlFree(attr_content);
+
+                            // get chapter name
+                            chapter_name_node = data_url_node->children;
+                            if (chapter_name_node->type != XML_TEXT_NODE)
+                                continue;
+
+                            xmlChar *content = xmlNodeGetContent(chapter_name_node);
+                            if (content != NULL)
+                            {
+                                std::string unclean = std::string((char *)content);
+                                index_entry.chapter_name = TrimWhitespace(unclean);
+                            }
+                            xmlFree(content);
                         }
+                        // TODO: get time published
+                        // else if (!xmlStrcmp(attribute->name, (const xmlChar *) "class"))
+                        // {
+                        //     xmlChar *attr_content = xmlNodeListGetString(data_url_node->doc, attribute->children, 1);
+                        //     if (attr_content != NULL)
+                        //     {
+                        //         index_entry.date_published = std::string((char *)attr_content);
+                        //     }
+                        //     xmlFree(attr_content);
+                        // }
                         attribute = attribute->next;
                     }
                     xmlFree(attribute);
-
-                    // get title
-                    for (title_node = data_url_node->children; title_node; title_node = title_node->next)
-                    {
-                        if (title_node->type != XML_TEXT_NODE)
-                            continue;
-
-                        xmlChar *content = xmlNodeGetContent(title_node);
-                        if (content != NULL)
-                        {
-                            index_entry.chapter_name = std::string((char *)content);
-                        }
-                        xmlFree(content);
-                    }
                 }
             }
         }
     }
+    xmlFree(cur_node);
+    xmlFree(data_url_node);
 
     return index_entry;
 }
