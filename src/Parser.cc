@@ -242,8 +242,8 @@ xmlAttributePayload Parser::GetXmlAttributeContentByName(xmlAttrPtr &attribute_p
 
 std::string Parser::TrimWhitespace(const std::string& target_string)
 {
-    auto leading_pos = target_string.find_first_not_of(" \t\r\n");
-    auto trailing_pos = target_string.find_last_not_of(" \t\r\n");
+    auto leading_pos = target_string.find_first_not_of(" \t\r\n\0");
+    auto trailing_pos = target_string.find_last_not_of(" \t\r\n\0");
     if (leading_pos == std::string::npos)
     {
         leading_pos = 0;
