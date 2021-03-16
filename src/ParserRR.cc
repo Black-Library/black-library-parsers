@@ -159,8 +159,7 @@ void ParserRR::Parse()
     root_node = xmlDocGetRootElement(chapter_doc_tree);
     current_node = root_node->children;
 
-    // std::string doc_string = GenerateXmlDocTreeString(current_node);
-    std::string doc_string = TrimWhitespace("\n\n\n\n\n\n");
+    std::string doc_string = GenerateXmlDocTreeString(current_node);
     std::cout << doc_string << std::endl;
 
     // }

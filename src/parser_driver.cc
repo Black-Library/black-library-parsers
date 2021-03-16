@@ -35,6 +35,15 @@ int main(int argc, char* argv[])
     parser2.SetUrl("https://www.royalroad.com/fiction/21220/mother-of-learning");
     parser2.Parse();
 
+    std::string doc_string_0 = parser2.TrimWhitespace("\n\n\n\n\n\n\n");
+    std::cout << "size: " << doc_string_0.size() << " - string: " << doc_string_0 << std::endl;
+
+    std::string doc_string_1 = parser2.TrimWhitespace("a\n\n\n\n\n\n");
+    std::cout << "size: " << doc_string_1.size() << " - string: " << doc_string_1 << std::endl;
+
+    std::string doc_string_2 = parser2.TrimWhitespace("\n\n\n\n\n\nb");
+    std::cout << "size: " << doc_string_2.size() << " - string: " << doc_string_2 << std::endl;
+
     curl_global_cleanup();
 
     std::cout << "Tester exit successful" << std::endl;

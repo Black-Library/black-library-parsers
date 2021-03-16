@@ -57,6 +57,8 @@ public:
     std::string GetTitle();
     std::string GetUrl();
 
+    std::string TrimWhitespace(const std::string &target_string);
+
 protected:
     virtual std::string ParseTitle();
     virtual std::string ParseAuthor();
@@ -66,7 +68,6 @@ protected:
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
-    std::string TrimWhitespace(const std::string &target_string);
 
     std::string local_des_;
     std::string title_;
