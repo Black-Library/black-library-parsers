@@ -248,7 +248,7 @@ std::string Parser::TrimWhitespace(const std::string& target_string)
     {
         return "";
     }
-    std::cout << "size: " << target_string.size() << " - leading_pos: " << leading_pos << " - trailing_pos: " << trailing_pos << std::endl;
+
     return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
 }
 

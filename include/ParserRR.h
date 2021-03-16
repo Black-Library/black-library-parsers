@@ -24,6 +24,9 @@ struct RR_index_entry {
     // TODO add date added
 };
 
+struct RR_chapter_seek {
+};
+
 class ParserRR : public Parser
 {
 public:
@@ -38,6 +41,8 @@ protected:
     void ParseChapter();
     void FindChapterNodes(xmlNode *root_node);
     RR_index_entry ExtractIndexEntry(xmlNode *root_node);
+    bool SeekToChapterContent(xmlNode *root_node);
+    bool HasAttributeContent(xmlNode *root_node, const std::string &target_content);
 
 private:
     std::vector<RR_index_entry> index_entries_;

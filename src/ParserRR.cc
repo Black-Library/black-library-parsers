@@ -146,21 +146,26 @@ void ParserRR::Parse()
 
     // for (auto const& entry : index_entries_)
     // {
-    std::string rr_url = "https://www.royalroad.com" + index_entries_[0].data_url;
-    std::cout << rr_url << std::endl;
-    std::string chapter_result = CurlRequest(rr_url);
-    xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
-        HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    if (chapter_doc_tree == NULL)
-    {
-        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
-        return;
-    }
-    root_node = xmlDocGetRootElement(chapter_doc_tree);
-    current_node = root_node->children;
+        std::string rr_url = "https://www.royalroad.com" + index_entries_[0].data_url;
+        std::cout << rr_url << std::endl;
+        std::string chapter_result = CurlRequest(rr_url);
+        xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
+            HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+        if (chapter_doc_tree == NULL)
+        {
+            std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
+            return;
+        }
+        root_node = xmlDocGetRootElement(chapter_doc_tree);
+        current_node = root_node->children;
 
-    std::string doc_string = GenerateXmlDocTreeString(current_node);
-    std::cout << doc_string << std::endl;
+        std::string doc_string = GenerateXmlDocTreeString(current_node);
+        std::cout << doc_string << std::endl;
+
+        if (!SeekToChapterContent(current_node))
+        {
+            std::cout << "Failed seek" << std::endl;
+        }
 
     // }
 
@@ -307,6 +312,44 @@ RR_index_entry ParserRR::ExtractIndexEntry(xmlNode *root_node)
     xmlFree(data_url_node);
 
     return index_entry;
+}
+
+bool ParserRR::SeekToChapterContent(xmlNode *root_node)
+{
+    xmlNode *cur_node = NULL;
+    bool found = false;
+
+    for (cur_node = root_node; cur_node; cur_node = cur_node->next)
+    {
+        if (cur_node->type != XML_ELEMENT_NODE)
+            continue;
+        if (HasAttributeContent(cur_node, "chapter-inner chapter-content"))
+            found = true;
+
+        found = found || SeekToChapterContent(cur_node->children);
+    }
+    return found;
+}
+
+bool ParserRR::HasAttributeContent(xmlNode *root_node, const std::string &target_content)
+{
+    xmlAttrPtr attribute = root_node->properties;
+    bool found = false;
+
+    while (attribute)
+    {
+        xmlChar *attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
+        if (attr_content != NULL)
+        {
+            if (!target_content.compare(std::string((char *)attr_content)))
+                found = true;
+        }
+        xmlFree(attr_content);
+
+        attribute = attribute->next;
+    }
+    xmlFree(attribute);
+    return found;
 }
 
 } // namespace RR
