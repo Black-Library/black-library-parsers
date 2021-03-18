@@ -162,12 +162,17 @@ void ParserRR::Parse()
         // std::string doc_string = GenerateXmlDocTreeString(current_node);
         // std::cout << doc_string << std::endl;
 
-        std::cout << current_node->name << current_node->content << std::endl;
-        if (!SeekToChapterContent(current_node))
+        RR_chapter_seek chapter_seek = SeekToChapterContent(current_node);
+        if (!chapter_seek.chapter_found)
         {
             std::cout << "Failed seek" << std::endl;
         }
-        std::cout << current_node->name << current_node->content << std::endl;
+        else
+        {
+            current_node = chapter_seek.seek_node;
+            std::cout << "Succeeded seek" << std::endl;
+        }
+        std::cout << current_node->name << current_node->content << current_node->name << std::endl;
 
     // }
 
@@ -211,7 +216,7 @@ void ParserRR::ParseChapter()
 
 }
 
-void ParserRR::FindChapterNodes(xmlNode *root_node)
+void ParserRR::FindChapterNodes(xmlNodePtr root_node)
 {
     xmlNode *cur_node = NULL;
     for (cur_node = root_node; cur_node; cur_node = cur_node->next)
@@ -246,11 +251,11 @@ void ParserRR::FindChapterNodes(xmlNode *root_node)
     xmlFree(cur_node);
 }
 
-RR_index_entry ParserRR::ExtractIndexEntry(xmlNode *root_node)
+RR_index_entry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 {
-    xmlNode *cur_node = NULL;
-    xmlNode *data_url_node = NULL;
-    xmlNode *chapter_name_node = NULL;
+    xmlNodePtr cur_node = NULL;
+    xmlNodePtr data_url_node = NULL;
+    xmlNodePtr chapter_name_node = NULL;
     RR_index_entry index_entry;
 
     for (cur_node = root_node->children; cur_node; cur_node = cur_node->next)
@@ -316,27 +321,35 @@ RR_index_entry ParserRR::ExtractIndexEntry(xmlNode *root_node)
     return index_entry;
 }
 
-bool ParserRR::SeekToChapterContent(xmlNode *root_node)
+RR_chapter_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
 {
-    xmlNode *cur_node = NULL;
+    RR_chapter_seek chapter_seek;
+    xmlNodePtr cur_node = NULL;
     bool found = false;
 
     for (cur_node = root_node; cur_node; cur_node = cur_node->next)
     {
         if (cur_node->type != XML_ELEMENT_NODE)
             continue;
-        if (HasAttributeContent(cur_node, "chapter-inner chapter-content"))
+        if (NodeHasAttributeContent(cur_node, "chapter-inner chapter-content"))
         {
-            root_node = cur_node;
+            chapter_seek.seek_node = cur_node;
             found = true;
+            break;
         }
 
-        found = found || SeekToChapterContent(cur_node->children);
+        RR_chapter_seek children_seek = SeekToChapterContent(cur_node->children);
+
+        if (children_seek.seek_node != NULL)
+            chapter_seek.seek_node = children_seek.seek_node;
+        found = found || children_seek.chapter_found;
     }
-    return found;
+    chapter_seek.chapter_found = found;
+
+    return chapter_seek;
 }
 
-bool ParserRR::HasAttributeContent(xmlNode *root_node, const std::string &target_content)
+bool ParserRR::NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content)
 {
     xmlAttrPtr attribute = root_node->properties;
     bool found = false;

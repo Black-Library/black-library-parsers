@@ -25,6 +25,8 @@ struct RR_index_entry {
 };
 
 struct RR_chapter_seek {
+    xmlNodePtr seek_node = NULL;
+    bool chapter_found;
 };
 
 class ParserRR : public Parser
@@ -39,10 +41,10 @@ protected:
     std::string ParseTitle();
     std::string ParseAuthor();
     void ParseChapter();
-    void FindChapterNodes(xmlNode *root_node);
-    RR_index_entry ExtractIndexEntry(xmlNode *root_node);
-    bool SeekToChapterContent(xmlNode *root_node);
-    bool HasAttributeContent(xmlNode *root_node, const std::string &target_content);
+    void FindChapterNodes(xmlNodePtr root_node);
+    RR_index_entry ExtractIndexEntry(xmlNodePtr root_node);
+    RR_chapter_seek SeekToChapterContent(xmlNodePtr root_node);
+    bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
 
 private:
     std::vector<RR_index_entry> index_entries_;
