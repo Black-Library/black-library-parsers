@@ -159,13 +159,15 @@ void ParserRR::Parse()
         root_node = xmlDocGetRootElement(chapter_doc_tree);
         current_node = root_node->children;
 
-        std::string doc_string = GenerateXmlDocTreeString(current_node);
-        std::cout << doc_string << std::endl;
+        // std::string doc_string = GenerateXmlDocTreeString(current_node);
+        // std::cout << doc_string << std::endl;
 
+        std::cout << current_node->name << current_node->content << std::endl;
         if (!SeekToChapterContent(current_node))
         {
             std::cout << "Failed seek" << std::endl;
         }
+        std::cout << current_node->name << current_node->content << std::endl;
 
     // }
 
@@ -324,7 +326,10 @@ bool ParserRR::SeekToChapterContent(xmlNode *root_node)
         if (cur_node->type != XML_ELEMENT_NODE)
             continue;
         if (HasAttributeContent(cur_node, "chapter-inner chapter-content"))
+        {
+            root_node = cur_node;
             found = true;
+        }
 
         found = found || SeekToChapterContent(cur_node->children);
     }
