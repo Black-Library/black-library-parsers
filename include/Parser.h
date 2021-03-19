@@ -65,6 +65,7 @@ protected:
 
     std::string GenerateXmlDocTreeString(xmlNode *root_node);
     std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
+    std::string GetChapterFileName(size_t index);
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 

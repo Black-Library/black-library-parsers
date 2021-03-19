@@ -174,8 +174,10 @@ void ParserRR::Parse()
         // std::string doc_string = GenerateXmlDocTreeString(current_node);
         // std::cout << doc_string << std::endl;
 
+        std::string chapter_file_name = GetChapterFileName(1);
+
         FILE* chapter_file;
-        chapter_file = fopen("CH1.html", "w+");
+        chapter_file = fopen(chapter_file_name.c_str(), "w+");
         xmlElemDump(chapter_file, chapter_doc_tree, current_node);
         fclose(chapter_file);
     // }

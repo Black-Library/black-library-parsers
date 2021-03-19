@@ -12,6 +12,8 @@ namespace core {
 
 namespace parsers {
 
+#define CHAPTER_FILENAME_BUFFER_SIZE 15
+
 Parser::Parser(parser_rep parser_type)
 {
     parser_type_ = parser_type;
@@ -208,6 +210,16 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
     }
 
     return ss.str();
+}
+
+std::string Parser::GetChapterFileName(size_t index)
+{
+    char buffer [CHAPTER_FILENAME_BUFFER_SIZE];
+    int res = snprintf(buffer, CHAPTER_FILENAME_BUFFER_SIZE, "CH%03lu.html", index);
+    if (res < 0)
+        return "";
+
+    return std::string(buffer);
 }
 
 std::string Parser::GetSpaceString(size_t num_tabs)
