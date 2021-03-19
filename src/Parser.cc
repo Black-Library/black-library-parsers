@@ -235,6 +235,7 @@ xmlAttributePayload Parser::GetXmlAttributeContentByName(xmlAttrPtr &attribute_p
     if (!xmlStrcmp(attribute_ptr->name, (const xmlChar *) name.c_str()))
     {
         attr_result.result = std::string((char *)attribute_ptr->children->content);
+        attr_result.attribute_found = true;
     }
 
     return attr_result;

@@ -30,7 +30,7 @@ namespace parsers {
 struct xmlAttributePayload {
     std::string result = "";
     bool is_null = false;
-    bool found = false;
+    bool attribute_found = false;
 };
 
 class Parser
@@ -67,7 +67,6 @@ protected:
     std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
-
 
     std::string local_des_;
     std::string title_;

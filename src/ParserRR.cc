@@ -39,6 +39,8 @@ void ParserRR::Parse()
         return;
     }
 
+    // const xmlChar* encoding = doc_tree->encoding;
+
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
@@ -79,7 +81,7 @@ void ParserRR::Parse()
                         {
                             xmlAttrPtr author_attr = attribute->next;
                             xmlAttributePayload attr_result = GetXmlAttributeContentByName(author_attr, "content");
-                            if (attr_result.is_null)
+                            if (attr_result.is_null || !attr_result.attribute_found)
                                 continue;
                             author = attr_result.result;
                         }
@@ -87,7 +89,7 @@ void ParserRR::Parse()
                         {
                             xmlAttrPtr title_attr = attribute->next;
                             xmlAttributePayload attr_result = GetXmlAttributeContentByName(title_attr, "content");
-                            if (attr_result.is_null)
+                            if (attr_result.is_null || !attr_result.attribute_found)
                                 continue;
                             std::string unprocessed_title = attr_result.result;
                             size_t found = unprocessed_title.find_last_of("/\\");
@@ -135,8 +137,6 @@ void ParserRR::Parse()
 
     FindChapterNodes(current_node);
 
-    std::cout << "found chapter nodes" << std::endl;
-
     std::stringstream ss;
     for (auto const& item : index_entries_)
     {
@@ -159,9 +159,8 @@ void ParserRR::Parse()
         root_node = xmlDocGetRootElement(chapter_doc_tree);
         current_node = root_node->children;
 
-        // std::string doc_string = GenerateXmlDocTreeString(current_node);
-        // std::cout << doc_string << std::endl;
-
+        // TODO: make chapter_seek exit loop if failure
+        // make length of chapter effect sleep duration
         RR_chapter_seek chapter_seek = SeekToChapterContent(current_node);
         if (!chapter_seek.chapter_found)
         {
@@ -172,19 +171,22 @@ void ParserRR::Parse()
             current_node = chapter_seek.seek_node;
             std::cout << "Succeeded seek" << std::endl;
         }
-        std::cout << current_node->name << current_node->content << current_node->name << std::endl;
+        // std::string doc_string = GenerateXmlDocTreeString(current_node);
+        // std::cout << doc_string << std::endl;
 
+        FILE* chapter_file;
+        chapter_file = fopen("CH1.html", "w+");
+        xmlElemDump(chapter_file, chapter_doc_tree, current_node);
+        fclose(chapter_file);
     // }
 
     std::string des = local_des_ + title + ".html";
 
     FILE* file;
     file = fopen(des.c_str(), "w+");
-    FILE* chapter_file;
-    chapter_file = fopen("CH1.html", "w+");
+
 
     xmlDocFormatDump(file, doc_tree, 1);
-    xmlDocFormatDump(chapter_file, chapter_doc_tree, 1);
 
     xmlFreeDoc(doc_tree);
     xmlFreeDoc(chapter_doc_tree);
@@ -218,14 +220,14 @@ void ParserRR::ParseChapter()
 
 void ParserRR::FindChapterNodes(xmlNodePtr root_node)
 {
-    xmlNode *cur_node = NULL;
+    xmlNodePtr cur_node = NULL;
     for (cur_node = root_node; cur_node; cur_node = cur_node->next)
     {
         if (cur_node->type == XML_ELEMENT_NODE)
         {
             if (!xmlStrcmp(cur_node->name, (const xmlChar *)"tbody"))
             {
-                xmlNode *index_node = NULL;
+                xmlNodePtr index_node = NULL;
                 uint16_t index_num = 0;
                 for (index_node = cur_node->children; index_node; index_node = index_node->next)
                 {
@@ -237,6 +239,7 @@ void ParserRR::FindChapterNodes(xmlNodePtr root_node)
                         ++index_num;
                     }
                 }
+                xmlFree(index_node);
             }
         }
         else if (cur_node->type == XML_ATTRIBUTE_NODE)
@@ -367,6 +370,7 @@ bool ParserRR::NodeHasAttributeContent(xmlNodePtr root_node, const std::string &
         attribute = attribute->next;
     }
     xmlFree(attribute);
+
     return found;
 }
 
