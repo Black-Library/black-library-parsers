@@ -57,6 +57,7 @@ public:
     std::string GetTitle();
     std::string GetUrl();
 
+    bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
     std::string TrimWhitespace(const std::string &target_string);
 
 protected:
@@ -65,7 +66,7 @@ protected:
 
     std::string GenerateXmlDocTreeString(xmlNode *root_node);
     std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
-    std::string GetChapterFileName(size_t index);
+    std::string GetChapterFileName(size_t index, const std::string &chapter_name);
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 

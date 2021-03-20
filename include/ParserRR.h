@@ -41,10 +41,11 @@ protected:
     std::string ParseTitle();
     std::string ParseAuthor();
     void ParseChapter();
-    void FindChapterNodes(xmlNodePtr root_node);
+
     RR_index_entry ExtractIndexEntry(xmlNodePtr root_node);
+    void FindChapterNodes(xmlNodePtr root_node);
+    std::string GetRRChapterName(const std::string &data_url);
     RR_chapter_seek SeekToChapterContent(xmlNodePtr root_node);
-    bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
 
 private:
     std::vector<RR_index_entry> index_entries_;
