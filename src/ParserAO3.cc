@@ -74,9 +74,9 @@ std::string ParserAO3::ParseAuthor()
     return "";
 }
 
-void ParserAO3::ParseChapter()
+int ParserAO3::ParseChapter()
 {
-
+    return 0;
 }
 
 } // namespace AO3

@@ -40,7 +40,7 @@ public:
 protected:
     std::string ParseTitle();
     std::string ParseAuthor();
-    void ParseChapter();
+    int ParseChapter(int index);
 
     RR_index_entry ExtractIndexEntry(xmlNodePtr root_node);
     void FindChapterNodes(xmlNodePtr root_node);

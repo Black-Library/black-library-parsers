@@ -70,10 +70,14 @@ protected:
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
-    std::string local_des_;
     std::string title_;
+    std::string nickname_;
     std::string source_url_;
     std::string url_;
+    std::string author_;
+
+    std::string local_des_;
+
     parser_rep parser_type_;
 
 private:

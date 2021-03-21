@@ -18,16 +18,16 @@ ParserRR::ParserRR()
 {
     parser_type_ = RR_PARSER;
     source_url_ = RR::source_url;
+
+    title_ = "RR_Parser_title";
+    nickname_ = "";
+    author_ = "unknown author";
 }
 
 void ParserRR::Parse()
 {
     std::cout << "Start ParserRR Parse" << std::endl;
-    std::string url_adult = url_;
-    std::string curl_result = CurlRequest(url_adult);
-    std::string author = "unknown author";
-    std::string title = "RR_Parser_base_title";
-    std::string nickname;
+    std::string curl_result = CurlRequest(url_);
     bool head_found = false;
     bool body_found = false;
 
@@ -83,7 +83,7 @@ void ParserRR::Parse()
                             xmlAttributePayload attr_result = GetXmlAttributeContentByName(author_attr, "content");
                             if (attr_result.is_null || !attr_result.attribute_found)
                                 continue;
-                            author = attr_result.result;
+                            author_ = attr_result.result;
                         }
                         else if (!xmlStrcmp(attr_content, (const xmlChar *) "og:url"))
                         {
@@ -93,7 +93,7 @@ void ParserRR::Parse()
                                 continue;
                             std::string unprocessed_title = attr_result.result;
                             size_t found = unprocessed_title.find_last_of("/\\");
-                            title = unprocessed_title.substr(found + 1, unprocessed_title.size());
+                            title_ = unprocessed_title.substr(found + 1, unprocessed_title.size());
                         }
                     }
                     xmlFree(attr_content);
@@ -108,9 +108,9 @@ void ParserRR::Parse()
     }
     xmlFree(current_node);
 
-    std::cout << "\tTitle: " << title << std::endl;
-    std::cout << "\tAuthor: " << author << std::endl;
-    std::cout << "\tNickname: " << nickname << std::endl;
+    std::cout << "\tTitle: " << title_ << std::endl;
+    std::cout << "\tAuthor: " << author_ << std::endl;
+    std::cout << "\tNickname: " << nickname_ << std::endl;
     std::cout << "\tElement_counter: " << element_counter << std::endl;
 
     // reset current node ptr to root node children
@@ -146,57 +146,13 @@ void ParserRR::Parse()
 
     // for (auto const& entry : index_entries_)
     // {
-        std::string rr_url = "https://www.royalroad.com" + index_entries_[0].data_url;
-        std::cout << rr_url << std::endl;
-        std::string chapter_result = CurlRequest(rr_url);
-        xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
-            HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-        if (chapter_doc_tree == NULL)
-        {
-            std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
-            return;
-        }
-        root_node = xmlDocGetRootElement(chapter_doc_tree);
-        current_node = root_node->children;
-
-        // TODO: make chapter_seek exit loop if failure
-        // make length of chapter effect sleep duration
-        RR_chapter_seek chapter_seek = SeekToChapterContent(current_node);
-        if (!chapter_seek.chapter_found)
-        {
-            std::cout << "Failed seek" << std::endl;
-        }
-        else
-        {
-            current_node = chapter_seek.seek_node;
-            std::cout << "Succeeded seek" << std::endl;
-        }
-        // std::string doc_string = GenerateXmlDocTreeString(current_node);
-        // std::cout << doc_string << std::endl;
-
-        std::string chapter_name = GetRRChapterName(index_entries_[0].data_url);
-
-        if (chapter_name.empty())
-        {
-            // exit loop
-        }
-
-        std::string chapter_file_name = GetChapterFileName(1, chapter_name);
-
-        FILE* chapter_file;
-        chapter_file = fopen(chapter_file_name.c_str(), "w+");
-        xmlElemDump(chapter_file, chapter_doc_tree, current_node);
-        fclose(chapter_file);
+        ParseChapter(1);
     // }
 
-
-
-    std::string des = local_des_ + title + ".html";
+    std::string des = local_des_ + title_ + ".html";
 
     xmlFreeDoc(doc_tree);
-    xmlFreeDoc(chapter_doc_tree);
     xmlCleanupParser();
-
 }
 
 Parser ParserRR::Copy()
@@ -217,9 +173,54 @@ std::string ParserRR::ParseAuthor()
     return "";
 }
 
-void ParserRR::ParseChapter()
+int ParserRR::ParseChapter(int index)
 {
+    std::string rr_url = "https://www.royalroad.com"+ index_entries_[index].data_url;
+    std::cout << "ParserRR ParseChapter: " << rr_url << std::endl;
+    std::string chapter_result = CurlRequest(rr_url);
+    xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
+        HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+    if (chapter_doc_tree == NULL)
+    {
+        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
+        return -1;
+    }
+    xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
+    xmlNodePtr current_node = root_node->children;
 
+    // TODO: make chapter_seek exit loop if failure
+    // make length of chapter effect sleep duration
+    RR_chapter_seek chapter_seek = SeekToChapterContent(current_node);
+    if (!chapter_seek.chapter_found)
+    {
+        std::cout << "Error: Failed seek" << std::endl;
+        return -1;
+    }
+    else
+    {
+        current_node = chapter_seek.seek_node;
+    }
+
+    std::string chapter_name = GetRRChapterName(index_entries_[index].data_url);
+
+    if (chapter_name.empty())
+    {
+        std::cout << "Error: Unable to generate RR chapter name" << std::endl;
+        return -1;
+    }
+
+    std::string chapter_file_name = GetChapterFileName(index + 1, chapter_name);
+
+    FILE* chapter_file;
+    chapter_file = fopen(chapter_file_name.c_str(), "w+");
+    xmlElemDump(chapter_file, chapter_doc_tree, current_node);
+    fclose(chapter_file);
+    
+    // xmlFree(current_node);
+    // xmlFree(root_node);
+    // xmlFreeDoc(chapter_doc_tree);
+
+    return 0;
 }
 
 RR_index_entry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)

@@ -67,9 +67,9 @@ std::string ParserFFN::ParseAuthor()
     return "";
 }
 
-void ParserFFN::ParseChapter()
+int ParserFFN::ParseChapter()
 {
-
+    return 0;
 }
 
 } // namespace FFN
