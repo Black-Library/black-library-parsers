@@ -2,6 +2,7 @@
  * Parser.cc
  */
 
+#include <functional>
 #include <sstream>
 
 #include <Parser.h>
@@ -17,6 +18,7 @@ namespace parsers {
 Parser::Parser(parser_rep parser_type)
 {
     parser_type_ = parser_type;
+    distribution_ = std::uniform_int_distribution<int>(1, 1000);
 }
 
 void Parser::Parse()
@@ -140,6 +142,20 @@ std::string Parser::GetTitle()
 std::string Parser::GetUrl()
 {
     return url_;
+}
+
+size_t Parser::GenerateWaitTime(size_t length)
+{
+    size_t wait_time;
+    auto dice = std::bind(distribution_, generator_);
+
+    for (size_t i = 0; i < length; ++i)
+    {
+        wait_time += 5 * 1000 + dice();
+        std::cout << wait_time << std::endl;
+    }
+
+    return wait_time;
 }
 
 bool Parser::NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content)

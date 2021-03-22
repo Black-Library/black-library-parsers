@@ -11,6 +11,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <string>
 
 #include <curl/curl.h>
@@ -57,6 +58,7 @@ public:
     std::string GetTitle();
     std::string GetUrl();
 
+    size_t GenerateWaitTime(size_t length);
     bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
     std::string TrimWhitespace(const std::string &target_string);
 
@@ -69,6 +71,9 @@ protected:
     std::string GetChapterFileName(size_t index, const std::string &chapter_name);
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
+
+    std::default_random_engine generator_;
+    std::uniform_int_distribution<int> distribution_;
 
     std::string title_;
     std::string nickname_;

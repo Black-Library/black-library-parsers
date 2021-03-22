@@ -133,7 +133,7 @@ void ParserRR::Parse()
         return;
     }
 
-    std::cout << "find chapter nodes" << std::endl;
+    std::cout << "ParserRR: Find chapter nodes" << std::endl;
 
     FindChapterNodes(current_node);
 
@@ -146,7 +146,15 @@ void ParserRR::Parse()
 
     // for (auto const& entry : index_entries_)
     // {
-        ParseChapter(1);
+        // Check local_des_
+        RR_chapter_parse chapter_parse_info = ParseChapter(index_entries_[0]);
+        // if (chapter_parse_info.has_error)
+        //     continue;
+
+        // for now, input raw size_t length
+        size_t wait_time = GenerateWaitTime(chapter_parse_info.RR_length);
+
+        std::cout << "ParserRR: " << title_ << " chapter length is " << chapter_parse_info.RR_length << " - waiting " << wait_time << " milliseconds" << std::endl;
     // }
 
     std::string des = local_des_ + title_ + ".html";
@@ -173,54 +181,68 @@ std::string ParserRR::ParseAuthor()
     return "";
 }
 
-int ParserRR::ParseChapter(int index)
+RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
 {
-    std::string rr_url = "https://www.royalroad.com"+ index_entries_[index].data_url;
+    RR_chapter_parse output;
+    std::string rr_url = "https://www.royalroad.com"+ entry.data_url;
     std::cout << "ParserRR ParseChapter: " << rr_url << std::endl;
+
     std::string chapter_result = CurlRequest(rr_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (chapter_doc_tree == NULL)
     {
         std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
-        return -1;
+        output.has_error = true;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
     }
+
     xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
     xmlNodePtr current_node = root_node->children;
+    xmlNodePtr length_node = NULL;
+    size_t length = 0;
 
-    // TODO: make chapter_seek exit loop if failure
-    // make length of chapter effect sleep duration
     RR_chapter_seek chapter_seek = SeekToChapterContent(current_node);
     if (!chapter_seek.chapter_found)
     {
         std::cout << "Error: Failed seek" << std::endl;
-        return -1;
-    }
-    else
-    {
-        current_node = chapter_seek.seek_node;
+        output.has_error = true;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
     }
 
-    std::string chapter_name = GetRRChapterName(index_entries_[index].data_url);
+    current_node = chapter_seek.seek_node;
+
+    for (length_node = current_node->children; length_node; length_node = length_node->next)
+    {
+        if (length_node->type != XML_ELEMENT_NODE)
+            continue;
+        ++length;
+    }
+
+    output.RR_length = length;
+
+    std::string chapter_name = GetRRChapterName(entry.data_url);
 
     if (chapter_name.empty())
     {
         std::cout << "Error: Unable to generate RR chapter name" << std::endl;
-        return -1;
+        output.has_error = true;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
     }
 
-    std::string chapter_file_name = GetChapterFileName(index + 1, chapter_name);
+    std::string chapter_file_name = GetChapterFileName(entry.index_num + 1, chapter_name);
 
     FILE* chapter_file;
     chapter_file = fopen(chapter_file_name.c_str(), "w+");
     xmlElemDump(chapter_file, chapter_doc_tree, current_node);
     fclose(chapter_file);
-    
-    // xmlFree(current_node);
-    // xmlFree(root_node);
-    // xmlFreeDoc(chapter_doc_tree);
 
-    return 0;
+    xmlFreeDoc(chapter_doc_tree);
+
+    return output;
 }
 
 RR_index_entry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
