@@ -17,9 +17,9 @@ namespace parsers {
 
 namespace RR {
 
-struct RR_chapter_seek {
+struct RR_xml_node_seek {
     xmlNodePtr seek_node = NULL;
-    bool chapter_found;
+    bool found = false;
 };
 
 struct RR_index_entry {
@@ -37,9 +37,10 @@ struct RR_chapter_parse {
 class ParserRR : public Parser
 {
 public:
-    ParserRR();
+    explicit ParserRR();
 
     void Parse();
+    void Stop();
     Parser Copy();
 
 protected:
@@ -49,8 +50,11 @@ protected:
 
     RR_index_entry ExtractIndexEntry(xmlNodePtr root_node);
     void FindChapterNodes(xmlNodePtr root_node);
+    void FindMetaData(xmlNodePtr root_node);
     std::string GetRRChapterName(const std::string &data_url);
-    RR_chapter_seek SeekToChapterContent(xmlNodePtr root_node);
+    RR_xml_node_seek SeekToChapterContent(xmlNodePtr root_node);
+    RR_xml_node_seek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
+    
 
 private:
     std::vector<RR_index_entry> index_entries_;

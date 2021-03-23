@@ -42,6 +42,7 @@ public:
     virtual ~Parser() = default;
 
     virtual void Parse();
+    virtual void Stop();
     virtual Parser Copy();
 
     std::string CurlRequest(const std::string &url);
@@ -84,6 +85,7 @@ protected:
     std::string local_des_;
 
     parser_rep parser_type_;
+    bool done_;
 
 private:
 };

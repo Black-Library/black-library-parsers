@@ -32,12 +32,18 @@ Parser::Parser(parser_rep parser_type)
                 ).count() );
 
     generator_ = std::mt19937_64(seed);
-    distribution_ = std::uniform_int_distribution<int>(1, 1000);
+    distribution_ = std::uniform_int_distribution<int>(0, 2);
+    done_ = false;
 }
 
 void Parser::Parse()
 {
 
+}
+
+void Parser::Stop()
+{
+    
 }
 
 std::string Parser::CurlRequest(const std::string &url)
@@ -160,12 +166,11 @@ std::string Parser::GetUrl()
 
 size_t Parser::GenerateWaitTime(size_t length)
 {
-    size_t wait_time;
+    size_t wait_time = 0;
 
     for (size_t i = 0; i < length; ++i)
     {
-        wait_time += 5 * 1000 + distribution_(generator_);
-        std::cout << wait_time << std::endl;
+        wait_time += 5 + distribution_(generator_);
     }
 
     return wait_time;
@@ -224,16 +229,16 @@ std::string Parser::GenerateXmlDocTreeString(xmlNode *root_node)
 std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth)
 {
     std::stringstream ss;
-    xmlNode *cur_node = NULL;
+    xmlNode *current_node = NULL;
 
-    for (cur_node = root_node; cur_node; cur_node = cur_node->next)
+    for (current_node = root_node; current_node; current_node = current_node->next)
     {
         std::string attribute_content_string = "";
-        xmlAttrPtr attribute = cur_node->properties;
+        xmlAttrPtr attribute = current_node->properties;
         while (attribute)
         {
             const xmlChar *attr_name = attribute->name;
-            xmlChar *attr_content = xmlNodeListGetString(cur_node->doc, attribute->children, 1);
+            xmlChar *attr_content = xmlNodeListGetString(current_node->doc, attribute->children, 1);
             if (attr_name !=NULL && attr_content != NULL)
             {
                 attribute_content_string += std::string((char *) attr_name) + ": " + std::string((char *) attr_content) + " ";
@@ -243,21 +248,21 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
         }
         xmlFree(attribute);
 
-        if (cur_node->type == XML_ELEMENT_NODE)
+        if (current_node->type == XML_ELEMENT_NODE)
         {
-            ss << GetSpaceString(depth) << "node type: Element, name: " << cur_node->name << 
+            ss << GetSpaceString(depth) << "node type: Element, name: " << current_node->name << 
             ", Attributes: " << attribute_content_string << std::endl;
         }
-        else if (cur_node->type == XML_ATTRIBUTE_NODE)
+        else if (current_node->type == XML_ATTRIBUTE_NODE)
         {
-            ss << GetSpaceString(depth) << "node type: Attribute, name: " << cur_node->name << 
+            ss << GetSpaceString(depth) << "node type: Attribute, name: " << current_node->name << 
             ", Attributes: " << attribute_content_string << std::endl;
         }
-        else if (cur_node->type == XML_TEXT_NODE)
+        else if (current_node->type == XML_TEXT_NODE)
         {
             std::string content_string = "unknown content";
             size_t string_size = 0;
-            xmlChar *content = xmlNodeGetContent(cur_node);
+            xmlChar *content = xmlNodeGetContent(current_node);
             if (content != NULL)
             {
                 std::string unclean = std::string((char *)content);
@@ -265,11 +270,11 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
             }
             xmlFree(content);
             string_size = content_string.size();
-            ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << 
+            ss << GetSpaceString(depth) << "node type: Text, name: " << current_node->name << 
             ", Attributes: " << attribute_content_string << ", Content: " << content_string << ", Size: " << string_size << std::endl;
         }
 
-        ss << GenerateXmlDocTreeStringHelper(cur_node->children, depth + 1);
+        ss << GenerateXmlDocTreeStringHelper(current_node->children, depth + 1);
     }
 
     return ss.str();

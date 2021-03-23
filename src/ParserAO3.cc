@@ -56,6 +56,11 @@ void ParserAO3::Parse()
     fclose(file);
 }
 
+void ParserAO3::Stop()
+{
+    
+}
+
 Parser ParserAO3::Copy()
 {
     ParserAO3 parser;

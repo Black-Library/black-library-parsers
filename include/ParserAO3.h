@@ -22,6 +22,7 @@ public:
     ~ParserAO3();
 
     void Parse();
+    void Stop();
     Parser Copy();
 
 protected:
