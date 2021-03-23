@@ -72,7 +72,7 @@ protected:
     std::string GetSpaceString(size_t num_tabs);
     xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
-    std::default_random_engine generator_;
+    std::mt19937_64 generator_;
     std::uniform_int_distribution<int> distribution_;
 
     std::string title_;

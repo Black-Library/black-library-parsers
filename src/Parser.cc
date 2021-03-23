@@ -2,6 +2,7 @@
  * Parser.cc
  */
 
+#include <chrono>
 #include <functional>
 #include <sstream>
 
@@ -18,6 +19,19 @@ namespace parsers {
 Parser::Parser(parser_rep parser_type)
 {
     parser_type_ = parser_type;
+
+    std::random_device rd;
+    std::mt19937_64::result_type seed = rd() ^ (
+            (std::mt19937_64::result_type)
+            std::chrono::duration_cast<std::chrono::seconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+                ).count() +
+            (std::mt19937_64::result_type)
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch()
+                ).count() );
+
+    generator_ = std::mt19937_64(seed);
     distribution_ = std::uniform_int_distribution<int>(1, 1000);
 }
 
@@ -147,11 +161,10 @@ std::string Parser::GetUrl()
 size_t Parser::GenerateWaitTime(size_t length)
 {
     size_t wait_time;
-    auto dice = std::bind(distribution_, generator_);
 
     for (size_t i = 0; i < length; ++i)
     {
-        wait_time += 5 * 1000 + dice();
+        wait_time += 5 * 1000 + distribution_(generator_);
         std::cout << wait_time << std::endl;
     }
 
