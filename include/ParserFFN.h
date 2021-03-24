@@ -22,7 +22,6 @@ public:
     ~ParserFFN();
 
     void Parse();
-    Parser Copy();
 
 protected:
     std::string ParseTitle();

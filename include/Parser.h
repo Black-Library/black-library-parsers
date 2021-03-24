@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <atomic>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -43,7 +44,6 @@ public:
 
     virtual void Parse();
     virtual void Stop();
-    virtual Parser Copy();
 
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
@@ -85,7 +85,7 @@ protected:
     std::string local_des_;
 
     parser_rep parser_type_;
-    bool done_;
+    std::atomic_bool done_;
 
 private:
 };

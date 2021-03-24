@@ -23,7 +23,6 @@ public:
 
     void Parse();
     void Stop();
-    Parser Copy();
 
 protected:
     std::string ParseTitle();

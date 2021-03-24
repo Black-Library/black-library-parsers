@@ -33,7 +33,7 @@ Parser::Parser(parser_rep parser_type)
 
     generator_ = std::mt19937_64(seed);
     distribution_ = std::uniform_int_distribution<int>(0, 2);
-    done_ = false;
+    done_ = true;
 }
 
 void Parser::Parse()
@@ -114,29 +114,22 @@ xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string val
 
 void Parser::SetParserType(parser_rep parser_type)
 {
-    this->parser_type_ = parser_type;
+    parser_type_ = parser_type;
 }
 
 void Parser::SetSourceUrl(const std::string &url)
 {
-    this->source_url_ = url;
+    source_url_ = url;
 }
 
 void Parser::SetUrl(const std::string &url)
 {
-    this->url_ = url;
+    url_ = url;
 }
 
 void Parser::SetLocalFilePath(const std::string &local_des)
 {
-    this->local_des_ = local_des;
-}
-
-Parser Parser::Copy()
-{
-    Parser parser;
-    parser.SetSourceUrl(this->GetSourceUrl());
-    return parser;
+    local_des_ = local_des;
 }
 
 std::string Parser::GetLocalDes()
@@ -229,16 +222,16 @@ std::string Parser::GenerateXmlDocTreeString(xmlNode *root_node)
 std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth)
 {
     std::stringstream ss;
-    xmlNode *current_node = NULL;
+    xmlNode *cur_node = NULL;
 
-    for (current_node = root_node; current_node; current_node = current_node->next)
+    for (cur_node = root_node; cur_node; cur_node = cur_node->next)
     {
         std::string attribute_content_string = "";
-        xmlAttrPtr attribute = current_node->properties;
+        xmlAttrPtr attribute = cur_node->properties;
         while (attribute)
         {
             const xmlChar *attr_name = attribute->name;
-            xmlChar *attr_content = xmlNodeListGetString(current_node->doc, attribute->children, 1);
+            xmlChar *attr_content = xmlNodeListGetString(cur_node->doc, attribute->children, 1);
             if (attr_name !=NULL && attr_content != NULL)
             {
                 attribute_content_string += std::string((char *) attr_name) + ": " + std::string((char *) attr_content) + " ";
@@ -248,21 +241,21 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
         }
         xmlFree(attribute);
 
-        if (current_node->type == XML_ELEMENT_NODE)
+        if (cur_node->type == XML_ELEMENT_NODE)
         {
-            ss << GetSpaceString(depth) << "node type: Element, name: " << current_node->name << 
+            ss << GetSpaceString(depth) << "node type: Element, name: " << cur_node->name << 
             ", Attributes: " << attribute_content_string << std::endl;
         }
-        else if (current_node->type == XML_ATTRIBUTE_NODE)
+        else if (cur_node->type == XML_ATTRIBUTE_NODE)
         {
-            ss << GetSpaceString(depth) << "node type: Attribute, name: " << current_node->name << 
+            ss << GetSpaceString(depth) << "node type: Attribute, name: " << cur_node->name << 
             ", Attributes: " << attribute_content_string << std::endl;
         }
-        else if (current_node->type == XML_TEXT_NODE)
+        else if (cur_node->type == XML_TEXT_NODE)
         {
             std::string content_string = "unknown content";
             size_t string_size = 0;
-            xmlChar *content = xmlNodeGetContent(current_node);
+            xmlChar *content = xmlNodeGetContent(cur_node);
             if (content != NULL)
             {
                 std::string unclean = std::string((char *)content);
@@ -270,11 +263,11 @@ std::string Parser::GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t de
             }
             xmlFree(content);
             string_size = content_string.size();
-            ss << GetSpaceString(depth) << "node type: Text, name: " << current_node->name << 
+            ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << 
             ", Attributes: " << attribute_content_string << ", Content: " << content_string << ", Size: " << string_size << std::endl;
         }
 
-        ss << GenerateXmlDocTreeStringHelper(current_node->children, depth + 1);
+        ss << GenerateXmlDocTreeStringHelper(cur_node->children, depth + 1);
     }
 
     return ss.str();

@@ -118,14 +118,6 @@ void ParserRR::Stop()
     done_ = true;
 }
 
-Parser ParserRR::Copy()
-{
-    std::cout << "ParserRR Copy" << std::endl;
-    ParserRR parser;
-    parser.SetSourceUrl(this->GetSourceUrl());
-    return parser;
-}
-
 std::string ParserRR::ParseTitle()
 {
     return "";
