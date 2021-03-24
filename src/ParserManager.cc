@@ -44,6 +44,7 @@ int ParserManager::Run()
 
 int ParserManager::RunOnce()
 {
+    // add new urls to queue
     return 0;
 }
 
@@ -57,7 +58,7 @@ int ParserManager::Stop()
 
 int ParserManager::AddUrl(const std::string &url)
 {
-    urls_.emplace(url);
+    urls_.push(url);
 
     return 0;
 }

@@ -6,10 +6,10 @@
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_MANAGER_H__
 
 #include <atomic>
-#include <queue>
 #include <unordered_map>
 
-#include <ThreadPool.h>
+#include "ThreadPool.h"
+#include "BlockingQueue.h"
 
 #include "Parser.h"
 #include "ParserFactory.h"
@@ -44,7 +44,7 @@ private:
 
     ThreadPool pool_;
     ParserFactory parser_factory_;
-    std::queue<std::string> urls_;
+    BlockingQueue<std::string> urls_;
     std::string config_;
     std::atomic_bool done_;
 };
