@@ -40,6 +40,7 @@ public:
     explicit ParserRR();
 
     void Parse();
+    void Parse(size_t start_chapter);
     void Stop();
 
 protected:

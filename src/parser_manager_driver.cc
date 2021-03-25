@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
     parser_manager = &manager;
 
-    parser_manager->AddUrl("https://archiveofourown.org/works/505809");
+    parser_manager->AddUrl("https://www.royalroad.com/fiction/21220/mother-of-learning");
 
     parser_manager->Run();
 

@@ -23,8 +23,9 @@ ParserAO3::~ParserAO3()
 
 }
 
-void ParserAO3::Parse()
+void ParserAO3::Parse(size_t start_chapter)
 {
+    (void) start_chapter;
     std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
 

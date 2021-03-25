@@ -88,7 +88,7 @@ void ParserManager::Init()
                   result.io_result = ss.str();
                   return result;
                 }
-                factory_result.parser_result->Parse();
+                factory_result.parser_result->Parse(1);
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 ss << "stopping parser manager slot " << i << std::endl;

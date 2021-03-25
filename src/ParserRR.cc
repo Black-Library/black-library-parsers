@@ -28,6 +28,11 @@ ParserRR::ParserRR() :
 
 void ParserRR::Parse()
 {
+    Parse(1);
+}
+
+void ParserRR::Parse(size_t start_chapter)
+{
     std::cout << "Start ParserRR Parse" << std::endl;
     std::string curl_result = CurlRequest(url_);
 
@@ -49,6 +54,7 @@ void ParserRR::Parse()
     if (!head_seek.found)
     {
         std::cout << "Could not find head, exiting" << std::endl;
+        xmlFreeDoc(doc_tree);
         return;
     }
 
@@ -68,6 +74,7 @@ void ParserRR::Parse()
     if (!body_seek.found)
     {
         std::cout << "Could not find chapter index, exiting" << std::endl;
+        xmlFreeDoc(doc_tree);
         return;
     }
 
@@ -77,11 +84,22 @@ void ParserRR::Parse()
 
     FindChapterNodes(current_node);
 
+    xmlFreeDoc(doc_tree);
+
     std::cout << "ParserRR: Found " << index_entries_.size() << " nodes" << std::endl;
 
-    size_t index = 0;
+    size_t index = start_chapter - 1;
+
+    if (index > index_entries_.size())
+    {
+        std::cout << "Error: ParserRR requested index greater than size" << std::endl;
+        xmlFreeDoc(doc_tree);
+        return;
+    }
+
     size_t seconds_counter = 0;
     size_t wait_time = 0;
+    done_ = false;
 
     // TODO: make parser take 8ish hour break
     while (!done_)
@@ -109,7 +127,6 @@ void ParserRR::Parse()
         std::this_thread::sleep_until(deadline);
     }
 
-    xmlFreeDoc(doc_tree);
     xmlCleanupParser();
 }
 
@@ -141,7 +158,6 @@ RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
     {
         std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
         output.has_error = true;
-        xmlFreeDoc(chapter_doc_tree);
         return output;
     }
 
@@ -404,8 +420,6 @@ RR_xml_node_seek ParserRR::SeekToNodeByName(xmlNodePtr root_node, const std::str
             break;
         }
     }
-
-    xmlFree(current_node);
 
     return seek;
 }
