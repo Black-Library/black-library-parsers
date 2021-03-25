@@ -23,6 +23,11 @@ ParserAO3::~ParserAO3()
 
 }
 
+void ParserAO3::Parse()
+{
+    Parse(1);
+}
+
 void ParserAO3::Parse(size_t start_chapter)
 {
     (void) start_chapter;

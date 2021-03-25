@@ -42,6 +42,7 @@ public:
     Parser() : Parser(_NUM_PARSERS_TYPE){};
     virtual ~Parser() = default;
 
+    virtual void Parse();
     virtual void Parse(size_t start_chapter);
     virtual void Stop();
 

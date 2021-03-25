@@ -36,6 +36,11 @@ Parser::Parser(parser_rep parser_type)
     done_ = true;
 }
 
+void Parser::Parse()
+{
+    
+}
+
 void Parser::Parse(size_t start_chapter)
 {
     (void) start_chapter;
