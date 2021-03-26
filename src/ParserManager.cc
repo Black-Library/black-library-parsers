@@ -16,7 +16,7 @@ namespace parsers {
 
 ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
     pool_(num_threads),
-    urls_(),
+    job_queue_(),
     config_(config),
     done_(true)
 {
@@ -60,17 +60,35 @@ int ParserManager::Stop()
 
 int ParserManager::AddUrl(const std::string &url)
 {
-    urls_.push(url);
+    ParserManagerJob job;
+    job.starting_chapter = 1;
+    job.url = url;
+
+    std::cout << "ParserManager adding job with url: " << job.url << " starting chapter: " << job.starting_chapter << std::endl;
+
+    job_queue_.push(job);
+
+    return 0;
+}
+
+int ParserManager::AddUrl(const std::string &url, const size_t &starting_chapter)
+{
+    ParserManagerJob job;
+    job.starting_chapter = starting_chapter;
+    job.url = url;
+
+    std::cout << "ParserManager adding job with url: " << job.url << " starting chapter: " << job.starting_chapter << std::endl;
+
+    job_queue_.push(job);
 
     return 0;
 }
 
 void ParserManager::Init()
 {
-    // TODO make this map results to result objects
     std::vector<std::future<ParserManagerResult>> results;
 
-    for(size_t i = 0; i < 1; ++i)
+    for(size_t i = 0; i < 8; ++i)
     {
         results.emplace_back(
             pool_.enqueue([this, i]
@@ -78,14 +96,14 @@ void ParserManager::Init()
                 ParserManagerResult result;
                 std::stringstream ss;
                 ss << "Starting parser manager slot " << i << std::endl;
-                if (urls_.empty())
+                if (job_queue_.empty())
                 {
-                    ss << "no urls in queue" << std::endl;
+                    ss << "no jobs in queue" << std::endl;
                     result.io_result = ss.str();
                     return result;
                 }
-                std::string url = urls_.pop();
-                ParserFactoryResult factory_result = parser_factory_.GetParser(url);
+                ParserManagerJob job = job_queue_.pop();
+                ParserFactoryResult factory_result = parser_factory_.GetParser(job.url);
                 ss << factory_result.io_string;
                 ss << "Parser type: " << GetParserName(factory_result.parser_result->GetParserType()) << std::endl;
                 if (factory_result.has_error)
@@ -96,7 +114,7 @@ void ParserManager::Init()
                   result.io_result = ss.str();
                   return result;
                 }
-                factory_result.parser_result->Parse(1);
+                factory_result.parser_result->Parse(job.starting_chapter);
 
                 ss << "Stopping parser manager slot " << i << std::endl;
                 result.io_result = ss.str();

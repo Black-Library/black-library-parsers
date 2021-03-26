@@ -20,6 +20,11 @@ namespace core {
 
 namespace parsers {
 
+struct ParserManagerJob {
+    std::string url;
+    size_t starting_chapter;
+};
+
 struct ParserManagerResult {
     std::string io_result;
     std::string error_string;
@@ -38,13 +43,14 @@ public:
     int Stop();
 
     int AddUrl(const std::string &url);
+    int AddUrl(const std::string &url, const size_t &starting_chapter);
 
 private:
     void Init();
 
     ThreadPool pool_;
     ParserFactory parser_factory_;
-    BlockingQueue<std::string> urls_;
+    BlockingQueue<ParserManagerJob> job_queue_;
     std::string config_;
     std::atomic_bool done_;
 };
