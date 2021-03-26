@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
     black_library::core::parsers::RR::ParserRR parser2;
     parser2.SetUrl("https://www.royalroad.com/fiction/21220/mother-of-learning");
-    parser2.Parse(1);
+    parser2.Parse();
 
     curl_global_cleanup();
 

@@ -36,6 +36,8 @@ int ParserManager::Run()
         if (done_)
             break;
 
+        std::cout << "tick" << std::endl;
+
         std::this_thread::sleep_until(deadline);
     }
 
@@ -44,7 +46,7 @@ int ParserManager::Run()
 
 int ParserManager::RunOnce()
 {
-    // add new urls to queue
+    // add new urls to pool
     return 0;
 }
 
@@ -76,7 +78,13 @@ void ParserManager::Init()
                 ParserManagerResult result;
                 std::stringstream ss;
                 ss << "Starting parser manager slot " << i << std::endl;
-                std::string url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+                if (urls_.empty())
+                {
+                    ss << "no urls in queue" << std::endl;
+                    result.io_result = ss.str();
+                    return result;
+                }
+                std::string url = urls_.pop();
                 ParserFactoryResult factory_result = parser_factory_.GetParser(url);
                 ss << factory_result.io_string;
                 ss << "Parser type: " << GetParserName(factory_result.parser_result->GetParserType()) << std::endl;
@@ -90,8 +98,7 @@ void ParserManager::Init()
                 }
                 factory_result.parser_result->Parse(1);
 
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                ss << "stopping parser manager slot " << i << std::endl;
+                ss << "Stopping parser manager slot " << i << std::endl;
                 result.io_result = ss.str();
                 return result;
             })

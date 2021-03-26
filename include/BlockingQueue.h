@@ -31,6 +31,15 @@ public:
         mutex_.unlock();
     }
 
+    size_t size()
+    {
+        size_t size;
+        mutex_.lock();
+        size = queue_.size();
+        mutex_.unlock();
+        return size;
+    }
+
     bool empty() {
         mutex_.lock();
         bool check = queue_.empty();
