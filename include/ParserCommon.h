@@ -7,11 +7,18 @@
 
 #include <string>
 
+#include <libxml/tree.h>
+
 namespace black_library {
 
 namespace core {
 
 namespace parsers {
+
+struct parser_xml_node_seek {
+    xmlNodePtr seek_node = NULL;
+    bool found = false;
+};
 
 typedef enum {
     AO3_PARSER,

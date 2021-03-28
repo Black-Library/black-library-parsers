@@ -49,7 +49,7 @@ void ParserRR::Parse(size_t start_chapter)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
-    RR_xml_node_seek head_seek = SeekToNodeByName(current_node, "head");
+    parser_xml_node_seek head_seek = SeekToNodeByName(current_node, "head");
 
     if (!head_seek.found)
     {
@@ -69,7 +69,7 @@ void ParserRR::Parse(size_t start_chapter)
     // reset current node ptr to root node children
     current_node = root_node->children;
 
-    RR_xml_node_seek body_seek = SeekToNodeByName(current_node, "body");
+    parser_xml_node_seek body_seek = SeekToNodeByName(current_node, "body");
 
     if (!body_seek.found)
     {
@@ -166,7 +166,7 @@ RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
     xmlNodePtr length_node = NULL;
     size_t length = 0;
 
-    RR_xml_node_seek chapter_seek = SeekToChapterContent(current_node);
+    parser_xml_node_seek chapter_seek = SeekToChapterContent(current_node);
     if (!chapter_seek.found)
     {
         std::cout << "Error: Failed seek" << std::endl;
@@ -372,9 +372,9 @@ std::string ParserRR::GetRRChapterName(const std::string &data_url)
     return data_url.substr(pos + 1);
 }
 
-RR_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
+parser_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
 {
-    RR_xml_node_seek chapter_seek;
+    parser_xml_node_seek chapter_seek;
     xmlNodePtr current_node = NULL;
     bool found = false;
 
@@ -390,7 +390,7 @@ RR_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
             break;
         }
 
-        RR_xml_node_seek children_seek = SeekToChapterContent(current_node->children);
+        parser_xml_node_seek children_seek = SeekToChapterContent(current_node->children);
 
         if (children_seek.seek_node != NULL)
             chapter_seek.seek_node = children_seek.seek_node;
@@ -403,9 +403,9 @@ RR_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
     return chapter_seek;
 }
 
-RR_xml_node_seek ParserRR::SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
+parser_xml_node_seek ParserRR::SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
 {
-    RR_xml_node_seek seek;
+    parser_xml_node_seek seek;
     xmlNodePtr current_node = NULL;
 
     for (current_node = root_node; current_node; current_node = current_node->next)
