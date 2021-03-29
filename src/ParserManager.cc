@@ -125,6 +125,9 @@ void ParserManager::Init()
 
     for (auto & res : results)
     {
+        if (!res.valid())
+            continue;
+
         res.wait();
         ParserManagerResult result = res.get(); 
         std::cout << result.io_result << std::endl;
