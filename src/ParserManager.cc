@@ -17,6 +17,7 @@ namespace parsers {
 ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
     pool_(num_threads),
     job_queue_(),
+    pool_results_(),
     config_(config),
     done_(true)
 {
@@ -47,6 +48,22 @@ int ParserManager::Run()
 int ParserManager::RunOnce()
 {
     // add new urls to pool
+
+    // check if futures list is ready
+    for (auto & res : pool_results_)
+    {
+        // check if future is ready
+        if (res.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        {
+            if (!res.valid())
+                continue;
+
+            ParserManagerResult result = res.get(); 
+        }
+    }
+
+    // add new urls to ready
+
     return 0;
 }
 

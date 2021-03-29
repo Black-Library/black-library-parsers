@@ -51,6 +51,7 @@ private:
     ThreadPool pool_;
     ParserFactory parser_factory_;
     BlockingQueue<ParserManagerJob> job_queue_;
+    std::vector<std::future<ParserManagerResult>> pool_results_;
     std::string config_;
     std::atomic_bool done_;
 };
