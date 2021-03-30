@@ -58,7 +58,7 @@ int ParserManager::RunOnce()
             if (!res.valid())
                 continue;
 
-            ParserManagerResult result = res.get(); 
+            ParserManagerResult result = res.get();
         }
     }
 
@@ -94,7 +94,7 @@ int ParserManager::AddUrl(const std::string &url, const size_t &starting_chapter
     job.starting_chapter = starting_chapter;
     job.url = url;
 
-    std::cout << "ParserManager adding job with url: " << job.url << " starting chapter: " << job.starting_chapter << std::endl;
+    std::cout << "ParserManager adding job with url: " << job.url << " - starting chapter: " << job.starting_chapter << std::endl;
 
     job_queue_.push(job);
 
@@ -131,7 +131,21 @@ void ParserManager::Init()
                   result.io_result = ss.str();
                   return result;
                 }
+                std::thread t([this, &factory_result](){
+                    while (!done_)
+                    {
+                        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+
+                        if (done_)
+                            break;
+
+                        std::this_thread::sleep_until(deadline);
+                    }
+                    factory_result.parser_result->Stop();
+                });
                 factory_result.parser_result->Parse(job.starting_chapter);
+
+                t.join();
 
                 ss << "Stopping parser manager slot " << i << std::endl;
                 result.io_result = ss.str();

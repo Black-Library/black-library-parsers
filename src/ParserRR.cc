@@ -106,6 +106,9 @@ void ParserRR::Parse(size_t start_chapter)
     {
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
     
+        if (done_)
+            break;
+
         if (seconds_counter >= wait_time)
             seconds_counter = 0;
 
@@ -133,6 +136,7 @@ void ParserRR::Parse(size_t start_chapter)
 void ParserRR::Stop()
 {
     done_ = true;
+    std::cout << "ParserRR: stop" << std::endl;
 }
 
 std::string ParserRR::ParseTitle()
