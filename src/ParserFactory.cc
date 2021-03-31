@@ -92,6 +92,30 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
     return result;
 }
 
+ParserFactoryResult ParserFactory::GetParserByType(parser_rep parser_type)
+{
+    ParserFactoryResult result;
+    std::stringstream ss;
+
+    auto parser_map_itr = parser_map_.find(parser_type);
+
+    if (parser_map_itr == parser_map_.end())
+    {
+        result.has_error = true;
+        result.error_string = "Error: ParserFactory could not match parser\n";
+        result.io_string = ss.str();
+        return result;
+    }
+
+    result.parser_result = parser_map_itr->second;
+
+    ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType()) << std::endl;
+
+    result.io_string = ss.str();
+
+    return result;
+}
+
 int ParserFactory::InitParserMap()
 {
     parser_map_.emplace(AO3_PARSER, std::static_pointer_cast<Parser>(std::make_shared<AO3::ParserAO3>()));

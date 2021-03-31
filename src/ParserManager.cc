@@ -32,8 +32,6 @@ int ParserManager::Run()
     {
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 
-        std::cout << "tick" << std::endl;
-
         RunOnce();
 
         if (done_)
@@ -113,7 +111,6 @@ int ParserManager::RunOnce()
 
 int ParserManager::Stop()
 {
-    // TODO: check to make sure pool_ does not leak memory
     done_ = true;
 
     return 0;
@@ -147,7 +144,27 @@ int ParserManager::AddUrl(const std::string &url, const size_t &starting_chapter
 
 void ParserManager::Init()
 {
+    AddWorker(AO3_PARSER);
+    AddWorker(RR_PARSER);
+}
+
+int ParserManager::AddWorker(parser_rep parser_type)
+{
+    ParserFactoryResult factory_result = parser_factory_.GetParserByType(parser_type);
     
+    std::cout << "ParserManager AddWorker " << factory_result.io_string << std::endl;
+
+    if (factory_result.has_error)
+    {
+        std::cout << "ParserManager AddWorker " << factory_result.error_string << std::endl;
+        return -1;
+    }
+    
+    auto worker = ParserWorker(parser_type, factory_result.parser_result);
+
+    worker_map_.emplace(parser_type, worker);
+
+    return 0;
 }
 
 } // namespace parsers

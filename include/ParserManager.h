@@ -49,6 +49,7 @@ public:
 
 private:
     void Init();
+    int AddWorker(parser_rep parser_type);
 
     std::unordered_map<parser_rep, ParserWorker> worker_map_;
     ThreadPool pool_;

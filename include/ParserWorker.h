@@ -33,6 +33,10 @@ public:
     explicit ParserWorker(parser_rep parser_type, std::shared_ptr<Parser> parser_ptr);
     ParserWorker &operator = (ParserWorker &&) = default;
 
+    int Run();
+    int RunOnce();
+    int Stop();
+
     int AddJob(const std::string &url);
     int AddJob(const std::string &url, const size_t &starting_chapter);
 

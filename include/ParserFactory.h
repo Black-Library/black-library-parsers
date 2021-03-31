@@ -30,6 +30,7 @@ public:
     ~ParserFactory();
 
     ParserFactoryResult GetParser(const std::string &url);
+    ParserFactoryResult GetParserByType(parser_rep parser_type);
 
 protected:
     int InitParserMap();

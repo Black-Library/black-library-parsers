@@ -23,6 +23,38 @@ ParserWorker::ParserWorker(parser_rep parser_type, std::shared_ptr<Parser> parse
     }
 }
 
+int ParserWorker::Run()
+{
+    done_ = false;
+
+    while (!done_)
+    {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+
+        RunOnce();
+
+        if (done_)
+            break;
+
+        std::this_thread::sleep_until(deadline);
+    }
+
+    return 0;
+}
+
+int ParserWorker::RunOnce()
+{
+    return 0;
+}
+
+int ParserWorker::Stop()
+{
+    // TODO: check to make sure pool_ does not leak memory
+    done_ = true;
+
+    return 0;
+}
+
 int ParserWorker::AddJob(const std::string &url)
 {
     ParserJob job;
