@@ -6,10 +6,10 @@
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_WORKER_H__
 
 #include <atomic>
-#include <bitset>
-#include <queue>
-#include <unordered_map>
+#include <memory>
+#include <vector>
 
+#include "BlockingQueue.h"
 #include "ThreadPool.h"
 
 #include "Parser.h"
@@ -20,18 +20,26 @@ namespace core {
 
 namespace parsers {
 
+#define _MANAGED_PARSER_COUNT 2
+
+struct ParserJob {
+    std::string url;
+    size_t starting_chapter;
+};
+
 class ParserWorker
 {
 public:
-    explicit ParserWorker(const std::string &source_name);
+    explicit ParserWorker(parser_rep parser_type, const Parser &parser);
+    ParserWorker &operator = (ParserWorker &&) = default;
 
 private:
     void Init();
 
-    std::unordered_map<managed_parsers_rep, Parser> parsers_;
-    std::bitset<_MANAGED_PARSER_COUNT> parser_ready_bit_;
-    std::queue<std::string> urls_;
-    std::string source_name_;
+    std::vector<std::shared_ptr<Parser>> parsers_;
+    ThreadPool pool_;
+    BlockingQueue<ParserJob> job_queue_;
+    parser_rep parser_type_;
     std::atomic_bool done_;
 };
 

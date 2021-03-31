@@ -6,13 +6,16 @@
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_MANAGER_H__
 
 #include <atomic>
+#include <bitset>
 #include <unordered_map>
+#include <vector>
 
-#include "ThreadPool.h"
 #include "BlockingQueue.h"
+#include "ThreadPool.h"
 
 #include "Parser.h"
 #include "ParserFactory.h"
+#include <ParserWorker.h>
 
 namespace black_library {
 
@@ -35,7 +38,6 @@ class ParserManager
 {
 public:
     explicit ParserManager(const uint8_t &num_threads, const std::string &config);
-
     ParserManager &operator = (ParserManager &&) = default;
 
     int Run();
@@ -48,6 +50,7 @@ public:
 private:
     void Init();
 
+    std::unordered_map<parser_rep, ParserWorker> worker_map_;
     ThreadPool pool_;
     ParserFactory parser_factory_;
     BlockingQueue<ParserManagerJob> job_queue_;

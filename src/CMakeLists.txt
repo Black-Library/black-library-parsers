@@ -10,6 +10,7 @@ add_library(Parsers
     ParserCommon.cc
     ParserFactory.cc
     ParserManager.cc
+    ParserWorker.cc
     SourceInformation.cc
 
     ParserAO3.cc
