@@ -160,7 +160,7 @@ int ParserManager::AddWorker(parser_rep parser_type)
         return -1;
     }
     
-    auto worker = ParserWorker(parser_type, factory_result.parser_result);
+    ParserWorker worker(parser_type, factory_result.parser_result);
 
     worker_map_.emplace(parser_type, worker);
 
