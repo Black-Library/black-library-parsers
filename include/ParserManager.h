@@ -51,7 +51,7 @@ private:
     void Init();
     int AddWorker(parser_rep parser_type);
 
-    std::unordered_map<parser_rep, ParserWorker> worker_map_;
+    std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
     ThreadPool pool_;
     ParserFactory parser_factory_;
     BlockingQueue<ParserManagerJob> job_queue_;

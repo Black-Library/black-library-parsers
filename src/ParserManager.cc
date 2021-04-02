@@ -159,10 +159,8 @@ int ParserManager::AddWorker(parser_rep parser_type)
         std::cout << "ParserManager AddWorker " << factory_result.error_string << std::endl;
         return -1;
     }
-    
-    ParserWorker worker(parser_type, factory_result.parser_result);
 
-    worker_map_.emplace(parser_type, worker);
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_type, factory_result.parser_result));
 
     return 0;
 }
