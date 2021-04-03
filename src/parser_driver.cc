@@ -2,8 +2,9 @@
  * parser_driver.cc
  */
 
-#include <ParserWorker.h>
+#include <Parser.h>
 
+#include <ParserAO3.h>
 #include <ParserRR.h>
 
 int main(int argc, char* argv[])
