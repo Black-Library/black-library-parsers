@@ -32,7 +32,7 @@ typedef enum {
 typedef uint8_t parser_rep;
 
 std::string GetParserName(parser_rep rep);
-parser_rep GetParserType(const std::string &url);
+parser_rep GetParserTypeByUrl(const std::string &url);
 
 } // namespace parsers
 } // namespace core

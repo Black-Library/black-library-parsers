@@ -36,7 +36,7 @@ std::string GetParserName(parser_rep rep)
     }
 }
 
-parser_rep GetParserType(const std::string &url)
+parser_rep GetParserTypeByUrl(const std::string &url)
 {
     parser_rep rep = _NUM_PARSERS_TYPE;
 
