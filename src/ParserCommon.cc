@@ -2,6 +2,8 @@
  * ParserCommon.cc
  */
 
+#include <string.h>
+
 #include <ParserCommon.h>
 #include <SourceInformation.h>
 
@@ -10,6 +12,18 @@ namespace black_library {
 namespace core {
 
 namespace parsers {
+
+// C++ wrapper around strstr()
+bool ContainsString(const std::string &haystack, const std::string &needle)
+{
+    // C-style compare is fastest
+    if (strstr(haystack.c_str(), needle.c_str()) == NULL)
+    {
+        return false;
+    }
+    
+    return true;
+}
 
 std::string GetParserName(parser_rep rep)
 {
@@ -36,23 +50,25 @@ std::string GetParserName(parser_rep rep)
     }
 }
 
+// c level string check is faster for smaller strings then
+// needle.find(haystack) != std::string::npos
 parser_rep GetParserTypeByUrl(const std::string &url)
 {
     parser_rep rep = _NUM_PARSERS_TYPE;
 
-    if (url.find(AO3::source_url) != std::string::npos)
+    if (ContainsString(AO3::source_url, url))
     {
         rep = AO3_PARSER;
     }
-    else if (url.find(FFN::source_url) != std::string::npos)
+    else if (ContainsString(FFN::source_url, url))
     {
         rep = FFN_PARSER;
     }
-    else if (url.find(SBF::source_url) != std::string::npos)
+    else if (ContainsString(SBF::source_url, url))
     {
         rep = SBF_PARSER;
     }
-    else if (url.find(RR::source_url) != std::string::npos)
+    else if (ContainsString(RR::source_url, url))
     {
         rep = RR_PARSER;
     }

@@ -17,6 +17,7 @@ namespace parsers {
 ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
     pool_(num_threads),
     job_queue_(),
+    urls_(),
     pool_results_(),
     config_(config),
     done_(true)

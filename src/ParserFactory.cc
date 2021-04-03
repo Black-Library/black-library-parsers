@@ -6,6 +6,8 @@
 
 #include <ParserFactory.h>
 
+#include <ParserCommon.h>
+
 #include "ParserAO3.h"
 #include "ParserFFN.h"
 #include "ParserRR.h"
@@ -16,27 +18,10 @@ namespace core {
 
 namespace parsers {
 
-namespace {
-
-// C++ wrapper around strstr()
-bool ContainsString(const std::string &haystack, const std::string &needle)
-{
-    // C-style compare is fastest
-    if (strstr(haystack.c_str(), needle.c_str()) == NULL)
-    {
-        return false;
-    }
-    
-    return true;
-}
-
-} // namespace
-
 ParserFactory::ParserFactory()
 {
     std::cout << "Initialize ParserFactory" << std::endl;
     InitParserMap();
-    InitParserUrlMap();
 }
 
 ParserFactory::~ParserFactory()
@@ -48,22 +33,10 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
 {
     ParserFactoryResult result;
     std::stringstream ss;
-    parser_rep parser_type = _NUM_PARSERS_TYPE;
 
-    bool url_found = false;
+    auto parser_type = GetParserTypeByUrl(url);
 
-    for (auto it = parser_url_map_.begin(); it != parser_url_map_.end(); ++it)
-    {
-        if (ContainsString(url, it->first))
-        {
-            parser_type = it->second;
-            url_found = true;
-            ss << "Matched url: " << url << " with: " << it->first << std::endl;
-            break;
-        }
-    }
-
-    if (!url_found)
+    if (parser_type == _NUM_PARSERS_TYPE)
     {
         result.has_error = true;
         result.error_string = "Error: ParserFactory could not match url\n";
@@ -154,18 +127,6 @@ int ParserFactory::InitParserMap()
     std::cout << "end parser test\n" << std::endl;
 
     std::cout << "Initialized Parser map with " << parser_map_.size() << " elements" << std::endl;
-
-    return 0;
-}
-
-int ParserFactory::InitParserUrlMap()
-{
-    std::cout << "Initialize Parser url map with " << parser_map_.size() << " elements" << std::endl;
-
-    for (auto it = parser_map_.begin(); it != parser_map_.end(); ++it)
-    {
-        parser_url_map_.emplace((*it->second).GetSourceUrl(), it->first);
-    }
 
     return 0;
 }

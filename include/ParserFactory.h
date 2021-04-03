@@ -34,10 +34,8 @@ public:
 
 protected:
     int InitParserMap();
-    int InitParserUrlMap();
 
     std::unordered_map<parser_rep, std::shared_ptr<Parser>> parser_map_;
-    std::unordered_map<std::string, parser_rep> parser_url_map_;
 
 private:
 };
