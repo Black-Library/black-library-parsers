@@ -20,8 +20,6 @@ namespace core {
 
 namespace parsers {
 
-#define _MANAGED_PARSER_COUNT 2
-
 class ParserWorker
 {
 public:

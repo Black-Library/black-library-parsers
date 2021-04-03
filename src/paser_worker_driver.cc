@@ -1,8 +1,8 @@
 /**
- * parser_driver.cc
+ * parser_worker_driver.cc
  */
 
-#include <ParserWorker.h>
+#include <Parser.h>
 
 #include <ParserRR.h>
 
@@ -20,10 +20,6 @@ int main(int argc, char* argv[])
     }
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
-
-    // black_library::core::parsers::AO3::ParserAO3 parser;
-    // parser.SetUrl("https://archiveofourown.org/works/505809");
-    // parser.Parse();
 
     black_library::core::parsers::RR::ParserRR parser2;
     parser2.SetUrl("https://www.royalroad.com/fiction/21220/mother-of-learning");

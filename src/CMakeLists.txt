@@ -28,6 +28,7 @@ install(
 )
 
 add_executable(parser_driver parser_driver.cc)
+add_executable(parser_worker_driver parser_worker_driver.cc)
 add_executable(parser_manager_driver parser_manager_driver.cc)
 add_executable(thread_pool_example ThreadpoolExample.cc)
 

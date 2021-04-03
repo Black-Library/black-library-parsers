@@ -12,7 +12,7 @@ namespace parsers {
 
 ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parsers, parser_rep parser_type) :
     parsers_(),
-    pool_(_MANAGED_PARSER_COUNT),
+    pool_(num_parsers),
     job_queue_(),
     parser_type_(parser_type),
     done_(true)
