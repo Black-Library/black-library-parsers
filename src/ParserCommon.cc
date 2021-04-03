@@ -3,6 +3,7 @@
  */
 
 #include <ParserCommon.h>
+#include <SourceInformation.h>
 
 namespace black_library {
 
@@ -33,6 +34,29 @@ std::string GetParserName(parser_rep rep)
         return "NO_PARSER";
         break;
     }
+}
+
+parser_rep GetParserType(const std::string &url)
+{
+    parser_rep rep = _NUM_PARSERS_TYPE;
+
+    if (url.find(AO3::source_url) != std::string::npos)
+    {
+        rep = AO3_PARSER;
+    }
+    else if (url.find(FFN::source_url) != std::string::npos)
+    {
+        rep = FFN_PARSER;
+    }
+    else if (url.find(SBF::source_url) != std::string::npos)
+    {
+        rep = SBF_PARSER;
+    }
+    else if (url.find(RR::source_url) != std::string::npos)
+    {
+        rep = RR_PARSER;
+    }
+    return rep;
 }
 
 } // namespace parsers

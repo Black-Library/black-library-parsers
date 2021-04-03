@@ -59,6 +59,12 @@ int ParserManager::RunOnce()
         }
     }
 
+    while (urls_.size() > 0)
+    {
+        auto url = urls_.pop();
+
+    }
+
     pool_results_.emplace_back(
         pool_.enqueue([this]
         {
