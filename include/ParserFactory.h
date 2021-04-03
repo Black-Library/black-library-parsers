@@ -29,7 +29,7 @@ public:
     ParserFactory();
     ~ParserFactory();
 
-    ParserFactoryResult GetParser(const std::string &url);
+    ParserFactoryResult GetParserByUrl(const std::string &url);
     ParserFactoryResult GetParserByType(parser_rep parser_type);
 
 protected:

@@ -29,7 +29,7 @@ ParserFactory::~ParserFactory()
 
 }
 
-ParserFactoryResult ParserFactory::GetParser(const std::string &url)
+ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
 {
     ParserFactoryResult result;
     std::stringstream ss;

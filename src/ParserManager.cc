@@ -79,7 +79,7 @@ int ParserManager::RunOnce()
                 return result;
             }
             ParserManagerJob job = job_queue_.pop();
-            ParserFactoryResult factory_result = parser_factory_.GetParser(job.url);
+            ParserFactoryResult factory_result = parser_factory_.GetParserByUrl(job.url);
             ss << factory_result.io_string;
             ss << "Parser type: " << GetParserName(factory_result.parser_result->GetParserType()) << std::endl;
             if (factory_result.has_error)
@@ -167,7 +167,7 @@ int ParserManager::AddWorker(parser_rep parser_type)
         return -1;
     }
 
-    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_type, factory_result.parser_result));
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, 2, parser_type));
 
     return 0;
 }

@@ -10,16 +10,20 @@ namespace core {
 
 namespace parsers {
 
-ParserWorker::ParserWorker(parser_rep parser_type, std::shared_ptr<Parser> parser_ptr) :
+ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parsers, parser_rep parser_type) :
     parsers_(),
     pool_(_MANAGED_PARSER_COUNT),
     job_queue_(),
     parser_type_(parser_type),
     done_(true)
 {
-    for (size_t i = 0; i < _MANAGED_PARSER_COUNT; ++i)
+    (void) parser_ptr;
+    for (size_t i = 0; i < num_parsers; ++i)
     {
-        parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
+        parsers_.emplace_back(std::make_shared<Parser>());
+        // parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
+
+        parsers_[i]->SetParserIndex(i);
     }
 }
 

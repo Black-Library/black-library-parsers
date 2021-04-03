@@ -72,6 +72,7 @@ parser_rep GetParserTypeByUrl(const std::string &url)
     {
         rep = RR_PARSER;
     }
+
     return rep;
 }
 

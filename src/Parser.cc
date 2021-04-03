@@ -44,6 +44,7 @@ void Parser::Parse()
 void Parser::Parse(size_t start_chapter)
 {
     (void) start_chapter;
+    std::cout << "Parser Index: " << index_ << std::endl;
 }
 
 void Parser::Stop()
@@ -117,6 +118,16 @@ xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string val
     return NULL;
 }
 
+void Parser::SetLocalFilePath(const std::string &local_des)
+{
+    local_des_ = local_des;
+}
+
+void Parser::SetParserIndex(size_t index)
+{
+    index_ = index;
+}
+
 void Parser::SetParserType(parser_rep parser_type)
 {
     parser_type_ = parser_type;
@@ -132,14 +143,14 @@ void Parser::SetUrl(const std::string &url)
     url_ = url;
 }
 
-void Parser::SetLocalFilePath(const std::string &local_des)
-{
-    local_des_ = local_des;
-}
-
 std::string Parser::GetLocalDes()
 {
     return local_des_;
+}
+
+size_t Parser::GetParserIndex()
+{
+    return index_;
 }
 
 parser_rep Parser::GetParserType()

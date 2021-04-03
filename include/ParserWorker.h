@@ -30,7 +30,7 @@ struct ParserJob {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(parser_rep parser_type, std::shared_ptr<Parser> parser_ptr);
+    explicit ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parsers, parser_rep parser_type);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
