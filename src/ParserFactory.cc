@@ -44,25 +44,7 @@ ParserFactoryResult ParserFactory::GetParser(const std::string &url)
         return result;
     }
 
-    auto parser_map_itr = parser_map_.find(parser_type);
-
-    if (parser_map_itr == parser_map_.end())
-    {
-        result.has_error = true;
-        result.error_string = "Error: ParserFactory could not match parser\n";
-        result.io_string = ss.str();
-        return result;
-    }
-
-    result.parser_result = parser_map_itr->second;
-
-    ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType()) << std::endl;
-
-    result.parser_result->SetUrl(url);
-
-    result.io_string = ss.str();
-
-    return result;
+    return GetParserByType(parser_type);
 }
 
 ParserFactoryResult ParserFactory::GetParserByType(parser_rep parser_type)
