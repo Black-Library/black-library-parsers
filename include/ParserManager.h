@@ -23,11 +23,6 @@ namespace core {
 
 namespace parsers {
 
-struct ParserManagerJob {
-    std::string url;
-    size_t starting_chapter;
-};
-
 struct ParserManagerResult {
     std::string io_result;
     std::string error_string;
@@ -54,8 +49,7 @@ private:
     std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
     ThreadPool pool_;
     ParserFactory parser_factory_;
-    BlockingQueue<ParserManagerJob> job_queue_;
-    BlockingQueue<std::string> urls_;
+    BlockingQueue<ParserJob> job_queue_;
     std::vector<std::future<ParserManagerResult>> pool_results_;
     std::string config_;
     std::atomic_bool done_;

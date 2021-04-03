@@ -15,6 +15,11 @@ namespace core {
 
 namespace parsers {
 
+struct ParserJob {
+    std::string url;
+    size_t starting_chapter;
+};
+
 struct parser_xml_node_seek {
     xmlNodePtr seek_node = NULL;
     bool found = false;

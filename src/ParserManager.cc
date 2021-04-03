@@ -17,7 +17,6 @@ namespace parsers {
 ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
     pool_(num_threads),
     job_queue_(),
-    urls_(),
     pool_results_(),
     config_(config),
     done_(true)
@@ -60,10 +59,26 @@ int ParserManager::RunOnce()
         }
     }
 
-    while (urls_.size() > 0)
+    while (job_queue_.size() > 0)
     {
-        auto url = urls_.pop();
+        auto job = job_queue_.pop();
+        auto parser_type = GetParserTypeByUrl(job.url);
 
+        if (parser_type == _NUM_PARSERS_TYPE)
+        {
+            std::cout << "Error: could not match url to parser" << std::endl;
+            continue;
+        }
+
+        auto worker = worker_map_.find(parser_type);
+
+        if (worker == worker_map_.end())
+        {
+            std::cout << "Error: could not find parser with rep: " << parser_type << std::endl;
+            continue;
+        }
+
+        worker->second->AddJob(job.url, job.starting_chapter);
     }
 
     pool_results_.emplace_back(
@@ -78,7 +93,7 @@ int ParserManager::RunOnce()
                 result.io_result = ss.str();
                 return result;
             }
-            ParserManagerJob job = job_queue_.pop();
+            auto job = job_queue_.pop();
             ParserFactoryResult factory_result = parser_factory_.GetParserByUrl(job.url);
             ss << factory_result.io_string;
             ss << "Parser type: " << GetParserName(factory_result.parser_result->GetParserType()) << std::endl;
@@ -125,7 +140,7 @@ int ParserManager::Stop()
 
 int ParserManager::AddUrl(const std::string &url)
 {
-    ParserManagerJob job;
+    ParserJob job;
     job.starting_chapter = 1;
     job.url = url;
 
@@ -138,7 +153,7 @@ int ParserManager::AddUrl(const std::string &url)
 
 int ParserManager::AddUrl(const std::string &url, const size_t &starting_chapter)
 {
-    ParserManagerJob job;
+    ParserJob job;
     job.starting_chapter = starting_chapter;
     job.url = url;
 

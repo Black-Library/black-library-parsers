@@ -22,11 +22,6 @@ namespace parsers {
 
 #define _MANAGED_PARSER_COUNT 2
 
-struct ParserJob {
-    std::string url;
-    size_t starting_chapter;
-};
-
 class ParserWorker
 {
 public:
