@@ -82,13 +82,7 @@ int ParserManager::Stop()
 
 int ParserManager::AddUrl(const std::string &url)
 {
-    ParserJob job;
-    job.starting_chapter = 1;
-    job.url = url;
-
-    std::cout << "ParserManager adding job with url: " << job.url << " starting chapter: " << job.starting_chapter << std::endl;
-
-    job_queue_.push(job);
+    AddUrl(url, 1);
 
     return 0;
 }

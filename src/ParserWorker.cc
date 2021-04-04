@@ -113,7 +113,7 @@ int ParserWorker::RunOnce()
 
             auto parser_default = std::make_shared<Parser>();
 
-            parser_default->Parse();
+            parser_default->Parse(1);
 
             std::cout << "default" << std::endl;
 
