@@ -39,7 +39,9 @@ target_link_libraries(thread_pool_example blacklibraryparsers)
 
 set_target_properties(parser_driver PROPERTIES INSTALL_RPATH
     "$LD_LIBRARY_PATH;${CMAKE_INSTALL_PREFIX}/lib")
+set_target_properties(parser_worker_driver PROPERTIES INSTALL_RPATH
+    "$LD_LIBRARY_PATH;${CMAKE_INSTALL_PREFIX}/lib")
 set_target_properties(parser_manager_driver PROPERTIES INSTALL_RPATH
 "$LD_LIBRARY_PATH;${CMAKE_INSTALL_PREFIX}/lib")
 
-install(TARGETS parser_driver parser_manager_driver thread_pool_example RUNTIME DESTINATION bin)
+install(TARGETS parser_driver parser_worker_driver parser_manager_driver thread_pool_example RUNTIME DESTINATION bin)

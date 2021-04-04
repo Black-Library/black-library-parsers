@@ -38,12 +38,14 @@ Parser::Parser(parser_rep parser_type)
 
 void Parser::Parse()
 {
-    
+    Parse(1);
 }
 
 void Parser::Parse(size_t start_chapter)
 {
     (void) start_chapter;
+    std::cout << "parse" << std::endl;
+    const std::lock_guard<std::mutex> lock(mutex_);
     std::cout << "Parser Index: " << index_ << std::endl;
 }
 
@@ -140,7 +142,14 @@ void Parser::SetSourceUrl(const std::string &url)
 
 void Parser::SetUrl(const std::string &url)
 {
+    const std::lock_guard<std::mutex> lock(mutex_);
     url_ = url;
+}
+
+bool Parser::GetDone()
+{
+    std::cout << "getdone" << std::endl;
+    return done_;
 }
 
 std::string Parser::GetLocalDes()

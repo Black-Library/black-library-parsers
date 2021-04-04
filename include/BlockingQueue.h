@@ -18,32 +18,28 @@ private:
     std::queue<T> queue_;
 public:
     T pop() {
-        mutex_.lock();
+        const std::lock_guard<std::mutex> lock(mutex_);
         T value = queue_.front();
         queue_.pop();
-        mutex_.unlock();
         return value;
     }
 
     void push(T value) {
-        mutex_.lock();
+        const std::lock_guard<std::mutex> lock(mutex_);
         queue_.push(value);
-        mutex_.unlock();
     }
 
     size_t size()
     {
         size_t size;
-        mutex_.lock();
+        const std::lock_guard<std::mutex> lock(mutex_);
         size = queue_.size();
-        mutex_.unlock();
         return size;
     }
 
     bool empty() {
-        mutex_.lock();
+        const std::lock_guard<std::mutex> lock(mutex_);
         bool check = queue_.empty();
-        mutex_.unlock();
         return check;
     }
 };

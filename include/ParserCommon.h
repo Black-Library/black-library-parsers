@@ -20,6 +20,12 @@ struct ParserJob {
     size_t starting_chapter;
 };
 
+struct ParserJobResult {
+    std::string io_result;
+    std::string error_string;
+    bool has_error = false;
+};
+
 struct parser_xml_node_seek {
     xmlNodePtr seek_node = NULL;
     bool found = false;

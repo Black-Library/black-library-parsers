@@ -14,10 +14,8 @@ namespace core {
 
 namespace parsers {
 
-ParserManager::ParserManager(const uint8_t &num_threads, const std::string &config) :
-    pool_(num_threads),
+ParserManager::ParserManager(const std::string &config) :
     job_queue_(),
-    pool_results_(),
     config_(config),
     done_(true)
 {
@@ -45,21 +43,7 @@ int ParserManager::Run()
 
 int ParserManager::RunOnce()
 {
-    // check if futures list is ready
-    for (auto & res : pool_results_)
-    {
-        // check if future is ready
-        if (!res.valid())
-            continue;
-
-        if (res.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-        {
-            ParserManagerResult result = res.get();
-            std::cout << result.io_result << std::endl;
-        }
-    }
-
-    while (job_queue_.size() > 0)
+    while (!job_queue_.empty())
     {
         auto job = job_queue_.pop();
         auto parser_type = GetParserTypeByUrl(job.url);
@@ -81,59 +65,17 @@ int ParserManager::RunOnce()
         worker->second->AddJob(job.url, job.starting_chapter);
     }
 
-    pool_results_.emplace_back(
-        pool_.enqueue([this]
-        {
-            ParserManagerResult result;
-            std::stringstream ss;
-            ss << "Starting parser manager slot " << std::endl;
-            if (job_queue_.empty())
-            {
-                ss << "no jobs in queue" << std::endl;
-                result.io_result = ss.str();
-                return result;
-            }
-            auto job = job_queue_.pop();
-            ParserFactoryResult factory_result = parser_factory_.GetParserByUrl(job.url);
-            ss << factory_result.io_string;
-            ss << "Parser type: " << GetParserName(factory_result.parser_result->GetParserType()) << std::endl;
-            if (factory_result.has_error)
-            {
-                ss << factory_result.error_string;
-                result.has_error = true;
-                ss << "Error: parser manager factory failed" << std::endl;
-                result.io_result = ss.str();
-                return result;
-            }
-            std::thread t([this, &factory_result](){
-                while (!done_)
-                {
-                    const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
-
-                    if (done_)
-                        break;
-
-                    std::this_thread::sleep_until(deadline);
-                }
-                std::cout << "Pass done" << std::endl;
-                factory_result.parser_result->Stop();
-            });
-            factory_result.parser_result->Parse(job.starting_chapter);
-
-            t.join();
-
-            ss << "Stopping parser manager slot " << std::endl;
-            result.io_result = ss.str();
-            return result;
-        })
-    );
-
     return 0;
 }
 
 int ParserManager::Stop()
 {
     done_ = true;
+
+    for (auto & worker : worker_map_)
+    {
+        worker.second->Stop();
+    }
 
     return 0;
 }

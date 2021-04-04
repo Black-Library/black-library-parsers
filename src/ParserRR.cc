@@ -33,6 +33,7 @@ void ParserRR::Parse()
 
 void ParserRR::Parse(size_t start_chapter)
 {
+    const std::lock_guard<std::mutex> lock(mutex_);
     std::cout << "Start ParserRR Parse" << std::endl;
     std::string curl_result = CurlRequest(url_);
 

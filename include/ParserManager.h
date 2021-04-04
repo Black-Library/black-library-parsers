@@ -23,16 +23,10 @@ namespace core {
 
 namespace parsers {
 
-struct ParserManagerResult {
-    std::string io_result;
-    std::string error_string;
-    bool has_error = false;
-};
-
 class ParserManager
 {
 public:
-    explicit ParserManager(const uint8_t &num_threads, const std::string &config);
+    explicit ParserManager(const std::string &config);
     ParserManager &operator = (ParserManager &&) = default;
 
     int Run();
@@ -47,10 +41,8 @@ private:
     int AddWorker(parser_rep parser_type);
 
     std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
-    ThreadPool pool_;
     ParserFactory parser_factory_;
     BlockingQueue<ParserJob> job_queue_;
-    std::vector<std::future<ParserManagerResult>> pool_results_;
     std::string config_;
     std::atomic_bool done_;
 };

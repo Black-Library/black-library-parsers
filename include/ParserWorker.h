@@ -39,6 +39,8 @@ private:
     std::vector<std::shared_ptr<Parser>> parsers_;
     ThreadPool pool_;
     BlockingQueue<ParserJob> job_queue_;
+    std::vector<std::future<ParserJobResult>> pool_results_;
+    size_t num_parsers_;
     parser_rep parser_type_;
     std::atomic_bool done_;
 };
