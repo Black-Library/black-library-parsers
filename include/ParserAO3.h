@@ -21,8 +21,8 @@ public:
     ParserAO3();
     ~ParserAO3();
 
-    void Parse();
-    void Parse(size_t start_chapter);
+    ParserResult Parse();
+    ParserResult Parse(size_t start_chapter);
     void Stop();
 
 protected:

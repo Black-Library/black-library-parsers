@@ -23,14 +23,15 @@ ParserAO3::~ParserAO3()
 
 }
 
-void ParserAO3::Parse()
+ParserResult ParserAO3::Parse()
 {
-    Parse(1);
+    return Parse(1);
 }
 
-void ParserAO3::Parse(size_t start_chapter)
+ParserResult ParserAO3::Parse(size_t start_chapter)
 {
     (void) start_chapter;
+    ParserResult parser_result;
     std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
 
@@ -39,7 +40,8 @@ void ParserAO3::Parse(size_t start_chapter)
     if(!doc)
     {
         std::cout << "Unable to Parse" << std::endl;
-        return;
+        parser_result.has_error = true;
+        return parser_result;
     }
 
     xmlNode* root_node = xmlDocGetRootElement(doc);
@@ -60,6 +62,8 @@ void ParserAO3::Parse(size_t start_chapter)
     file = fopen(des.c_str(), "w+");
     xmlDocFormatDump(file, doc, 1);
     fclose(file);
+
+    return parser_result;
 }
 
 void ParserAO3::Stop()

@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    black_library::core::parsers::ParserWorker worker(std::make_shared<black_library::core::parsers::Parser>(), 1, black_library::core::parsers::_NUM_PARSERS_TYPE);
+    black_library::core::parsers::ParserWorker worker(std::make_shared<black_library::core::parsers::RR::ParserRR>(), 1, black_library::core::parsers::RR_PARSER);
 
     parser_worker = &worker;
 

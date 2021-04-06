@@ -26,7 +26,19 @@ struct ParserJobResult {
     bool has_error = false;
 };
 
-struct parser_xml_node_seek {
+struct ParserResult {
+    std::string io_result;
+    std::string error_string;
+    bool has_error = false;
+};
+
+struct ParserXmlAttributePayload {
+    std::string result = "";
+    bool is_null = false;
+    bool attribute_found = false;
+};
+
+struct ParserXmlNodeSeek {
     xmlNodePtr seek_node = NULL;
     bool found = false;
 };

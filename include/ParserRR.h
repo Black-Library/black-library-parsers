@@ -34,8 +34,8 @@ class ParserRR : public Parser
 public:
     explicit ParserRR();
 
-    void Parse();
-    void Parse(size_t start_chapter);
+    ParserResult Parse();
+    ParserResult Parse(size_t start_chapter);
     void Stop();
 
 protected:
@@ -47,8 +47,8 @@ protected:
     void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     std::string GetRRChapterName(const std::string &data_url);
-    parser_xml_node_seek SeekToChapterContent(xmlNodePtr root_node);
-    parser_xml_node_seek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
+    ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
+    ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
     
 
 private:

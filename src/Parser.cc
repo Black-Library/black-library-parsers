@@ -36,16 +36,20 @@ Parser::Parser(parser_rep parser_type)
     done_ = false;
 }
 
-void Parser::Parse()
+ParserResult Parser::Parse()
 {
-    Parse(1);
+    return Parse(1);
 }
 
-void Parser::Parse(size_t start_chapter)
+ParserResult Parser::Parse(size_t start_chapter)
 {
     (void) start_chapter;
     const std::lock_guard<std::mutex> lock(mutex_);
+    ParserResult parser_result;
+
     std::cout << index_ << " - parse" << std::endl;
+
+    return parser_result;
 }
 
 void Parser::Stop()
@@ -147,7 +151,6 @@ void Parser::SetUrl(const std::string &url)
 
 bool Parser::GetDone()
 {
-    std::cout << "getdone" << std::endl;
     return done_;
 }
 
@@ -319,9 +322,9 @@ std::string Parser::GetSpaceString(size_t num_tabs)
     return tab_string;
 }
 
-xmlAttributePayload Parser::GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name)
+ParserXmlAttributePayload Parser::GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name)
 {
-    xmlAttributePayload attr_result;
+    ParserXmlAttributePayload attr_result;
 
     if (attribute_ptr == NULL)
     {

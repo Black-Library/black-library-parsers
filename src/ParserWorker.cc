@@ -23,12 +23,11 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parser
     parser_type_(parser_type),
     done_(true)
 {
-    (void) parser_ptr;
+    // (void) parser_ptr;
     for (size_t i = 0; i < num_parsers_; ++i)
     {
-        parsers_.emplace_back(std::make_shared<Parser>());
-        // parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
-
+        // parsers_.emplace_back(std::make_shared<Parser>());
+        parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
         parsers_[i]->SetParserIndex(i);
     }
 }
@@ -100,11 +99,9 @@ int ParserWorker::RunOnce()
                     if (done_)
                         break;
 
-                    std::cout << "beat" << std::endl;
-
                     std::this_thread::sleep_until(deadline);
                 }
-                std::cout << "Pass done" << std::endl;
+
                 parser->Stop();
             });
 

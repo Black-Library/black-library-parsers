@@ -26,14 +26,17 @@ ParserRR::ParserRR() :
     parser_type_ = RR_PARSER;
 }
 
-void ParserRR::Parse()
+ParserResult ParserRR::Parse()
 {
-    Parse(1);
+    return Parse(1);
 }
 
-void ParserRR::Parse(size_t start_chapter)
+ParserResult ParserRR::Parse(size_t start_chapter)
 {
     const std::lock_guard<std::mutex> lock(mutex_);
+    ParserResult parser_result;
+    done_ = false;
+
     std::cout << "Start ParserRR Parse" << std::endl;
     std::string curl_result = CurlRequest(url_);
 
@@ -42,7 +45,8 @@ void ParserRR::Parse(size_t start_chapter)
     if (doc_tree == NULL)
     {
         std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
-        return;
+        parser_result.has_error = true;
+        return parser_result;
     }
 
     // const xmlChar* encoding = doc_tree->encoding;
@@ -50,13 +54,14 @@ void ParserRR::Parse(size_t start_chapter)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
-    parser_xml_node_seek head_seek = SeekToNodeByName(current_node, "head");
+    ParserXmlNodeSeek head_seek = SeekToNodeByName(current_node, "head");
 
     if (!head_seek.found)
     {
         std::cout << "Could not find head, exiting" << std::endl;
+        parser_result.has_error = true;
         xmlFreeDoc(doc_tree);
-        return;
+        return parser_result;
     }
 
     current_node = head_seek.seek_node;
@@ -70,13 +75,14 @@ void ParserRR::Parse(size_t start_chapter)
     // reset current node ptr to root node children
     current_node = root_node->children;
 
-    parser_xml_node_seek body_seek = SeekToNodeByName(current_node, "body");
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(current_node, "body");
 
     if (!body_seek.found)
     {
         std::cout << "Could not find chapter index, exiting" << std::endl;
+        parser_result.has_error = true;
         xmlFreeDoc(doc_tree);
-        return;
+        return parser_result;
     }
 
     current_node = body_seek.seek_node;
@@ -94,13 +100,13 @@ void ParserRR::Parse(size_t start_chapter)
     if (index > index_entries_.size())
     {
         std::cout << "Error: ParserRR requested index greater than size" << std::endl;
+        parser_result.has_error = true;
         xmlFreeDoc(doc_tree);
-        return;
+        return parser_result;
     }
 
     size_t seconds_counter = 0;
     size_t wait_time = 0;
-    done_ = false;
 
     // TODO: make parser take 8ish hour break
     while (!done_)
@@ -132,6 +138,8 @@ void ParserRR::Parse(size_t start_chapter)
     }
 
     xmlCleanupParser();
+
+    return parser_result;
 }
 
 void ParserRR::Stop()
@@ -171,7 +179,7 @@ RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
     xmlNodePtr length_node = NULL;
     size_t length = 0;
 
-    parser_xml_node_seek chapter_seek = SeekToChapterContent(current_node);
+    ParserXmlNodeSeek chapter_seek = SeekToChapterContent(current_node);
     if (!chapter_seek.found)
     {
         std::cout << "Error: Failed seek" << std::endl;
@@ -336,7 +344,7 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
                         if (!xmlStrcmp(attr_content, (const xmlChar *) "books:author"))
                         {
                             xmlAttrPtr author_attr = attribute->next;
-                            xmlAttributePayload attr_result = GetXmlAttributeContentByName(author_attr, "content");
+                            ParserXmlAttributePayload attr_result = GetXmlAttributeContentByName(author_attr, "content");
 
                             if (attr_result.is_null || !attr_result.attribute_found)
                                 continue;
@@ -346,7 +354,7 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
                         else if (!xmlStrcmp(attr_content, (const xmlChar *) "og:url"))
                         {
                             xmlAttrPtr title_attr = attribute->next;
-                            xmlAttributePayload attr_result = GetXmlAttributeContentByName(title_attr, "content");
+                            ParserXmlAttributePayload attr_result = GetXmlAttributeContentByName(title_attr, "content");
 
                             if (attr_result.is_null || !attr_result.attribute_found)
                                 continue;
@@ -377,9 +385,9 @@ std::string ParserRR::GetRRChapterName(const std::string &data_url)
     return data_url.substr(pos + 1);
 }
 
-parser_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
+ParserXmlNodeSeek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
 {
-    parser_xml_node_seek chapter_seek;
+    ParserXmlNodeSeek chapter_seek;
     xmlNodePtr current_node = NULL;
     bool found = false;
 
@@ -395,7 +403,7 @@ parser_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
             break;
         }
 
-        parser_xml_node_seek children_seek = SeekToChapterContent(current_node->children);
+        ParserXmlNodeSeek children_seek = SeekToChapterContent(current_node->children);
 
         if (children_seek.seek_node != NULL)
             chapter_seek.seek_node = children_seek.seek_node;
@@ -408,9 +416,9 @@ parser_xml_node_seek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
     return chapter_seek;
 }
 
-parser_xml_node_seek ParserRR::SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
+ParserXmlNodeSeek ParserRR::SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
 {
-    parser_xml_node_seek seek;
+    ParserXmlNodeSeek seek;
     xmlNodePtr current_node = NULL;
 
     for (current_node = root_node; current_node; current_node = current_node->next)

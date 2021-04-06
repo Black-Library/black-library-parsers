@@ -30,12 +30,6 @@ namespace core {
 
 namespace parsers {
 
-struct xmlAttributePayload {
-    std::string result = "";
-    bool is_null = false;
-    bool attribute_found = false;
-};
-
 class Parser
 {
 public:
@@ -43,8 +37,8 @@ public:
     Parser() : Parser(_NUM_PARSERS_TYPE){};
     virtual ~Parser() = default;
 
-    virtual void Parse();
-    virtual void Parse(size_t start_chapter);
+    virtual ParserResult Parse();
+    virtual ParserResult Parse(size_t start_chapter);
     virtual void Stop();
 
     std::string CurlRequest(const std::string &url);
@@ -76,7 +70,7 @@ protected:
     std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
     std::string GetChapterFileName(size_t index, const std::string &chapter_name);
     std::string GetSpaceString(size_t num_tabs);
-    xmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
+    ParserXmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
     std::mt19937_64 generator_;
     std::uniform_int_distribution<int> distribution_;
