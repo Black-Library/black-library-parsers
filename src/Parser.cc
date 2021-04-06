@@ -33,7 +33,7 @@ Parser::Parser(parser_rep parser_type)
 
     generator_ = std::mt19937_64(seed);
     distribution_ = std::uniform_int_distribution<int>(0, 2);
-    done_ = true;
+    done_ = false;
 }
 
 void Parser::Parse()
@@ -44,9 +44,8 @@ void Parser::Parse()
 void Parser::Parse(size_t start_chapter)
 {
     (void) start_chapter;
-    std::cout << "parse" << std::endl;
     const std::lock_guard<std::mutex> lock(mutex_);
-    std::cout << "Parser Index: " << index_ << std::endl;
+    std::cout << index_ << " - parse" << std::endl;
 }
 
 void Parser::Stop()

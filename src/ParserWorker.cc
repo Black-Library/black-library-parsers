@@ -6,6 +6,8 @@
 
 #include <ParserWorker.h>
 
+#include <ParserRR.h>
+
 namespace black_library {
 
 namespace core {
@@ -73,7 +75,7 @@ int ParserWorker::RunOnce()
     auto parser = parsers_[0];
 
     pool_results_.emplace_back(
-        pool_.enqueue([this, &parser]
+        pool_.enqueue([this, parser]
         {
             ParserJobResult result;
             std::stringstream ss;
@@ -89,39 +91,30 @@ int ParserWorker::RunOnce()
 
             auto job = job_queue_.pop();
             
-            // std::thread t([this, &parser](){
-            //     while (!done_ && !parser->GetDone())
-            //     {
-            //         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+            std::thread t([this, parser](){
 
-            //         if (done_)
-            //             break;
+                while (!done_ && !parser->GetDone())
+                {
+                    const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 
-            //         std::cout << "beat" << std::endl;
+                    if (done_)
+                        break;
 
-            //         std::this_thread::sleep_until(deadline);
-            //     }
-            //     std::cout << "Pass done" << std::endl;
-            //     parser->Stop();
-            // });
+                    std::cout << "beat" << std::endl;
 
-            std::cout << "foo" << std::endl;
+                    std::this_thread::sleep_until(deadline);
+                }
+                std::cout << "Pass done" << std::endl;
+                parser->Stop();
+            });
 
             parser->SetUrl(job.url);
-
-            std::cout << "bar" << std::endl;
-
-            auto parser_default = std::make_shared<Parser>();
-
-            parser_default->Parse(1);
-
-            std::cout << "default" << std::endl;
 
             parser->Parse(job.starting_chapter);
 
             // std::cout << "joining" << std::endl;
 
-            // t.join();
+            t.join();
 
             ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
             result.io_result = ss.str();
