@@ -76,8 +76,10 @@ int ParserWorker::RunOnce()
     pool_results_.emplace_back(
         pool_.enqueue([this, parser]
         {
-            ParserJobResult result;
             std::stringstream ss;
+            ParserJobResult result;
+            std::atomic_bool parser_error;
+            parser_error = false;
 
             ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
 
@@ -90,14 +92,16 @@ int ParserWorker::RunOnce()
 
             auto job = job_queue_.pop();
             
-            std::thread t([this, parser](){
+            std::thread t([this, parser, &parser_error](){
 
-                while (!done_ && !parser->GetDone())
+                while (!done_ && !parser->GetDone() && !parser_error)
                 {
                     const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 
                     if (done_)
                         break;
+
+                    std::cout << "beat" << std::endl;
 
                     std::this_thread::sleep_until(deadline);
                 }
@@ -107,7 +111,10 @@ int ParserWorker::RunOnce()
 
             parser->SetUrl(job.url);
 
-            parser->Parse(job.starting_chapter);
+            auto parser_result = parser->Parse(job.starting_chapter);
+
+            if (parser_result.has_error)
+                parser_error = true;
 
             // std::cout << "joining" << std::endl;
 
