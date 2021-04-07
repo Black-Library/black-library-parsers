@@ -121,13 +121,20 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
         if (seconds_counter == 0)
         {
+            // let the fake reader finish waiting before exiting
+            if (index + 1 > index_entries_.size())
+            {
+                done_ = true;
+                continue;
+            }
+
             ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
             wait_time = GenerateWaitTime(chapter_parse_info.length);
             if (chapter_parse_info.has_error)
             {
                 std::cout << "Error: ParserRR failed to parse chapter index: " << index << std::endl;
             }
-            std::cout << "ParserRR: " << title_ << " chapter length is " << chapter_parse_info.length 
+            std::cout << "ParserRR: " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
                       << " - waiting " << wait_time << " seconds" << std::endl;
             ++index;
         }
