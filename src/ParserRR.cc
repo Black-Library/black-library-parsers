@@ -121,13 +121,13 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
         if (seconds_counter == 0)
         {
-            RR_chapter_parse chapter_parse_info = ParseChapter(index_entries_[index]);
-            wait_time = GenerateWaitTime(chapter_parse_info.RR_length);
+            ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
+            wait_time = GenerateWaitTime(chapter_parse_info.length);
             if (chapter_parse_info.has_error)
             {
                 std::cout << "Error: ParserRR failed to parse chapter index: " << index << std::endl;
             }
-            std::cout << "ParserRR: " << title_ << " chapter length is " << chapter_parse_info.RR_length 
+            std::cout << "ParserRR: " << title_ << " chapter length is " << chapter_parse_info.length 
                       << " - waiting " << wait_time << " seconds" << std::endl;
             ++index;
         }
@@ -158,9 +158,9 @@ std::string ParserRR::ParseAuthor()
     return "";
 }
 
-RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
+ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 {
-    RR_chapter_parse output;
+    ParserChapterInfo output;
     std::string rr_url = "https://www.royalroad.com"+ entry.data_url;
     std::cout << "ParserRR ParseChapter: " << rr_url << std::endl;
 
@@ -197,7 +197,7 @@ RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
         ++length;
     }
 
-    output.RR_length = length;
+    output.length = length;
 
     std::string chapter_name = GetRRChapterName(entry.data_url);
 
@@ -221,12 +221,12 @@ RR_chapter_parse ParserRR::ParseChapter(const RR_index_entry &entry)
     return output;
 }
 
-RR_index_entry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
+ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
     xmlNodePtr data_url_node = NULL;
     xmlNodePtr chapter_name_node = NULL;
-    RR_index_entry index_entry;
+    ParserIndexEntry index_entry;
 
     for (current_node = root_node->children; current_node; current_node = current_node->next)
     {
@@ -308,7 +308,7 @@ void ParserRR::FindChapterNodes(xmlNodePtr root_node)
                 {
                     if (index_node->type == XML_ELEMENT_NODE)
                     {
-                        RR_index_entry index_entry = ExtractIndexEntry(index_node);
+                        ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
                         index_entry.index_num = index_num;
                         index_entries_.emplace_back(index_entry);
                         ++index_num;

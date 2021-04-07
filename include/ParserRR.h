@@ -17,18 +17,6 @@ namespace parsers {
 
 namespace RR {
 
-struct RR_index_entry {
-    std::string data_url;
-    std::string chapter_name;
-    uint16_t index_num;
-    // TODO add date added
-};
-
-struct RR_chapter_parse {
-    size_t RR_length = 0;
-    bool has_error = false;
-};
-
 class ParserRR : public Parser
 {
 public:
@@ -41,9 +29,9 @@ public:
 protected:
     std::string ParseTitle();
     std::string ParseAuthor();
-    RR_chapter_parse ParseChapter(const RR_index_entry &entry);
+    ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
 
-    RR_index_entry ExtractIndexEntry(xmlNodePtr root_node);
+    ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     std::string GetRRChapterName(const std::string &data_url);
@@ -52,7 +40,7 @@ protected:
     
 
 private:
-    std::vector<RR_index_entry> index_entries_;
+    std::vector<ParserIndexEntry> index_entries_;
 };
 
 } // namespace RR

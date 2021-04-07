@@ -15,6 +15,18 @@ namespace core {
 
 namespace parsers {
 
+struct ParserChapterInfo {
+    size_t length = 0;
+    bool has_error = false;
+};
+
+struct ParserIndexEntry {
+    std::string data_url;
+    std::string chapter_name;
+    uint16_t index_num;
+    // TODO add date added
+};
+
 struct ParserJob {
     std::string url;
     size_t starting_chapter;
