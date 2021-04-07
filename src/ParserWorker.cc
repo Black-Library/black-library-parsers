@@ -21,7 +21,7 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parser
     pool_results_(),
     num_parsers_(num_parsers),
     parser_type_(parser_type),
-    done_(true)
+    done_(false)
 {
     // (void) parser_ptr;
     for (size_t i = 0; i < num_parsers_; ++i)
@@ -101,8 +101,6 @@ int ParserWorker::RunOnce()
                     if (done_)
                         break;
 
-                    std::cout << "beat" << std::endl;
-
                     std::this_thread::sleep_until(deadline);
                 }
 
@@ -133,6 +131,8 @@ int ParserWorker::Stop()
 {
     // TODO: check to make sure pool_ does not leak memory
     done_ = true;
+
+    std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop" << std::endl;
 
     return 0;
 }

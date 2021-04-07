@@ -125,6 +125,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
             if (index + 1 > index_entries_.size())
             {
                 done_ = true;
+                std::cout << "Parser " << GetParserName(parser_type_) << " - " << index_ << " reached end" << std::endl;
                 continue;
             }
 
@@ -132,7 +133,8 @@ ParserResult ParserRR::Parse(size_t start_chapter)
             wait_time = GenerateWaitTime(chapter_parse_info.length);
             if (chapter_parse_info.has_error)
             {
-                std::cout << "Error: ParserRR failed to parse chapter index: " << index << std::endl;
+                std::cout << "Error: ParserRR failed to parse chapter entry index: " << index << std::endl;
+                wait_time = 300;
             }
             std::cout << "ParserRR: " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
                       << " - waiting " << wait_time << " seconds" << std::endl;
@@ -152,7 +154,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 void ParserRR::Stop()
 {
     done_ = true;
-    std::cout << "ParserRR: stop" << std::endl;
+    std::cout << "Parser " << GetParserName(parser_type_) << " - " << index_ << " stop" << std::endl;
 }
 
 std::string ParserRR::ParseTitle()

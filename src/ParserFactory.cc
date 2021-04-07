@@ -64,7 +64,7 @@ ParserFactoryResult ParserFactory::GetParserByType(parser_rep parser_type)
 
     result.parser_result = parser_map_itr->second;
 
-    ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType()) << std::endl;
+    ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType());
 
     result.io_string = ss.str();
 

@@ -56,19 +56,19 @@ parser_rep GetParserTypeByUrl(const std::string &url)
 {
     parser_rep rep = _NUM_PARSERS_TYPE;
 
-    if (ContainsString(AO3::source_url, url))
+    if (ContainsString(url, AO3::source_url))
     {
         rep = AO3_PARSER;
     }
-    else if (ContainsString(FFN::source_url, url))
+    else if (ContainsString(url, FFN::source_url))
     {
         rep = FFN_PARSER;
     }
-    else if (ContainsString(SBF::source_url, url))
+    else if (ContainsString(url, SBF::source_url))
     {
         rep = SBF_PARSER;
     }
-    else if (ContainsString(RR::source_url, url))
+    else if (ContainsString(url, RR::source_url))
     {
         rep = RR_PARSER;
     }

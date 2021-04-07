@@ -115,7 +115,7 @@ int ParserManager::AddWorker(parser_rep parser_type)
 {
     ParserFactoryResult factory_result = parser_factory_.GetParserByType(parser_type);
     
-    std::cout << "ParserManager AddWorker " << factory_result.io_string << std::endl;
+    std::cout << "ParserManager AddWorker " << GetParserName(parser_type) << " - " << factory_result.io_string << std::endl;
 
     if (factory_result.has_error)
     {
