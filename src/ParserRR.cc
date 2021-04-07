@@ -161,7 +161,7 @@ std::string ParserRR::ParseAuthor()
 ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
-    std::string rr_url = "https://www.royalroad.com"+ entry.data_url;
+    std::string rr_url = "https://" + RR::source_url + entry.data_url;
     std::cout << "ParserRR ParseChapter: " << rr_url << std::endl;
 
     std::string chapter_result = CurlRequest(rr_url);
@@ -309,6 +309,9 @@ void ParserRR::FindChapterNodes(xmlNodePtr root_node)
                     if (index_node->type == XML_ELEMENT_NODE)
                     {
                         ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
+                        if (index_entry.data_url.empty())
+                            continue;
+
                         index_entry.index_num = index_num;
                         index_entries_.emplace_back(index_entry);
                         ++index_num;
