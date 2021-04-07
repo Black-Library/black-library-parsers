@@ -65,6 +65,11 @@ int ParserManager::RunOnce()
         worker->second->AddJob(job.url, job.starting_chapter);
     }
 
+    for (auto & worker : worker_map_)
+    {
+        worker.second->RunOnce();
+    }
+
     return 0;
 }
 
