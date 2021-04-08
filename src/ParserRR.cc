@@ -37,7 +37,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
     ParserResult parser_result;
     done_ = false;
 
-    std::cout << "Start ParserRR Parse" << std::endl;
+    std::cout << "Start ParserRR Parse: " << url_ << std::endl;
     std::string curl_result = CurlRequest(url_);
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
@@ -66,7 +66,9 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
     current_node = head_seek.seek_node;
 
-    FindMetaData(current_node);
+    std::cout << "ParserRR: Find metadata" << std::endl;
+
+    FindMetaData(current_node->children);
 
     std::cout << "\tTitle: " << title_ << std::endl;
     std::cout << "\tAuthor: " << author_ << std::endl;
@@ -89,7 +91,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
     std::cout << "ParserRR: Find chapter nodes" << std::endl;
 
-    FindChapterNodes(current_node);
+    FindChapterNodes(current_node->children);
 
     xmlFreeDoc(doc_tree);
 
@@ -170,7 +172,7 @@ std::string ParserRR::ParseAuthor()
 ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
-    std::string rr_url = "https://" + RR::source_url + entry.data_url;
+    std::string rr_url = "https://www." + source_url_ + entry.data_url;
     std::cout << "ParserRR ParseChapter: " << rr_url << std::endl;
 
     std::string chapter_result = CurlRequest(rr_url);
