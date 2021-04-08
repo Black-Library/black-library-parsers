@@ -13,6 +13,7 @@ include(cmake/docker.cmake)
 
 configure_file(include/ParsersConfig.h.in include/ParsersConfig.h)
 
+add_subdirectory(ext)
 add_subdirectory(src)
 
 add_docker_targets()
