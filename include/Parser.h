@@ -5,13 +5,10 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <atomic>
 #include <fstream>
-#include <iostream>
 #include <mutex>
 #include <random>
 #include <string>
@@ -59,18 +56,10 @@ public:
     std::string GetUrl();
 
     size_t GenerateWaitTime(size_t length);
-    bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
-    std::string TrimWhitespace(const std::string &target_string);
 
 protected:
     virtual std::string ParseTitle();
     virtual std::string ParseAuthor();
-
-    std::string GenerateXmlDocTreeString(xmlNode *root_node);
-    std::string GenerateXmlDocTreeStringHelper(xmlNode *root_node, size_t depth);
-    std::string GetChapterFileName(size_t index, const std::string &chapter_name);
-    std::string GetSpaceString(size_t num_tabs);
-    ParserXmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
     std::mt19937_64 generator_;
     std::uniform_int_distribution<int> distribution_;

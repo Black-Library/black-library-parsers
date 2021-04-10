@@ -2,6 +2,7 @@
  * parser_worker_driver.cc
  */
 
+#include <iostream>
 #include <memory>
 #include <signal.h>
 

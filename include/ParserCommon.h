@@ -66,8 +66,18 @@ typedef enum {
 
 typedef uint8_t parser_rep;
 
+std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
+std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
+
+std::string GetChapterFileName(size_t index, const std::string &chapter_name);
 std::string GetParserName(parser_rep rep);
 parser_rep GetParserTypeByUrl(const std::string &url);
+std::string GetSpaceString(size_t num_tabs);
+ParserXmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
+
+bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
+
+std::string TrimWhitespace(const std::string &target_string);
 
 } // namespace parsers
 } // namespace core

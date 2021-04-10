@@ -2,6 +2,8 @@
  * parser_driver.cc
  */
 
+#include <iostream>
+
 #include <Parser.h>
 
 #include <ParserAO3.h>

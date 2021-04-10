@@ -2,6 +2,7 @@
  * ParserWorker.cc
  */
 
+#include <iostream>
 #include <sstream>
 
 #include <ParserWorker.h>

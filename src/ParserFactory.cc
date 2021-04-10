@@ -2,6 +2,7 @@
  * ParserFactory.cc
  */
 
+#include <iostream>
 #include <sstream>
 
 #include <ParserFactory.h>

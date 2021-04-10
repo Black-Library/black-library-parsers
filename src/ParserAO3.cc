@@ -2,6 +2,8 @@
  * ParserAO3.cc
  */
 
+#include <iostream>
+
 #include <ParserAO3.h>
 
 namespace black_library {

@@ -6,6 +6,7 @@
     #include <curl/curl.h>
 }*/
 
+#include <iostream>
 #include <signal.h>
 
 #include <ParserManager.h>
