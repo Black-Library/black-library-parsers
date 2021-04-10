@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
     parser_worker = &worker;
 
-    parser_worker->AddJob("foo");
+    parser_worker->AddJob("https://www.royalroad.com/fiction/21220/mother-of-learning");
     parser_worker->Run();
 
     curl_global_cleanup();

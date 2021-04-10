@@ -1,3 +1,21 @@
 include_directories(${PROJECT_SOURCE_DIR}/ext/catch2)
-add_executable(parser_test parser_test.cc)
-target_link_libraries(parser_test PRIVATE Catch2::Catch2WithMain blacklibraryparsers)
+
+set(SOURCES_TESTS
+    parser_common_test.cc
+    parser_test.cc
+    )
+
+string( REPLACE ".cc" "" BASENAMES_TESTS "${SOURCES_TESTS}" )
+set( TARGETS_TESTS ${BASENAMES_TESTS} )
+    
+foreach( name ${TARGETS_TESTS} )
+    add_executable( ${name} ${name}.cc )
+endforeach()
+
+foreach( name ${TARGETS_TESTS} )
+    target_link_libraries( ${name} Catch2::Catch2WithMain blacklibraryparsers)
+    set_property(TARGET ${name} PROPERTY CXX_STANDARD 14)
+    set_property(TARGET ${name} PROPERTY CXX_EXTENSIONS OFF)
+endforeach()
+
+# target_link_libraries(parser_test PRIVATE Catch2::Catch2WithMain blacklibraryparsers)
