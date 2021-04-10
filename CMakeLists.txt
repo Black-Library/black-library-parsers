@@ -17,4 +17,4 @@ add_subdirectory(ext)
 add_subdirectory(src)
 add_subdirectory(test)
 
-add_docker_targets()
+add_parser_docker_targets()

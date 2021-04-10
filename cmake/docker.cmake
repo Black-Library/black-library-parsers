@@ -1,4 +1,4 @@
-macro(add_docker_targets)
+macro(add_parser_docker_targets)
     add_custom_target(bl-parsers-builder
         COMMAND docker build --force-rm --tag bl/parsers/builder --file tools/docker/bl_parser_builder.docker .
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
