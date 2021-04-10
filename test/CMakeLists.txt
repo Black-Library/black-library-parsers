@@ -17,5 +17,3 @@ foreach( name ${TARGETS_TESTS} )
     set_property(TARGET ${name} PROPERTY CXX_STANDARD 14)
     set_property(TARGET ${name} PROPERTY CXX_EXTENSIONS OFF)
 endforeach()
-
-# target_link_libraries(parser_test PRIVATE Catch2::Catch2WithMain blacklibraryparsers)
