@@ -136,11 +136,6 @@ void Parser::SetParserType(parser_rep parser_type)
     parser_type_ = parser_type;
 }
 
-void Parser::SetSourceUrl(const std::string &url)
-{
-    source_url_ = url;
-}
-
 void Parser::SetUrl(const std::string &url)
 {
     const std::lock_guard<std::mutex> lock(mutex_);

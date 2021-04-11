@@ -19,7 +19,8 @@ bool ContainsUsingFind(const std::string &haystack, const std::string &needle)
     return false;
 }
 
-TEST_CASE( "ContainsString generic tests (pass)", "[single-file]" ) {
+TEST_CASE( "ContainsString generic tests (pass)", "[single-file]" )
+{
     REQUIRE( ContainsString("haystack", "aystac") == true );
     REQUIRE( ContainsUsingFind("haystack", "aystac") == true );
     REQUIRE( ContainsString("haystack", "notneedle") == false );
@@ -30,13 +31,15 @@ TEST_CASE( "ContainsString generic tests (pass)", "[single-file]" ) {
     REQUIRE( ContainsUsingFind("", "aystac") == false );
 }
 
-TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" ) {
+TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" )
+{
     REQUIRE( ContainsString( RR_URL, RR::source_url) == true );
     REQUIRE( ContainsString( RR_URL, SBF::source_url) == false );
     REQUIRE( ContainsString( RR::source_url, RR_URL) == false );
 }
 
-TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" ) {
+TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
+{
     REQUIRE( TrimWhitespace(" \t\r\n\0") == "" );
     REQUIRE( TrimWhitespace(" \t\r\n\0\0\n\r\t ") == "" );
     REQUIRE( TrimWhitespace(" a\t\rb\nc") == "a\t\rb\nc" );
