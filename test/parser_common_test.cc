@@ -9,7 +9,7 @@ namespace core {
 
 namespace parsers {
 
-static constexpr const char RR_URL[] = "https://www.royalroad.com/fiction/00000/some-fiction";
+static constexpr const char RR_DUMMY_URL[] = "https://www.royalroad.com/fiction/00000/some-fiction";
 
 bool ContainsUsingFind(const std::string &haystack, const std::string &needle)
 {
@@ -33,9 +33,9 @@ TEST_CASE( "ContainsString generic tests (pass)", "[single-file]" )
 
 TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" )
 {
-    REQUIRE( ContainsString( RR_URL, RR::source_url) == true );
-    REQUIRE( ContainsString( RR_URL, SBF::source_url) == false );
-    REQUIRE( ContainsString( RR::source_url, RR_URL) == false );
+    REQUIRE( ContainsString( RR_DUMMY_URL, RR::source_url) == true );
+    REQUIRE( ContainsString( RR_DUMMY_URL, SBF::source_url) == false );
+    REQUIRE( ContainsString( RR::source_url, RR_DUMMY_URL) == false );
 }
 
 TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
