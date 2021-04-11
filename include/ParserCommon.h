@@ -66,6 +66,8 @@ typedef enum {
 
 typedef uint8_t parser_rep;
 
+bool ContainsString(const std::string &haystack, const std::string &needle);
+
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 
