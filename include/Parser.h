@@ -43,7 +43,6 @@ public:
 
     void SetLocalFilePath(const std::string &local_des);
     void SetParserIndex(size_t index);
-    void SetParserType(parser_rep source);
     void SetUrl(const std::string &url);
 
     bool GetDone();
