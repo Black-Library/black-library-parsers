@@ -28,11 +28,13 @@ struct ParserIndexEntry {
 };
 
 struct ParserJob {
+    std::string uuid;
     std::string url;
     size_t starting_chapter;
 };
 
 struct ParserJobResult {
+    std::string uuid;
     std::string io_result;
     std::string error_string;
     bool has_error = false;

@@ -24,10 +24,8 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parser
     parser_type_(parser_type),
     done_(false)
 {
-    // (void) parser_ptr;
     for (size_t i = 0; i < num_parsers_; ++i)
     {
-        // parsers_.emplace_back(std::make_shared<Parser>());
         parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
         parsers_[i]->SetParserIndex(i);
     }
@@ -65,6 +63,7 @@ int ParserWorker::RunOnce()
         {
             ParserJobResult result = res.get();
             std::cout << result.io_result << std::endl;
+
         }
     }
 
@@ -115,8 +114,6 @@ int ParserWorker::RunOnce()
             if (parser_result.has_error)
                 parser_error = true;
 
-            // std::cout << "joining" << std::endl;
-
             t.join();
 
             ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
@@ -138,28 +135,24 @@ int ParserWorker::Stop()
     return 0;
 }
 
-int ParserWorker::AddJob(const std::string &url)
+int ParserWorker::AddJob(ParserJob parser_job)
 {
-    AddJob(url, 1);
-
-    return 0;
-}
-
-int ParserWorker::AddJob(const std::string &url, const size_t &starting_chapter)
-{
-    ParserJob job;
-    job.starting_chapter = starting_chapter;
-    job.url = url;
-
-    if (url.empty())
+    if (parser_job.uuid.empty())
     {
-        std::cout << "Error: ParserWorker sent empty url" << std::endl;
+        std::cout << "Error: ParserWorker was sent empty uuid" << std::endl;
         return -1;
     }
 
-    std::cout << "ParserWorker " << GetParserName(parser_type_) << " adding job with url: " << job.url << " starting chapter: " << job.starting_chapter << std::endl;
+    if (parser_job.url.empty())
+    {
+        std::cout << "Error: ParserWorker was sent empty url" << std::endl;
+        return -1;
+    }
 
-    job_queue_.push(job);
+    std::cout << "ParserWorker " << GetParserName(parser_type_) <<
+     " adding job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.starting_chapter << std::endl;
+
+    job_queue_.push(parser_job);
 
     return 0;
 }

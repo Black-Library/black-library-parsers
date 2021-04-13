@@ -30,8 +30,7 @@ public:
     int RunOnce();
     int Stop();
 
-    int AddJob(const std::string &url);
-    int AddJob(const std::string &url, const size_t &starting_chapter);
+    int AddJob(ParserJob parser_job);
 
 private:
     void Init();

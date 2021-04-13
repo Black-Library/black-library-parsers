@@ -41,7 +41,11 @@ int main(int argc, char* argv[])
 
     parser_worker = &worker;
 
-    parser_worker->AddJob("https://www.royalroad.com/fiction/21220/mother-of-learning");
+    black_library::core::parsers::ParserJob job;
+
+    job.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+
+    parser_worker->AddJob(job);
     parser_worker->Run();
 
     curl_global_cleanup();

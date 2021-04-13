@@ -41,7 +41,9 @@ int main(int argc, char* argv[])
 
     parser_manager = &manager;
 
-    parser_manager->AddUrl("https://www.royalroad.com/fiction/21220/mother-of-learning");
+    black_library::core::parsers::ParserJob job;
+
+    parser_manager->AddUrl("some-uuid", "https://www.royalroad.com/fiction/21220/mother-of-learning");
 
     parser_manager->Run();
 

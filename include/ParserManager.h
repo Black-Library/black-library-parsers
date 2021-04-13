@@ -33,8 +33,8 @@ public:
     int RunOnce();
     int Stop();
 
-    int AddUrl(const std::string &url);
-    int AddUrl(const std::string &url, const size_t &starting_chapter);
+    int AddUrl(const std::string &uuid, const std::string &url);
+    int AddUrl(const std::string &uuid, const std::string &url, const size_t &starting_chapter);
 
 private:
     void Init();

@@ -63,7 +63,7 @@ int ParserManager::RunOnce()
             continue;
         }
 
-        worker->second->AddJob(job.url, job.starting_chapter);
+        worker->second->AddJob(job);
     }
 
     for (auto & worker : worker_map_)
@@ -86,20 +86,21 @@ int ParserManager::Stop()
     return 0;
 }
 
-int ParserManager::AddUrl(const std::string &url)
+int ParserManager::AddUrl(const std::string &uuid, const std::string &url)
 {
-    AddUrl(url, 1);
+    AddUrl(uuid, url, 1);
 
     return 0;
 }
 
-int ParserManager::AddUrl(const std::string &url, const size_t &starting_chapter)
+int ParserManager::AddUrl(const std::string &uuid, const std::string &url, const size_t &starting_chapter)
 {
     ParserJob job;
     job.starting_chapter = starting_chapter;
+    job.uuid = uuid;
     job.url = url;
 
-    std::cout << "ParserManager adding job with url: " << job.url << " - starting chapter: " << job.starting_chapter << std::endl;
+    std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << " - starting chapter: " << job.starting_chapter << std::endl;
 
     job_queue_.push(job);
 
