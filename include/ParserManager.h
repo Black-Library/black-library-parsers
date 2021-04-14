@@ -33,16 +33,19 @@ public:
     int RunOnce();
     int Stop();
 
-    int AddUrl(const std::string &uuid, const std::string &url);
-    int AddUrl(const std::string &uuid, const std::string &url, const size_t &starting_chapter);
+    int AddJob(const std::string &uuid, const std::string &url);
+    int AddJob(const std::string &uuid, const std::string &url, const size_t &starting_chapter);
 
 private:
     void Init();
+    int AddResult(ParserJobResult result);
     int AddWorker(parser_rep parser_type);
+    int RegisterWorkerCallbacks();
 
     std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
     ParserFactory parser_factory_;
     BlockingQueue<ParserJob> job_queue_;
+    BlockingQueue<ParserJobResult> result_queue_;
     std::string config_;
     std::atomic_bool done_;
 };

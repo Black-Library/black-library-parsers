@@ -20,6 +20,7 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parser
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
+    notify_callback_(),
     num_parsers_(num_parsers),
     parser_type_(parser_type),
     done_(false)
@@ -64,6 +65,8 @@ int ParserWorker::RunOnce()
             ParserJobResult result = res.get();
             std::cout << result.io_result << std::endl;
 
+            if (notify_callback_)
+                notify_callback_(result);
         }
     }
 
@@ -74,7 +77,7 @@ int ParserWorker::RunOnce()
     auto parser = parsers_[0];
 
     pool_results_.emplace_back(
-        pool_.enqueue([this, parser]
+        pool_.enqueue([this, parser]()
         {
             std::stringstream ss;
             ParserJobResult result;
@@ -118,6 +121,7 @@ int ParserWorker::RunOnce()
 
             ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
             result.io_result = ss.str();
+            result.uuid = job.uuid;
             return result;
         })
     );
@@ -153,6 +157,13 @@ int ParserWorker::AddJob(ParserJob parser_job)
      " adding job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.starting_chapter << std::endl;
 
     job_queue_.push(parser_job);
+
+    return 0;
+}
+
+int ParserWorker::RegisterManagerNotifyCallback(const manager_notify_callback &callback)
+{
+    notify_callback_ = callback;
 
     return 0;
 }

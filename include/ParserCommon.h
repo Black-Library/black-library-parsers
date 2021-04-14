@@ -5,6 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_COMMON_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_COMMON_H__
 
+#include <functional>
 #include <string>
 
 #include <libxml/tree.h>
@@ -67,6 +68,8 @@ typedef enum {
 } parser_t;
 
 typedef uint8_t parser_rep;
+
+typedef std::function<void(ParserJobResult)> manager_notify_callback;
 
 bool ContainsString(const std::string &haystack, const std::string &needle);
 

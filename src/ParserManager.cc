@@ -17,6 +17,7 @@ namespace parsers {
 
 ParserManager::ParserManager(const std::string &config) :
     job_queue_(),
+    result_queue_(),
     config_(config),
     done_(true)
 {
@@ -86,14 +87,14 @@ int ParserManager::Stop()
     return 0;
 }
 
-int ParserManager::AddUrl(const std::string &uuid, const std::string &url)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url)
 {
-    AddUrl(uuid, url, 1);
+    AddJob(uuid, url, 1);
 
     return 0;
 }
 
-int ParserManager::AddUrl(const std::string &uuid, const std::string &url, const size_t &starting_chapter)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &starting_chapter)
 {
     ParserJob job;
     job.starting_chapter = starting_chapter;
@@ -111,6 +112,7 @@ void ParserManager::Init()
 {
     AddWorker(AO3_PARSER);
     AddWorker(RR_PARSER);
+    RegisterWorkerCallbacks();
 }
 
 int ParserManager::AddWorker(parser_rep parser_type)
@@ -126,6 +128,21 @@ int ParserManager::AddWorker(parser_rep parser_type)
     }
 
     worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, 2, parser_type));
+
+    return 0;
+}
+
+int ParserManager::RegisterWorkerCallbacks()
+{
+    for (auto & worker : worker_map_)
+    {
+        worker.second->RegisterManagerNotifyCallback(
+            [this](ParserJobResult result)
+            {
+                result_queue_.push(result);
+            }
+        );
+    }
 
     return 0;
 }
