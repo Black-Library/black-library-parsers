@@ -72,6 +72,12 @@ int ParserManager::RunOnce()
         worker.second->RunOnce();
     }
 
+    while (!result_queue_.empty())
+    {
+        auto job = result_queue_.pop();
+        std::cout << "ParserManager: finished job with uuid: " << job.uuid << std::endl;
+    }
+
     return 0;
 }
 

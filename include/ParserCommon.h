@@ -59,6 +59,16 @@ struct ParserXmlNodeSeek {
 };
 
 typedef enum {
+    QUEUED,
+    WORKING,
+    FINISHED,
+    ERROR,
+    _NUM_JOB_STATUS_TYPES_
+} job_status_t;
+
+typedef uint8_t job_status_rep;
+
+typedef enum {
     AO3_PARSER,
     FFN_PARSER,
     SBF_PARSER,

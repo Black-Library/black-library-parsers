@@ -1,5 +1,5 @@
 /**
- * ParserManager.h
+ * BlockingQueue.h
  * 
  * Thread safe blocking queue
  */

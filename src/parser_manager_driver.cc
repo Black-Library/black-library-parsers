@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
 
     black_library::core::parsers::ParserJob job;
 
-    parser_manager->AddJob("some-uuid", "https://www.royalroad.com/fiction/21220/mother-of-learning");
+    parser_manager->AddJob("some-uuid-0", "https://www.royalroad.com/fiction/21220/mother-of-learning");
+    parser_manager->AddJob("some-uuid-1", "https://www.royalroad.com/fiction/42266/elysium");
 
     parser_manager->Run();
 

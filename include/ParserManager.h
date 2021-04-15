@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "BlockingQueue.h"
+#include "BlockingUnorderedMap.h"
 #include "ThreadPool.h"
 
 #include "Parser.h"
@@ -44,6 +45,7 @@ private:
 
     std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
     ParserFactory parser_factory_;
+    BlockingUnorderedMap<std::string, job_status_rep> current_jobs_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
     std::string config_;

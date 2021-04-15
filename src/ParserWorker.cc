@@ -65,6 +65,10 @@ int ParserWorker::RunOnce()
             ParserJobResult result = res.get();
             std::cout << result.io_result << std::endl;
 
+            if (result.has_error)
+                // TODO: do something about error? notify?
+                std::cout << result.error_string << std::endl;
+
             if (notify_callback_)
                 notify_callback_(result);
         }
