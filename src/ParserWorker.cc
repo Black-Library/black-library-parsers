@@ -82,6 +82,7 @@ int ParserWorker::RunOnce()
             std::stringstream ss;
             ParserJobResult result;
             std::atomic_bool parser_error;
+
             parser_error = false;
 
             ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
