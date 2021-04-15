@@ -17,12 +17,11 @@ private:
     std::mutex mutex_;
     std::unordered_map<Key, Value> map_;
 public:
-    // T pop() {
-    //     const std::lock_guard<std::mutex> lock(mutex_);
-    //     T value = queue_.front();
-    //     queue_.pop();
-    //     return value;
-    // }
+    Value find(Key key) {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        Value value = map_.find(key);
+        return value;
+    }
 
     // void push(T value) {
     //     const std::lock_guard<std::mutex> lock(mutex_);
