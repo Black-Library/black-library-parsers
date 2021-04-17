@@ -12,31 +12,42 @@
 #include <unordered_map>
 
 template <typename Key, typename Value>
-class BlockingUnorderedMap {
+class BlockingUnorderedMap
+{
 private:
     std::mutex mutex_;
     std::unordered_map<Key, Value> map_;
 public:
-    Value find(Key key) {
+    // TODO: emplace actually returns something
+    void emplace(Key key, Value value)
+    {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        map_.emplace(key, value);
+    }
+
+    // TODO: erase actually returns something
+    void erase(Key key)
+    {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        map_.erase(key);
+    }
+
+    Value find(Key key)
+    {
         const std::lock_guard<std::mutex> lock(mutex_);
         Value value = map_.find(key);
         return value;
     }
 
-    // void push(T value) {
-    //     const std::lock_guard<std::mutex> lock(mutex_);
-    //     queue_.push(value);
-    // }
-
     size_t size()
     {
-        size_t size;
         const std::lock_guard<std::mutex> lock(mutex_);
-        size = map_.size();
+        size_t size = map_.size();
         return size;
     }
 
-    bool empty() {
+    bool empty()
+    {
         const std::lock_guard<std::mutex> lock(mutex_);
         bool check = map_.empty();
         return check;

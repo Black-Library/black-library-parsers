@@ -31,9 +31,8 @@ public:
 
     size_t size()
     {
-        size_t size;
         const std::lock_guard<std::mutex> lock(mutex_);
-        size = queue_.size();
+        size_t size = queue_.size();
         return size;
     }
 
