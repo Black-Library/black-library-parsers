@@ -32,6 +32,7 @@ public:
 
     int AddJob(ParserJob parser_job);
 
+    int RegisterJobStatusCallback(const job_status_callback &callback);
     int RegisterManagerNotifyCallback(const manager_notify_callback &callback);
 
 private:
@@ -41,6 +42,7 @@ private:
     ThreadPool pool_;
     BlockingQueue<ParserJob> job_queue_;
     std::vector<std::future<ParserJobResult>> pool_results_;
+    job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
     size_t num_parsers_;
     parser_rep parser_type_;

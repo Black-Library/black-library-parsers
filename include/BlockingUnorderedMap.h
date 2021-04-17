@@ -39,6 +39,19 @@ public:
         return value;
     }
 
+    bool find_and_replace(Key key, Value value)
+    {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        if (map_.find(key) == map_.end())
+            return false;
+
+        map_.erase(key);
+
+        map_.emplace(key, value);
+
+        return true;
+    }
+
     size_t size()
     {
         const std::lock_guard<std::mutex> lock(mutex_);

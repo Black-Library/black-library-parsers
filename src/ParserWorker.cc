@@ -20,6 +20,7 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parser
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
+    job_status_callback_(),
     notify_callback_(),
     num_parsers_(num_parsers),
     parser_type_(parser_type),
@@ -169,6 +170,13 @@ int ParserWorker::AddJob(ParserJob parser_job)
 int ParserWorker::RegisterManagerNotifyCallback(const manager_notify_callback &callback)
 {
     notify_callback_ = callback;
+
+    return 0;
+}
+
+int ParserWorker::RegisterJobStatusCallback(const job_status_callback &callback)
+{
+    job_status_callback_ = callback;
 
     return 0;
 }

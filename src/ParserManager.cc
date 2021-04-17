@@ -65,6 +65,7 @@ int ParserManager::RunOnce()
         }
 
         worker->second->AddJob(job);
+        current_jobs_.emplace(job.uuid, JOB_QUEUED);
     }
 
     for (auto & worker : worker_map_)
@@ -142,6 +143,12 @@ int ParserManager::RegisterWorkerCallbacks()
 {
     for (auto & worker : worker_map_)
     {
+        worker.second->RegisterJobStatusCallback(
+            [this](const std::string &uuid, job_status_rep job_status)
+            {
+                current_jobs_.find_and_replace(uuid, job_status);
+            }
+        );
         worker.second->RegisterManagerNotifyCallback(
             [this](ParserJobResult result)
             {
