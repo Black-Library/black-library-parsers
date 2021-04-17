@@ -37,6 +37,8 @@ public:
     int AddJob(const std::string &uuid, const std::string &url);
     int AddJob(const std::string &uuid, const std::string &url, const size_t &starting_chapter);
 
+    int RegisterDatabaseStatusCallback(const database_status_callback &callback);
+
 private:
     void Init();
     int AddResult(ParserJobResult result);
@@ -48,6 +50,7 @@ private:
     BlockingUnorderedMap<std::string, job_status_rep> current_jobs_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
+    database_status_callback database_status_callback_;
     std::string config_;
     std::atomic_bool done_;
 };

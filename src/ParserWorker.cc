@@ -118,6 +118,9 @@ int ParserWorker::RunOnce()
 
             parser->SetUrl(job.url);
 
+            if (job_status_callback_)
+                job_status_callback_(job.uuid, JOB_WORKING);
+
             auto parser_result = parser->Parse(job.starting_chapter);
 
             if (parser_result.has_error)

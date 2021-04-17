@@ -79,6 +79,7 @@ typedef enum {
 
 typedef uint8_t parser_rep;
 
+typedef std::function<void(ParserJobResult)> database_status_callback;
 typedef std::function<void(const std::string &uuid, job_status_rep job_status)> job_status_callback;
 typedef std::function<void(ParserJobResult)> manager_notify_callback;
 

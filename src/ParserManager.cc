@@ -77,6 +77,7 @@ int ParserManager::RunOnce()
     {
         auto job = result_queue_.pop();
         std::cout << "ParserManager: finished job with uuid: " << job.uuid << std::endl;
+        current_jobs_.erase(job.uuid);
     }
 
     return 0;
@@ -110,6 +111,12 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
 
     std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << " - starting chapter: " << job.starting_chapter << std::endl;
 
+    if (current_jobs_.key_exists(job.uuid))
+    {
+        std::cout << "ParserManager already working on " << job.uuid << std::endl;
+        return 0;
+    }
+
     job_queue_.push(job);
 
     return 0;
@@ -139,6 +146,13 @@ int ParserManager::AddWorker(parser_rep parser_type)
     return 0;
 }
 
+int ParserManager::RegisterDatabaseStatusCallback(const database_status_callback &callback)
+{
+    database_status_callback_ = callback;
+
+    return 0;
+}
+
 int ParserManager::RegisterWorkerCallbacks()
 {
     for (auto & worker : worker_map_)
@@ -153,6 +167,7 @@ int ParserManager::RegisterWorkerCallbacks()
             [this](ParserJobResult result)
             {
                 result_queue_.push(result);
+                current_jobs_.find_and_replace(result.uuid, JOB_FINISHED);
             }
         );
     }
