@@ -16,6 +16,27 @@ namespace core {
 
 namespace parsers {
 
+typedef enum {
+    JOB_QUEUED,
+    JOB_WORKING,
+    JOB_FINISHED,
+    JOB_ERROR,
+    _NUM_JOB_STATUS_TYPES_
+} job_status_t;
+
+typedef uint8_t job_status_rep;
+
+typedef enum {
+    AO3_PARSER,
+    FFN_PARSER,
+    SBF_PARSER,
+    RR_PARSER,
+
+    _NUM_PARSERS_TYPE
+} parser_t;
+
+typedef uint8_t parser_rep;
+
 struct ParserChapterInfo {
     size_t length = 0;
     bool has_error = false;
@@ -36,6 +57,16 @@ struct ParserJob {
 
 struct ParserJobResult {
     std::string uuid;
+    std::string title;
+    std::string nickname;
+    std::string source;
+    parser_rep parser_source;
+    std::string url;
+    std::string last_url;
+    std::string series;
+    uint16_t series_length = 1;
+    std::string media_path;
+    std::string birth_date;
     std::string io_result;
     std::string error_string;
     bool has_error = false;
@@ -57,27 +88,6 @@ struct ParserXmlNodeSeek {
     xmlNodePtr seek_node = NULL;
     bool found = false;
 };
-
-typedef enum {
-    JOB_QUEUED,
-    JOB_WORKING,
-    JOB_FINISHED,
-    JOB_ERROR,
-    _NUM_JOB_STATUS_TYPES_
-} job_status_t;
-
-typedef uint8_t job_status_rep;
-
-typedef enum {
-    AO3_PARSER,
-    FFN_PARSER,
-    SBF_PARSER,
-    RR_PARSER,
-
-    _NUM_PARSERS_TYPE
-} parser_t;
-
-typedef uint8_t parser_rep;
 
 typedef std::function<void(ParserJobResult)> database_status_callback;
 typedef std::function<void(const std::string &uuid, job_status_rep job_status)> job_status_callback;

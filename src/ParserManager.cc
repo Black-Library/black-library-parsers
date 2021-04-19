@@ -16,8 +16,12 @@ namespace core {
 namespace parsers {
 
 ParserManager::ParserManager(const std::string &config) :
+    worker_map_(),
+    parser_factory_(),
+    current_jobs_(),
     job_queue_(),
     result_queue_(),
+    database_status_callback_(),
     config_(config),
     done_(true)
 {
