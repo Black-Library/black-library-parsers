@@ -79,12 +79,12 @@ int ParserManager::RunOnce()
 
     while (!result_queue_.empty())
     {
-        auto job = result_queue_.pop();
-        std::cout << "ParserManager: finished job with uuid: " << job.uuid << std::endl;
-        current_jobs_.erase(job.uuid);
+        auto job_result = result_queue_.pop();
+        std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << std::endl;
+        current_jobs_.erase(job_result.metadata.uuid);
 
         if (database_status_callback_)
-            database_status_callback_(job);
+            database_status_callback_(job_result);
     }
 
     return 0;
@@ -174,7 +174,7 @@ int ParserManager::RegisterWorkerCallbacks()
             [this](ParserJobResult result)
             {
                 result_queue_.push(result);
-                current_jobs_.find_and_replace(result.uuid, JOB_FINISHED);
+                current_jobs_.find_and_replace(result.metadata.uuid, JOB_FINISHED);
             }
         );
     }

@@ -130,7 +130,8 @@ int ParserWorker::RunOnce()
 
             ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
             result.io_result = ss.str();
-            result.uuid = job.uuid;
+            result.metadata = parser_result.metadata;
+
             return result;
         })
     );

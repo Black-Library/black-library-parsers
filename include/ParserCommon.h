@@ -55,10 +55,10 @@ struct ParserJob {
     size_t starting_chapter;
 };
 
-struct ParserJobResult {
+struct ParserResultMetadata {
     std::string uuid;
     std::string title;
-    std::string nickname;
+    std::string nickname = "";
     std::string source;
     parser_rep parser_source;
     std::string url;
@@ -67,6 +67,10 @@ struct ParserJobResult {
     uint16_t series_length = 1;
     std::string media_path;
     std::string update_date;
+};
+
+struct ParserJobResult {
+    ParserResultMetadata metadata;
 
     std::string io_result;
     std::string error_string;
@@ -74,6 +78,8 @@ struct ParserJobResult {
 };
 
 struct ParserResult {
+    ParserResultMetadata metadata;
+
     std::string io_result;
     std::string error_string;
     bool has_error = false;
