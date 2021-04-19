@@ -82,6 +82,9 @@ int ParserManager::RunOnce()
         auto job = result_queue_.pop();
         std::cout << "ParserManager: finished job with uuid: " << job.uuid << std::endl;
         current_jobs_.erase(job.uuid);
+
+        if (database_status_callback_)
+            database_status_callback_(job);
     }
 
     return 0;

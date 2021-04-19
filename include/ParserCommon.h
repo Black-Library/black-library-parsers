@@ -66,7 +66,8 @@ struct ParserJobResult {
     std::string series;
     uint16_t series_length = 1;
     std::string media_path;
-    std::string birth_date;
+    std::string update_date;
+
     std::string io_result;
     std::string error_string;
     bool has_error = false;
