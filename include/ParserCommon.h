@@ -58,9 +58,9 @@ struct ParserJob {
 struct ParserResultMetadata {
     std::string uuid;
     std::string title;
+    std::string author;
     std::string nickname = "";
     std::string source;
-    parser_rep parser_source;
     std::string url;
     std::string last_url;
     std::string series;

@@ -75,6 +75,11 @@ ParserResult ParserRR::Parse(size_t start_chapter)
     std::cout << "\tAuthor: " << author_ << std::endl;
     std::cout << "\tNickname: " << nickname_ << std::endl;
 
+    parser_result.metadata.title = title_;
+    parser_result.metadata.author = author_;
+    parser_result.metadata.nickname = nickname_;
+    parser_result.metadata.source = RR::name;
+
     // reset current node ptr to root node children
     current_node = root_node->children;
 
@@ -150,6 +155,8 @@ ParserResult ParserRR::Parse(size_t start_chapter)
     }
 
     xmlCleanupParser();
+
+    parser_result.metadata.media_path = local_des_;
 
     return parser_result;
 }
