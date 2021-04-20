@@ -153,13 +153,13 @@ int ParserWorker::AddJob(ParserJob parser_job)
 {
     if (parser_job.uuid.empty())
     {
-        std::cout << "Error: ParserWorker was sent empty uuid" << std::endl;
+        std::cout << "Error: ParserWorker was sent job with empty uuid" << std::endl;
         return -1;
     }
 
     if (parser_job.url.empty())
     {
-        std::cout << "Error: ParserWorker was sent empty url" << std::endl;
+        std::cout << "Error: ParserWorker was sent job with empty url" << std::endl;
         return -1;
     }
 

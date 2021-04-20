@@ -52,7 +52,7 @@ struct ParserIndexEntry {
 struct ParserJob {
     std::string uuid;
     std::string url;
-    size_t starting_chapter;
+    size_t starting_chapter = 1;
 };
 
 struct ParserResultMetadata {

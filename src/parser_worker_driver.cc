@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
 
     black_library::core::parsers::ParserJob job;
 
+    job.uuid = "some-uuid-0";
     job.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
 
     parser_worker->AddJob(job);
