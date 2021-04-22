@@ -36,6 +36,7 @@ public:
 
     int AddJob(const std::string &uuid, const std::string &url);
     int AddJob(const std::string &uuid, const std::string &url, const size_t &starting_chapter);
+    bool GetDone();
 
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
 

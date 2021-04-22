@@ -129,6 +129,11 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     return 0;
 }
 
+bool ParserManager::GetDone()
+{
+    return done_;
+}
+
 void ParserManager::Init()
 {
     AddWorker(AO3_PARSER);
