@@ -33,9 +33,9 @@ TEST_CASE( "ContainsString generic tests (pass)", "[single-file]" )
 
 TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" )
 {
-    REQUIRE( ContainsString( RR_DUMMY_URL, RR::source_url) == true );
-    REQUIRE( ContainsString( RR_DUMMY_URL, SBF::source_url) == false );
-    REQUIRE( ContainsString( RR::source_url, RR_DUMMY_URL) == false );
+    REQUIRE( ContainsString( RR_DUMMY_URL, black_library::core::common::RR::source_url) == true );
+    REQUIRE( ContainsString( RR_DUMMY_URL, black_library::core::common::SBF::source_url) == false );
+    REQUIRE( ContainsString( black_library::core::common::RR::source_url, RR_DUMMY_URL) == false );
 }
 
 TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )

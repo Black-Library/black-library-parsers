@@ -17,7 +17,7 @@ namespace AO3 {
 ParserAO3::ParserAO3()
 {
     parser_type_ = AO3_PARSER;
-    source_url_ = AO3::source_url;
+    source_url_ = black_library::core::common::AO3::source_url;
 }
 
 ParserAO3::~ParserAO3()

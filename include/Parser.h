@@ -18,8 +18,9 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <SourceInformation.h>
+
 #include "ParserCommon.h"
-#include "SourceInformation.h"
 
 namespace black_library {
 

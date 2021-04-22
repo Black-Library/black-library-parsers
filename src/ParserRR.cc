@@ -22,7 +22,7 @@ ParserRR::ParserRR() :
 {
     title_ = "RR_Parser_title";
     nickname_ = "";
-    source_url_ = RR::source_url;
+    source_url_ = black_library::core::common::RR::source_url;
     author_ = "unknown author";
     parser_type_ = RR_PARSER;
 }
@@ -78,7 +78,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
     parser_result.metadata.title = title_;
     parser_result.metadata.author = author_;
     parser_result.metadata.nickname = nickname_;
-    parser_result.metadata.source = RR::name;
+    parser_result.metadata.source = black_library::core::common::RR::name;
 
     // reset current node ptr to root node children
     current_node = root_node->children;

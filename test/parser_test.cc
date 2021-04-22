@@ -26,7 +26,7 @@ TEST_CASE( "RR parser tests (pass)", "[single-file]" )
     parser.SetParserIndex(0);
     parser.SetUrl(RR_DUMMY_URL);
     REQUIRE(parser.GetParserType() == RR_PARSER);
-    REQUIRE(parser.GetSourceUrl() == RR::source_url);
+    REQUIRE(parser.GetSourceUrl() == black_library::core::common::RR::source_url);
 }
 
 } // namespace parsers

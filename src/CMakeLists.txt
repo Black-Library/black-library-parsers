@@ -11,14 +11,13 @@ add_library(blacklibraryparsers
     ParserFactory.cc
     ParserManager.cc
     ParserWorker.cc
-    SourceInformation.cc
 
     ParserAO3.cc
     # ParserFFN.cc
     ParserRR.cc
     )
 
-target_link_libraries(blacklibraryparsers ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
+target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
 target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
 
 install(
@@ -26,6 +25,9 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+set_target_properties(blacklibraryparsers PROPERTIES INSTALL_RPATH
+    "$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 
 add_executable(parser_driver parser_driver.cc)
 add_executable(parser_worker_driver parser_worker_driver.cc)
@@ -38,10 +40,12 @@ target_link_libraries(parser_manager_driver blacklibraryparsers)
 target_link_libraries(thread_pool_example blacklibraryparsers)
 
 set_target_properties(parser_driver PROPERTIES INSTALL_RPATH
-    "$LD_LIBRARY_PATH;${CMAKE_INSTALL_PREFIX}/lib")
+    "$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 set_target_properties(parser_worker_driver PROPERTIES INSTALL_RPATH
-    "$LD_LIBRARY_PATH;${CMAKE_INSTALL_PREFIX}/lib")
+    "$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 set_target_properties(parser_manager_driver PROPERTIES INSTALL_RPATH
-"$LD_LIBRARY_PATH;${CMAKE_INSTALL_PREFIX}/lib")
+    "$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
+
+message("linker path: $LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 
 install(TARGETS parser_driver parser_worker_driver parser_manager_driver thread_pool_example RUNTIME DESTINATION bin)
