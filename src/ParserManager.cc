@@ -64,7 +64,7 @@ int ParserManager::RunOnce()
 
         if (worker == worker_map_.end())
         {
-            std::cout << "Error: could not find parser with rep: " << parser_type << std::endl;
+            std::cout << "Error: could not find parser with rep: " << GetParserName(parser_type) << std::endl;
             continue;
         }
 
