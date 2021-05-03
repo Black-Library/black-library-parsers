@@ -15,7 +15,7 @@ namespace core {
 
 namespace parsers {
 
-ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parsers, parser_rep parser_type) :
+ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, parser_rep parser_type, size_t num_parsers) :
     parsers_(),
     pool_(num_parsers),
     job_queue_(),
@@ -30,6 +30,11 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, size_t num_parser
     {
         parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
         parsers_[i]->SetParserIndex(i);
+    }
+
+    for (auto parser : parsers_)
+    {
+        std::cout << "ParserWorker: " << GetParserName(parser_type_) << " with parser index: " parser->GetParserIndex() << std::endl;
     }
 }
 
@@ -79,6 +84,7 @@ int ParserWorker::RunOnce()
         return 0;
 
     // TODO: use more than just the first parser
+
     auto parser = parsers_[0];
 
     pool_results_.emplace_back(
@@ -100,6 +106,8 @@ int ParserWorker::RunOnce()
             }
 
             auto job = job_queue_.pop();
+
+            std::cout << "starting parser done tracking thread" << std::endl;
             
             std::thread t([this, parser, &parser_error](){
 
@@ -110,8 +118,12 @@ int ParserWorker::RunOnce()
                     if (done_)
                         break;
 
+                    std::cout << parser->GetUrl() << " not done yet" << std::endl;
+
                     std::this_thread::sleep_until(deadline);
                 }
+
+                std::cout << parser->GetUrl() << " done" << std::endl;
 
                 parser->Stop();
             });
@@ -141,7 +153,7 @@ int ParserWorker::RunOnce()
 
 int ParserWorker::Stop()
 {
-    // TODO: check to make sure pool_ does not leak memory
+    // TODO: check to make sure pool_ does not leak memory   
     done_ = true;
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop" << std::endl;

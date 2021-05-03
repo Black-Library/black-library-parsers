@@ -7,6 +7,8 @@
 #include <sstream>
 #include <thread>
 
+#include <FileOperations.h>
+
 #include <ParserManager.h>
 
 namespace black_library {
@@ -15,7 +17,7 @@ namespace core {
 
 namespace parsers {
 
-ParserManager::ParserManager(const std::string &config) :
+ParserManager::ParserManager(const std::string &storage_dir, const std::string &config) :
     worker_map_(),
     parser_factory_(),
     current_jobs_(),
@@ -23,9 +25,19 @@ ParserManager::ParserManager(const std::string &config) :
     result_queue_(),
     database_status_callback_(),
     config_(config),
-    done_(true)
+    storage_dir_(storage_dir),
+    done_(true),
+    initialized_(false)
 {
-    Init();
+    if (!black_library::core::common::CheckFilePermission(storage_dir_))
+    {
+        std::cout << "Error: parser manager could not access storage directory" << std::endl;
+        return;
+    }
+
+    WorkerInit();
+
+    initialized_ = true;
 }
 
 int ParserManager::Run()
@@ -102,6 +114,11 @@ int ParserManager::Stop()
     return 0;
 }
 
+bool ParserManager::IsReady()
+{
+    return initialized_;
+}
+
 int ParserManager::AddJob(const std::string &uuid, const std::string &url)
 {
     AddJob(uuid, url, 1);
@@ -134,14 +151,14 @@ bool ParserManager::GetDone()
     return done_;
 }
 
-void ParserManager::Init()
+void ParserManager::WorkerInit()
 {
-    AddWorker(AO3_PARSER);
-    AddWorker(RR_PARSER);
+    AddWorker(AO3_PARSER, 2);
+    AddWorker(RR_PARSER, 2);
     RegisterWorkerCallbacks();
 }
 
-int ParserManager::AddWorker(parser_rep parser_type)
+int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
 {
     ParserFactoryResult factory_result = parser_factory_.GetParserByType(parser_type);
     
@@ -153,7 +170,7 @@ int ParserManager::AddWorker(parser_rep parser_type)
         return -1;
     }
 
-    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, 2, parser_type));
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, parser_type, num_parsers));
 
     return 0;
 }

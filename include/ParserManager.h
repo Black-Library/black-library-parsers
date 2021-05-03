@@ -27,12 +27,14 @@ namespace parsers {
 class ParserManager
 {
 public:
-    explicit ParserManager(const std::string &config);
+    explicit ParserManager(const std::string &storage_dir, const std::string &config);
     ParserManager &operator = (ParserManager &&) = default;
 
     int Run();
     int RunOnce();
     int Stop();
+
+    bool IsReady();
 
     int AddJob(const std::string &uuid, const std::string &url);
     int AddJob(const std::string &uuid, const std::string &url, const size_t &starting_chapter);
@@ -41,9 +43,9 @@ public:
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
 
 private:
-    void Init();
+    void WorkerInit();
     int AddResult(ParserJobResult result);
-    int AddWorker(parser_rep parser_type);
+    int AddWorker(parser_rep parser_type, size_t num_parsers);
     int RegisterWorkerCallbacks();
 
     std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
@@ -53,7 +55,9 @@ private:
     BlockingQueue<ParserJobResult> result_queue_;
     database_status_callback database_status_callback_;
     std::string config_;
+    std::string storage_dir_;
     std::atomic_bool done_;
+    std::atomic_bool initialized_;
 };
 
 } // namespace parsers

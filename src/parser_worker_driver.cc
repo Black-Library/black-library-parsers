@@ -37,7 +37,18 @@ int main(int argc, char* argv[])
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    black_library::core::parsers::ParserWorker worker(std::make_shared<black_library::core::parsers::RR::ParserRR>(), 1, black_library::core::parsers::RR_PARSER);
+    using dummy_parser = black_library::core::parsers::Parser;
+
+    auto dummy_one = std::make_shared<dummy_parser>(black_library::core::parsers::_NUM_PARSERS_TYPE);
+    dummy_one->SetParserIndex(0);
+
+    auto dummy_two = std::make_shared<dummy_parser>(black_library::core::parsers::_NUM_PARSERS_TYPE);
+    dummy_two->SetParserIndex(1);
+
+    std::cout << "dummy_one: " << dummy_one->GetParserIndex() << std::endl;
+    std::cout << "dummy_two: " << dummy_two->GetParserIndex() << std::endl;
+
+    black_library::core::parsers::ParserWorker worker(std::make_shared<black_library::core::parsers::RR::ParserRR>(), black_library::core::parsers::RR_PARSER, 1);
 
     parser_worker = &worker;
 

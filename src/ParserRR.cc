@@ -129,11 +129,11 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
         if (seconds_counter == 0)
         {
-            // let the fake reader finish waiting before exiting
+            // TODO: let the fake reader finish waiting before exiting
             if (index + 1 > index_entries_.size())
             {
                 done_ = true;
-                std::cout << "Parser " << GetParserName(parser_type_) << " - " << index_ << " reached end" << std::endl;
+                std::cout << "Parser " << GetParserName(parser_type_) << " - " << parser_index_ << " reached end" << std::endl;
                 continue;
             }
 
@@ -148,6 +148,8 @@ ParserResult ParserRR::Parse(size_t start_chapter)
                       << " - waiting " << wait_time << " seconds" << std::endl;
             ++index;
         }
+
+        std::cout << title_ << std::endl;
 
         ++seconds_counter;
 
@@ -164,7 +166,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 void ParserRR::Stop()
 {
     done_ = true;
-    std::cout << "Parser " << GetParserName(parser_type_) << " - " << index_ << " stop" << std::endl;
+    std::cout << "Parser " << GetParserName(parser_type_) << " - " << parser_index_ << " stop " << url_ << std::endl;
 }
 
 std::string ParserRR::ParseTitle()
