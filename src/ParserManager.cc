@@ -170,7 +170,7 @@ int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
         return -1;
     }
 
-    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, parser_type, num_parsers));
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, num_parsers));
 
     return 0;
 }

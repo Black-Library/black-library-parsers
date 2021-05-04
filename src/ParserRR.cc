@@ -18,13 +18,13 @@ namespace parsers {
 namespace RR {
 
 ParserRR::ParserRR() :
+    Parser(RR_PARSER),
     index_entries_()
 {
     title_ = "RR_Parser_title";
     nickname_ = "";
     source_url_ = black_library::core::common::RR::source_url;
     author_ = "unknown author";
-    parser_type_ = RR_PARSER;
 }
 
 ParserResult ParserRR::Parse()

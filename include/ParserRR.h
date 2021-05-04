@@ -38,7 +38,6 @@ protected:
     ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
     ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
     
-
 private:
     std::vector<ParserIndexEntry> index_entries_;
 };

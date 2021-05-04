@@ -34,6 +34,15 @@ Parser::Parser(parser_rep parser_type)
     done_ = false;
 }
 
+Parser::Parser(const Parser &parser) :
+    generator_(parser.generator_),
+    distribution_(parser.distribution_),
+    parser_index_(parser.parser_index_),
+    parser_type_(parser.parser_type_),
+    done_(bool(parser.done_))
+{
+}
+
 ParserResult Parser::Parse()
 {
     return Parse(1);

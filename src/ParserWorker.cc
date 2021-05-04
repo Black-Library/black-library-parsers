@@ -15,7 +15,7 @@ namespace core {
 
 namespace parsers {
 
-ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, parser_rep parser_type, size_t num_parsers) :
+ParserWorker::ParserWorker(const std::shared_ptr<Parser> parser_ptr, size_t num_parsers) :
     parsers_(),
     pool_(num_parsers),
     job_queue_(),
@@ -23,9 +23,15 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, parser_rep parser
     job_status_callback_(),
     notify_callback_(),
     num_parsers_(num_parsers),
-    parser_type_(parser_type),
+    parser_type_(parser_ptr->GetParserType()),
     done_(false)
 {
+
+    for (size_t i = 0; i < num_parsers_; ++i)
+    {
+        auto parser_copy = std::make_shared<Parser>(*parser_ptr);
+    }
+
     for (size_t i = 0; i < num_parsers_; ++i)
     {
         parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
@@ -34,7 +40,7 @@ ParserWorker::ParserWorker(std::shared_ptr<Parser> parser_ptr, parser_rep parser
 
     for (auto parser : parsers_)
     {
-        std::cout << "ParserWorker: " << GetParserName(parser_type_) << " with parser index: " parser->GetParserIndex() << std::endl;
+        std::cout << "ParserWorker: " << GetParserName(parser_type_) << " with parser index: " << parser->GetParserIndex() << std::endl;
     }
 }
 

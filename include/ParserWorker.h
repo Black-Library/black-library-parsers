@@ -23,7 +23,7 @@ namespace parsers {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(std::shared_ptr<Parser> parser_ptr, parser_rep parser_type, size_t num_parsers);
+    explicit ParserWorker(const std::shared_ptr<Parser> parser_ptr, size_t num_parsers);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
