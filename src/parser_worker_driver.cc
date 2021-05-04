@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     using dummy_parser = black_library::core::parsers::Parser;
     using dummy_worker = black_library::core::parsers::ParserWorker;
 
-    auto dummy_one = std::make_shared<dummy_parser>(black_library::core::parsers::_NUM_PARSERS_TYPE);
+    auto dummy_one = std::make_shared<dummy_parser>(black_library::core::parsers::ERROR_PARSER);
     dummy_one->SetParserIndex(0);
 
     auto dummy_two = std::make_shared<dummy_parser>(*dummy_one);

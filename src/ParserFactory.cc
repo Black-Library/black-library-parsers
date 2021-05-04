@@ -37,7 +37,7 @@ ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
 
     auto parser_type = GetParserTypeByUrl(url);
 
-    if (parser_type == _NUM_PARSERS_TYPE)
+    if (parser_type == ERROR_PARSER)
     {
         result.has_error = true;
         result.error_string = "Error: ParserFactory could not match url\n";

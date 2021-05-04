@@ -35,7 +35,25 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
         return;
     }
 
-    WorkerInit();
+    AddWorker(AO3_PARSER, 2);
+    AddWorker(RR_PARSER, 2);
+
+    for (auto & worker : worker_map_)
+    {
+        worker.second->RegisterJobStatusCallback(
+            [this](const std::string &uuid, job_status_rep job_status)
+            {
+                current_jobs_.find_and_replace(uuid, job_status);
+            }
+        );
+        worker.second->RegisterManagerNotifyCallback(
+            [this](ParserJobResult result)
+            {
+                result_queue_.push(result);
+                current_jobs_.find_and_replace(result.metadata.uuid, JOB_FINISHED);
+            }
+        );
+    }
 
     initialized_ = true;
 }
@@ -66,7 +84,7 @@ int ParserManager::RunOnce()
         auto job = job_queue_.pop();
         auto parser_type = GetParserTypeByUrl(job.url);
 
-        if (parser_type == _NUM_PARSERS_TYPE)
+        if (parser_type == ERROR_PARSER)
         {
             std::cout << "Error: could not match url to parser" << std::endl;
             continue;
@@ -151,13 +169,6 @@ bool ParserManager::GetDone()
     return done_;
 }
 
-void ParserManager::WorkerInit()
-{
-    AddWorker(AO3_PARSER, 2);
-    AddWorker(RR_PARSER, 2);
-    RegisterWorkerCallbacks();
-}
-
 int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
 {
     ParserFactoryResult factory_result = parser_factory_.GetParserByType(parser_type);
@@ -178,28 +189,6 @@ int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
 int ParserManager::RegisterDatabaseStatusCallback(const database_status_callback &callback)
 {
     database_status_callback_ = callback;
-
-    return 0;
-}
-
-int ParserManager::RegisterWorkerCallbacks()
-{
-    for (auto & worker : worker_map_)
-    {
-        worker.second->RegisterJobStatusCallback(
-            [this](const std::string &uuid, job_status_rep job_status)
-            {
-                current_jobs_.find_and_replace(uuid, job_status);
-            }
-        );
-        worker.second->RegisterManagerNotifyCallback(
-            [this](ParserJobResult result)
-            {
-                result_queue_.push(result);
-                current_jobs_.find_and_replace(result.metadata.uuid, JOB_FINISHED);
-            }
-        );
-    }
 
     return 0;
 }

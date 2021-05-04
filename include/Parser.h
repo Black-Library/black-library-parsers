@@ -32,7 +32,7 @@ class Parser
 {
 public:
     Parser(parser_rep parser_type);
-    Parser() : Parser(_NUM_PARSERS_TYPE){};
+    Parser() : Parser(ERROR_PARSER){};
     Parser(const Parser &parser);
     virtual ~Parser() = default;
 

@@ -43,7 +43,6 @@ public:
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
 
 private:
-    void WorkerInit();
     int AddResult(ParserJobResult result);
     int AddWorker(parser_rep parser_type, size_t num_parsers);
     int RegisterWorkerCallbacks();

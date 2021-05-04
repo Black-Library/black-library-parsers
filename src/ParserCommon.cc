@@ -104,6 +104,9 @@ std::string GetParserName(parser_rep rep)
 {
     switch (rep)
     {
+    case ERROR_PARSER:
+        return "ERROR_PARSER";
+        break;
     case AO3_PARSER:
         return "AO3_PARSER";
         break;
@@ -129,7 +132,7 @@ std::string GetParserName(parser_rep rep)
 // needle.find(haystack) != std::string::npos
 parser_rep GetParserTypeByUrl(const std::string &url)
 {
-    parser_rep rep = _NUM_PARSERS_TYPE;
+    parser_rep rep = ERROR_PARSER;
 
     if (ContainsString(url, black_library::core::common::AO3::source_url))
     {
