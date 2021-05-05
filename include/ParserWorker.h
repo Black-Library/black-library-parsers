@@ -13,6 +13,7 @@
 #include "ThreadPool.h"
 
 #include "Parser.h"
+#include "ParserFactory.h"
 
 namespace black_library {
 
@@ -23,7 +24,7 @@ namespace parsers {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(const std::shared_ptr<Parser> parser_ptr, size_t num_parsers);
+    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, parser_rep parser_type, size_t num_parsers);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
@@ -38,13 +39,12 @@ public:
 private:
     void Init();
 
-    std::vector<std::shared_ptr<Parser>> parsers_;
     ThreadPool pool_;
     BlockingQueue<ParserJob> job_queue_;
     std::vector<std::future<ParserJobResult>> pool_results_;
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
-    size_t num_parsers_;
+    std::shared_ptr<ParserFactory> parser_factory_;
     parser_rep parser_type_;
     std::atomic_bool done_;
 };

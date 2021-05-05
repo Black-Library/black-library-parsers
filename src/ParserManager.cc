@@ -170,18 +170,10 @@ bool ParserManager::GetDone()
 }
 
 int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
-{
-    ParserFactoryResult factory_result = parser_factory_.GetParserByType(parser_type);
-    
-    std::cout << "ParserManager AddWorker " << GetParserName(parser_type) << " - " << factory_result.io_string << std::endl;
+{   
+    std::cout << "ParserManager AddWorker: " << GetParserName(parser_type) << " num: " << num_parsers << std::endl;
 
-    if (factory_result.has_error)
-    {
-        std::cout << "ParserManager AddWorker " << factory_result.error_string << std::endl;
-        return -1;
-    }
-
-    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(factory_result.parser_result, num_parsers));
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, parser_type, num_parsers));
 
     return 0;
 }

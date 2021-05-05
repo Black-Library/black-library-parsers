@@ -7,6 +7,7 @@
 #include <signal.h>
 
 #include <Parser.h>
+#include <ParserFactory.h>
 #include <ParserWorker.h>
 
 #include <ParserRR.h>
@@ -37,21 +38,12 @@ int main(int argc, char* argv[])
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    using dummy_parser = black_library::core::parsers::Parser;
     using dummy_worker = black_library::core::parsers::ParserWorker;
 
-    auto dummy_one = std::make_shared<dummy_parser>(black_library::core::parsers::ERROR_PARSER);
-    dummy_one->SetParserIndex(0);
+    auto factory = std::make_shared<black_library::core::parsers::ParserFactory>();
 
-    auto dummy_two = std::make_shared<dummy_parser>(*dummy_one);
-    dummy_two->SetParserIndex(1);
-
-    std::cout << "dummy_one: " << dummy_one->GetParserIndex() << std::endl;
-    std::cout << "dummy_two: " << dummy_two->GetParserIndex() << std::endl;
-
-    dummy_worker dummy_worker_0(dummy_one, 3);
-
-    dummy_worker dummy_worker_1(std::make_shared<black_library::core::parsers::RR::ParserRR>(), 1);
+    dummy_worker dummy_worker_0(factory, black_library::core::parsers::ERROR_PARSER, 3);
+    dummy_worker dummy_worker_1(factory, black_library::core::parsers::RR_PARSER, 1);
 
     parser_worker = &dummy_worker_1;
 

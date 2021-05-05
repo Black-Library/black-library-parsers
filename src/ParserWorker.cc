@@ -15,33 +15,17 @@ namespace core {
 
 namespace parsers {
 
-ParserWorker::ParserWorker(const std::shared_ptr<Parser> parser_ptr, size_t num_parsers) :
-    parsers_(),
+ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, parser_rep parser_type, size_t num_parsers) :
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
     job_status_callback_(),
     notify_callback_(),
-    num_parsers_(num_parsers),
-    parser_type_(parser_ptr->GetParserType()),
+    parser_factory_(parser_factory),
+    parser_type_(parser_type),
     done_(false)
 {
-
-    for (size_t i = 0; i < num_parsers_; ++i)
-    {
-        auto parser_copy = std::make_shared<Parser>(*parser_ptr);
-    }
-
-    for (size_t i = 0; i < num_parsers_; ++i)
-    {
-        parsers_.emplace_back(std::static_pointer_cast<Parser>(parser_ptr));
-        parsers_[i]->SetParserIndex(i);
-    }
-
-    for (auto parser : parsers_)
-    {
-        std::cout << "ParserWorker: " << GetParserName(parser_type_) << " with parser index: " << parser->GetParserIndex() << std::endl;
-    }
+    std::cout << "Initialize ParserWorker: " << GetParserName(parser_type) << " with pool size: " << pool_.GetSize() << std::endl;
 }
 
 int ParserWorker::Run()
@@ -74,15 +58,15 @@ int ParserWorker::RunOnce()
 
         if (res.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
         {
-            ParserJobResult result = res.get();
-            std::cout << result.io_result << std::endl;
+            ParserJobResult job_result = res.get();
+            std::cout << job_result.io_result << std::endl;
 
-            if (result.has_error)
+            if (job_result.has_error)
                 // TODO: do something about error? notify?
-                std::cout << result.error_string << std::endl;
+                std::cout << job_result.error_string << std::endl;
 
             if (notify_callback_)
-                notify_callback_(result);
+                notify_callback_(job_result);
         }
     }
 
@@ -91,27 +75,36 @@ int ParserWorker::RunOnce()
 
     // TODO: use more than just the first parser
 
-    auto parser = parsers_[0];
-
     pool_results_.emplace_back(
-        pool_.enqueue([this, parser]()
+        pool_.enqueue([this]()
         {
             std::stringstream ss;
-            ParserJobResult result;
+            ParserJobResult job_result;
             std::atomic_bool parser_error;
 
             parser_error = false;
 
-            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
-
             if (job_queue_.empty())
             {
-                ss << "no jobs in queue" << std::endl;
-                result.io_result = ss.str();
-                return result;
+                ss << "ParserWorker: no jobs in queue" << std::endl;
+                job_result.io_result = ss.str();
+                return job_result;
             }
 
             auto job = job_queue_.pop();
+
+            auto factory_result = parser_factory_->GetParserByUrl(job.url);
+
+            if (factory_result.has_error)
+            {
+                ss << "Factory Error: " << factory_result.debug_string << std::endl;
+                job_result.io_result = ss.str();
+                return job_result;            
+            }
+
+            auto parser = factory_result.parser_result;
+
+            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetUrl() <<  std::endl;
 
             std::cout << "starting parser done tracking thread" << std::endl;
             
@@ -146,11 +139,11 @@ int ParserWorker::RunOnce()
 
             t.join();
 
-            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetParserIndex() <<  std::endl;
-            result.io_result = ss.str();
-            result.metadata = parser_result.metadata;
+            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetUrl() <<  std::endl;
+            job_result.io_result = ss.str();
+            job_result.metadata = parser_result.metadata;
 
-            return result;
+            return job_result;
         })
     );
     

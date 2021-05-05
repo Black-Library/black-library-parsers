@@ -18,10 +18,11 @@ namespace parsers {
 
 struct ParserFactoryResult {
     std::shared_ptr<Parser> parser_result;
-    std::string io_string;
-    std::string error_string;
+    std::string debug_string;
     bool has_error = false;
 };
+
+typedef std::function<ParserFactoryResult(void)> factory_function;
 
 class ParserFactory
 {
@@ -35,7 +36,7 @@ public:
 protected:
     int InitParserMap();
 
-    std::unordered_map<parser_rep, std::shared_ptr<Parser>> parser_map_;
+    std::unordered_map<parser_rep, factory_function> parser_map_;
 
 private:
 };

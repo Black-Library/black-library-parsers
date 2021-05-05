@@ -44,12 +44,10 @@ public:
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
     void SetLocalFilePath(const std::string &local_des);
-    void SetParserIndex(size_t index);
     void SetUrl(const std::string &url);
 
     bool GetDone();
     std::string GetLocalDes();
-    size_t GetParserIndex();
     parser_rep GetParserType();
     std::string GetSourceUrl();
     std::string GetTitle();

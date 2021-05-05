@@ -135,11 +135,6 @@ void Parser::SetLocalFilePath(const std::string &local_des)
     local_des_ = local_des;
 }
 
-void Parser::SetParserIndex(size_t index)
-{
-    parser_index_ = index;
-}
-
 void Parser::SetUrl(const std::string &url)
 {
     const std::lock_guard<std::mutex> lock(mutex_);
@@ -154,11 +149,6 @@ bool Parser::GetDone()
 std::string Parser::GetLocalDes()
 {
     return local_des_;
-}
-
-size_t Parser::GetParserIndex()
-{
-    return parser_index_;
 }
 
 parser_rep Parser::GetParserType()

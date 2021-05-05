@@ -33,15 +33,13 @@ ParserFactory::~ParserFactory()
 ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
 {
     ParserFactoryResult result;
-    std::stringstream ss;
 
     auto parser_type = GetParserTypeByUrl(url);
 
     if (parser_type == ERROR_PARSER)
     {
         result.has_error = true;
-        result.error_string = "Error: ParserFactory could not match url\n";
-        result.io_string = ss.str();
+        result.debug_string = "Error: ParserFactory could not match url\n";
         return result;
     }
 
@@ -58,24 +56,37 @@ ParserFactoryResult ParserFactory::GetParserByType(parser_rep parser_type)
     if (parser_map_itr == parser_map_.end())
     {
         result.has_error = true;
-        result.error_string = "Error: ParserFactory could not match parser\n";
-        result.io_string = ss.str();
+        result.debug_string = "Error: ParserFactory could not match parser\n";
         return result;
     }
 
-    result.parser_result = parser_map_itr->second;
+    result = parser_map_itr->second();
 
     ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType());
 
-    result.io_string = ss.str();
+    result.debug_string = ss.str();
 
     return result;
 }
 
 int ParserFactory::InitParserMap()
 {
-    parser_map_.emplace(AO3_PARSER, std::static_pointer_cast<Parser>(std::make_shared<AO3::ParserAO3>()));
-    parser_map_.emplace(RR_PARSER, std::static_pointer_cast<Parser>(std::make_shared<RR::ParserRR>()));
+    parser_map_.emplace(AO3_PARSER, 
+    [](void){
+        ParserFactoryResult result;
+
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<AO3::ParserAO3>());
+
+        return result;
+    });
+    parser_map_.emplace(RR_PARSER, 
+    [](void){
+        ParserFactoryResult result;
+
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<RR::ParserRR>());
+
+        return result;
+    });
 
     std::cout << "Initialized Parser map with " << parser_map_.size() << " elements" << std::endl;
 
