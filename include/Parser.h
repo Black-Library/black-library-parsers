@@ -70,7 +70,6 @@ protected:
 
     std::string local_des_;
     std::mutex mutex_;
-    size_t parser_index_;
     parser_rep parser_type_;
     std::atomic_bool done_;
 

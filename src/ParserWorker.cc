@@ -93,6 +93,8 @@ int ParserWorker::RunOnce()
 
             auto job = job_queue_.pop();
 
+            job_result.metadata.uuid = job.uuid;
+
             auto factory_result = parser_factory_->GetParserByUrl(job.url);
 
             if (factory_result.has_error)
@@ -105,8 +107,6 @@ int ParserWorker::RunOnce()
             auto parser = factory_result.parser_result;
 
             ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetUrl() <<  std::endl;
-
-            std::cout << "starting parser done tracking thread" << std::endl;
             
             std::thread t([this, parser, &parser_error](){
 
@@ -116,8 +116,6 @@ int ParserWorker::RunOnce()
 
                     if (done_)
                         break;
-
-                    std::cout << parser->GetUrl() << " not done yet" << std::endl;
 
                     std::this_thread::sleep_until(deadline);
                 }

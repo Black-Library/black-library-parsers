@@ -19,7 +19,7 @@ namespace parsers {
 
 ParserManager::ParserManager(const std::string &storage_dir, const std::string &config) :
     worker_map_(),
-    parser_factory_(),
+    parser_factory_(std::make_shared<ParserFactory>()),
     current_jobs_(),
     job_queue_(),
     result_queue_(),

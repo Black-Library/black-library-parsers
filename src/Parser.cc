@@ -37,7 +37,6 @@ Parser::Parser(parser_rep parser_type)
 Parser::Parser(const Parser &parser) :
     generator_(parser.generator_),
     distribution_(parser.distribution_),
-    parser_index_(parser.parser_index_),
     parser_type_(parser.parser_type_),
     done_(bool(parser.done_))
 {
@@ -54,7 +53,7 @@ ParserResult Parser::Parse(size_t start_chapter)
     const std::lock_guard<std::mutex> lock(mutex_);
     ParserResult parser_result;
 
-    std::cout << parser_index_ << " - parse" << std::endl;
+    std::cout << GetUrl() << " - parse" << std::endl;
 
     return parser_result;
 }
