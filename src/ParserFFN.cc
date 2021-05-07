@@ -23,10 +23,9 @@ ParserFFN::~ParserFFN()
 
 }
 
-void ParserFFN::Parse()
+void ParserFFN::Parse(const ParserJob &parser_job)
 {
-
-    std::string url_adult = url_ + "?view_full_work=true&view_adult=true";
+    std::string url_adult = parser_job.url + "?view_full_work=true&view_adult=true";
     std::string result = CurlRequest(url_adult);
 
     xmlDoc* doc = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
@@ -48,7 +47,7 @@ void ParserFFN::Parse()
     xmlNode* workskin = GetElementAttr(next, "id", "workskin");
     xmlDocSetRootElement(doc, workskin);
 
-    std::string title_ = url_.substr(url_.find_last_of("/") + 1, url_.length() - 1);
+    std::string title_ = parser_job.url.substr(parser_job.url.find_last_of("/") + 1, parser_job.url.length() - 1);
     std::string des = local_des_ + title_ + ".html";
 
     FILE* file;

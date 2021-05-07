@@ -21,8 +21,7 @@ public:
     ParserFFN();
     ~ParserFFN();
 
-    ParserResult Parse();
-    ParserResult Parse(size_t starting_chapter);
+    ParserResult Parse(const ParserJob &parser_job);
 
 protected:
     std::string ParseTitle();

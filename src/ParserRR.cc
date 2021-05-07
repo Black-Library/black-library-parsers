@@ -27,19 +27,16 @@ ParserRR::ParserRR() :
     author_ = "unknown author";
 }
 
-ParserResult ParserRR::Parse()
-{
-    return Parse(1);
-}
-
-ParserResult ParserRR::Parse(size_t start_chapter)
+ParserResult ParserRR::Parse(const ParserJob &parser_job)
 {
     const std::lock_guard<std::mutex> lock(mutex_);
     ParserResult parser_result;
     done_ = false;
 
-    std::cout << "Start ParserRR Parse: " << url_ << std::endl;
-    std::string curl_result = CurlRequest(url_);
+    uuid_ = parser_job.uuid;
+
+    std::cout << "Start ParserRR Parse: " << parser_job.url << std::endl;
+    std::string curl_result = CurlRequest(parser_job.url);
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -103,7 +100,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
     std::cout << "ParserRR: Found " << index_entries_.size() << " nodes" << std::endl;
 
-    size_t index = start_chapter - 1;
+    size_t index = parser_job.start_chapter - 1;
 
     if (index > index_entries_.size())
     {
@@ -133,7 +130,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
             if (index + 1 > index_entries_.size())
             {
                 done_ = true;
-                std::cout << "Parser " << GetParserName(parser_type_) << " - " << GetUrl() << " reached end" << std::endl;
+                std::cout << "Parser " << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
                 continue;
             }
 
@@ -156,6 +153,8 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 
     xmlCleanupParser();
 
+    parser_result.metadata.url = parser_job.url;
+    parser_result.metadata.uuid = uuid_;
     parser_result.metadata.media_path = local_des_;
 
     return parser_result;
@@ -164,7 +163,7 @@ ParserResult ParserRR::Parse(size_t start_chapter)
 void ParserRR::Stop()
 {
     done_ = true;
-    std::cout << "Parser " << GetParserName(parser_type_) << " - " << GetUrl() << " stop " << url_ << std::endl;
+    std::cout << "Parser " << GetParserName(parser_type_) << " stop " << uuid_ << std::endl;
 }
 
 std::string ParserRR::ParseTitle()
@@ -231,7 +230,9 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     std::string chapter_file_name = GetChapterFileName(entry.index_num + 1, chapter_name);
 
     FILE* chapter_file;
-    chapter_file = fopen(chapter_file_name.c_str(), "w+");
+    std::string file_name = local_des_ + "/" + uuid_ + "/" + chapter_file_name;
+    std::cout << "FILENAME: " << file_name << std::endl;
+    chapter_file = fopen(file_name.c_str(), "w+");
     xmlElemDump(chapter_file, chapter_doc_tree, current_node);
     fclose(chapter_file);
 

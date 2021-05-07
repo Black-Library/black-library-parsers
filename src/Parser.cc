@@ -42,18 +42,13 @@ Parser::Parser(const Parser &parser) :
 {
 }
 
-ParserResult Parser::Parse()
+ParserResult Parser::Parse(const ParserJob &parser_job)
 {
-    return Parse(1);
-}
-
-ParserResult Parser::Parse(size_t start_chapter)
-{
-    (void) start_chapter;
+    (void) parser_job;
     const std::lock_guard<std::mutex> lock(mutex_);
     ParserResult parser_result;
 
-    std::cout << GetUrl() << " - parse" << std::endl;
+    std::cout << parser_job.url << " - parse" << std::endl;
 
     return parser_result;
 }
@@ -131,13 +126,8 @@ xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string val
 
 void Parser::SetLocalFilePath(const std::string &local_des)
 {
-    local_des_ = local_des;
-}
-
-void Parser::SetUrl(const std::string &url)
-{
     const std::lock_guard<std::mutex> lock(mutex_);
-    url_ = url;
+    local_des_ = local_des;
 }
 
 bool Parser::GetDone()
@@ -147,6 +137,7 @@ bool Parser::GetDone()
 
 std::string Parser::GetLocalDes()
 {
+    const std::lock_guard<std::mutex> lock(mutex_);
     return local_des_;
 }
 
@@ -163,11 +154,6 @@ std::string Parser::GetSourceUrl()
 std::string Parser::GetTitle()
 {
     return title_;
-}
-
-std::string Parser::GetUrl()
-{
-    return url_;
 }
 
 size_t Parser::GenerateWaitTime(size_t length)

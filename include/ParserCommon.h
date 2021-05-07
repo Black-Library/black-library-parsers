@@ -54,7 +54,7 @@ struct ParserIndexEntry {
 struct ParserJob {
     std::string uuid;
     std::string url;
-    size_t starting_chapter = 1;
+    size_t start_chapter = 1;
 };
 
 struct ParserResultMetadata {
@@ -74,9 +74,8 @@ struct ParserResultMetadata {
 struct ParserJobResult {
     ParserResultMetadata metadata;
 
-    std::string io_result;
-    std::string error_string;
-    bool has_error = false;
+    std::string debug_string;
+    bool has_error = true;
 };
 
 struct ParserResult {
@@ -84,7 +83,7 @@ struct ParserResult {
 
     std::string io_result;
     std::string error_string;
-    bool has_error = false;
+    bool has_error = true;
 };
 
 struct ParserXmlAttributePayload {

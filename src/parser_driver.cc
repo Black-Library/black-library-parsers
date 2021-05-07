@@ -28,9 +28,10 @@ int main(int argc, char* argv[])
     // parser.SetUrl("https://archiveofourown.org/works/505809");
     // parser.Parse();
 
-    black_library::core::parsers::RR::ParserRR parser2;
-    parser2.SetUrl("https://www.royalroad.com/fiction/21220/mother-of-learning");
-    parser2.Parse();
+    black_library::core::parsers::RR::ParserRR parser;
+    black_library::core::parsers::ParserJob parser_job;
+    parser_job.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+    parser.Parse(parser_job);
 
     curl_global_cleanup();
 

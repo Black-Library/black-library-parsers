@@ -29,11 +29,23 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
     done_(true),
     initialized_(false)
 {
+    if (storage_dir_.empty())
+    {
+        storage_dir_ = "/mnt/store";
+        std::cout << "Empty storage dir given, using default: " << storage_dir_ << std::endl;
+    }
+
+    // okay to pop_back(), string isn't empty
+    if (storage_dir_.back() == '/')
+        storage_dir_.pop_back();
+
     if (!black_library::core::common::CheckFilePermission(storage_dir_))
     {
         std::cout << "Error: parser manager could not access storage directory" << std::endl;
         return;
     }
+
+    std::cout << "Using storage dir: " << storage_dir_ << std::endl;
 
     AddWorker(AO3_PARSER, 2);
     AddWorker(RR_PARSER, 2);
@@ -113,7 +125,7 @@ int ParserManager::RunOnce()
         std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << std::endl;
         current_jobs_.erase(job_result.metadata.uuid);
 
-        if (database_status_callback_)
+        if (!job_result.has_error && database_status_callback_)
             database_status_callback_(job_result);
     }
 
@@ -144,14 +156,14 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url)
     return 0;
 }
 
-int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &starting_chapter)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_chapter)
 {
     ParserJob job;
-    job.starting_chapter = starting_chapter;
+    job.start_chapter = start_chapter;
     job.uuid = uuid;
     job.url = url;
 
-    std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << " - starting chapter: " << job.starting_chapter << std::endl;
+    std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << " - starting chapter: " << job.start_chapter << std::endl;
 
     if (current_jobs_.key_exists(job.uuid))
     {
@@ -173,7 +185,7 @@ int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
 {   
     std::cout << "ParserManager AddWorker: " << GetParserName(parser_type) << " num: " << num_parsers << std::endl;
 
-    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, parser_type, num_parsers));
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, storage_dir_, parser_type, num_parsers));
 
     return 0;
 }

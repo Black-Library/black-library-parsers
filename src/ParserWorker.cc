@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <FileOperations.h>
+
 #include <ParserWorker.h>
 
 #include <ParserRR.h>
@@ -15,12 +17,13 @@ namespace core {
 
 namespace parsers {
 
-ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, parser_rep parser_type, size_t num_parsers) :
+ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const std::string &storage_dir, parser_rep parser_type, size_t num_parsers) :
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
     job_status_callback_(),
     notify_callback_(),
+    storage_dir_(storage_dir),
     parser_factory_(parser_factory),
     parser_type_(parser_type),
     done_(false)
@@ -59,11 +62,11 @@ int ParserWorker::RunOnce()
         if (res.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
         {
             ParserJobResult job_result = res.get();
-            std::cout << job_result.io_result << std::endl;
+            std::cout << job_result.debug_string << std::endl;
 
             if (job_result.has_error)
                 // TODO: do something about error? notify?
-                std::cout << job_result.error_string << std::endl;
+                std::cout << job_result.debug_string << std::endl;
 
             if (notify_callback_)
                 notify_callback_(job_result);
@@ -87,28 +90,39 @@ int ParserWorker::RunOnce()
             if (job_queue_.empty())
             {
                 ss << "ParserWorker: no jobs in queue" << std::endl;
-                job_result.io_result = ss.str();
+                job_result.debug_string = ss.str();
                 return job_result;
             }
 
-            auto job = job_queue_.pop();
+            auto parser_job = job_queue_.pop();
 
-            job_result.metadata.uuid = job.uuid;
-
-            auto factory_result = parser_factory_->GetParserByUrl(job.url);
+            auto factory_result = parser_factory_->GetParserByUrl(parser_job.url);
 
             if (factory_result.has_error)
             {
+                job_result.metadata.url = parser_job.url;
+                job_result.metadata.uuid = parser_job.uuid;
                 ss << "Factory Error: " << factory_result.debug_string << std::endl;
-                job_result.io_result = ss.str();
+                job_result.debug_string = ss.str();
                 return job_result;            
             }
 
             auto parser = factory_result.parser_result;
 
-            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetUrl() <<  std::endl;
+            std::string local_file_path = storage_dir_ + "/" + parser_job.uuid + "/";
+
+            parser->SetLocalFilePath(local_file_path);
+
+            if (!black_library::core::common::CheckFilePermission(local_file_path))
+            {
+                ss << "Error: parser worker could not access uuid directory: " << local_file_path << std::endl;
+                job_result.debug_string = ss.str();
+                return job_result;              
+            }
+
+            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid <<  std::endl;
             
-            std::thread t([this, parser, &parser_error](){
+            std::thread t([this, parser, &parser_job, &parser_error](){
 
                 while (!done_ && !parser->GetDone() && !parser_error)
                 {
@@ -120,26 +134,25 @@ int ParserWorker::RunOnce()
                     std::this_thread::sleep_until(deadline);
                 }
 
-                std::cout << parser->GetUrl() << " done" << std::endl;
+                std::cout << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid << " done" << std::endl;
 
                 parser->Stop();
             });
 
-            parser->SetUrl(job.url);
-
             if (job_status_callback_)
-                job_status_callback_(job.uuid, JOB_WORKING);
+                job_status_callback_(parser_job.uuid, JOB_WORKING);
 
-            auto parser_result = parser->Parse(job.starting_chapter);
+            auto parser_result = parser->Parse(parser_job);
 
             if (parser_result.has_error)
                 parser_error = true;
 
             t.join();
 
-            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser->GetUrl() <<  std::endl;
-            job_result.io_result = ss.str();
+            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid <<  std::endl;
+            job_result.debug_string = ss.str();
             job_result.metadata = parser_result.metadata;
+            job_result.has_error = false;
 
             return job_result;
         })
@@ -162,18 +175,18 @@ int ParserWorker::AddJob(ParserJob parser_job)
 {
     if (parser_job.uuid.empty())
     {
-        std::cout << "Error: ParserWorker was sent job with empty uuid" << std::endl;
+        std::cout << "Error: ParserWorker was sent parser_job with empty uuid" << std::endl;
         return -1;
     }
 
     if (parser_job.url.empty())
     {
-        std::cout << "Error: ParserWorker was sent job with empty url" << std::endl;
+        std::cout << "Error: ParserWorker was sent parser_job with empty url" << std::endl;
         return -1;
     }
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) <<
-     " adding job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.starting_chapter << std::endl;
+     " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.start_chapter << std::endl;
 
     job_queue_.push(parser_job);
 

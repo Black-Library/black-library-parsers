@@ -24,7 +24,7 @@ namespace parsers {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, parser_rep parser_type, size_t num_parsers);
+    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const std::string &storage_dir, parser_rep parser_type, size_t num_parsers);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
@@ -44,6 +44,7 @@ private:
     std::vector<std::future<ParserJobResult>> pool_results_;
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
+    std::string storage_dir_;
     std::shared_ptr<ParserFactory> parser_factory_;
     parser_rep parser_type_;
     std::atomic_bool done_;

@@ -36,22 +36,19 @@ public:
     Parser(const Parser &parser);
     virtual ~Parser() = default;
 
-    virtual ParserResult Parse();
-    virtual ParserResult Parse(size_t start_chapter);
+    virtual ParserResult Parse(const ParserJob &parser_job);
     virtual void Stop();
 
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
     void SetLocalFilePath(const std::string &local_des);
-    void SetUrl(const std::string &url);
 
     bool GetDone();
     std::string GetLocalDes();
     parser_rep GetParserType();
     std::string GetSourceUrl();
     std::string GetTitle();
-    std::string GetUrl();
 
     size_t GenerateWaitTime(size_t length);
 
@@ -65,9 +62,9 @@ protected:
     std::string title_;
     std::string nickname_;
     std::string source_url_;
-    std::string url_;
     std::string author_;
 
+    std::string uuid_;
     std::string local_des_;
     std::mutex mutex_;
     parser_rep parser_type_;

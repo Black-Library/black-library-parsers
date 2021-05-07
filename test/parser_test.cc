@@ -15,14 +15,12 @@ TEST_CASE( "Generic parser tests (pass)", "[single-file]" )
 {
     Parser parser;
     parser.SetLocalFilePath("foo");
-    parser.SetUrl("dummy_url");
 }
 
 TEST_CASE( "RR parser tests (pass)", "[single-file]" )
 {
     RR::ParserRR parser;
     parser.SetLocalFilePath("foo");
-    parser.SetUrl(RR_DUMMY_URL);
     REQUIRE(parser.GetParserType() == RR_PARSER);
     REQUIRE(parser.GetSourceUrl() == black_library::core::common::RR::source_url);
 }

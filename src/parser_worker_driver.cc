@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
 
     auto factory = std::make_shared<black_library::core::parsers::ParserFactory>();
 
-    dummy_worker dummy_worker_0(factory, black_library::core::parsers::ERROR_PARSER, 3);
-    dummy_worker dummy_worker_1(factory, black_library::core::parsers::RR_PARSER, 1);
+    dummy_worker dummy_worker_0(factory, "", black_library::core::parsers::ERROR_PARSER, 3);
+    dummy_worker dummy_worker_1(factory, "", black_library::core::parsers::RR_PARSER, 1);
 
     parser_worker = &dummy_worker_1;
 
