@@ -41,7 +41,7 @@ typedef uint8_t parser_rep;
 
 struct ParserChapterInfo {
     size_t length = 0;
-    bool has_error = false;
+    bool has_error = true;
 };
 
 struct ParserIndexEntry {

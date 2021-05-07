@@ -188,7 +188,6 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     if (chapter_doc_tree == NULL)
     {
         std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
-        output.has_error = true;
         return output;
     }
 
@@ -201,7 +200,6 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     if (!chapter_seek.found)
     {
         std::cout << "Error: Failed seek" << std::endl;
-        output.has_error = true;
         xmlFreeDoc(chapter_doc_tree);
         return output;
     }
@@ -222,7 +220,6 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     if (chapter_name.empty())
     {
         std::cout << "Error: Unable to generate RR chapter name" << std::endl;
-        output.has_error = true;
         xmlFreeDoc(chapter_doc_tree);
         return output;
     }
@@ -237,6 +234,8 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     fclose(chapter_file);
 
     xmlFreeDoc(chapter_doc_tree);
+
+    output.has_error = false;
 
     return output;
 }
