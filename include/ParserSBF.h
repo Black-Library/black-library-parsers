@@ -33,7 +33,7 @@ protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    std::string GetRRChapterName(const std::string &data_url);
+    std::string GetSBFChapterName(const std::string &data_url);
     ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
     ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
     

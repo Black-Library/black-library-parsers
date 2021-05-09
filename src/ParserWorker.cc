@@ -104,7 +104,7 @@ int ParserWorker::RunOnce()
                 job_result.metadata.uuid = parser_job.uuid;
                 ss << "Factory Error: " << factory_result.debug_string << std::endl;
                 job_result.debug_string = ss.str();
-                return job_result;            
+                return job_result;
             }
 
             auto parser = factory_result.parser_result;
@@ -112,6 +112,13 @@ int ParserWorker::RunOnce()
             std::string local_file_path = storage_dir_ + "/" + parser_job.uuid + "/";
 
             parser->SetLocalFilePath(local_file_path);
+
+            if (!black_library::core::common::MakeDirectories(local_file_path))
+            {
+                ss << "Error: parser worker could make local file path directory: " << local_file_path << std::endl;
+                job_result.debug_string = ss.str();
+                return job_result;              
+            }
 
             if (!black_library::core::common::CheckFilePermission(local_file_path))
             {

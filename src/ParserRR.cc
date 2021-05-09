@@ -227,7 +227,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     std::string chapter_file_name = GetChapterFileName(entry.index_num + 1, chapter_name);
 
     FILE* chapter_file;
-    std::string file_name = local_des_ + "/" + uuid_ + "/" + chapter_file_name;
+    std::string file_name = local_des_ + chapter_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     chapter_file = fopen(file_name.c_str(), "w+");
     xmlElemDump(chapter_file, chapter_doc_tree, current_node);
