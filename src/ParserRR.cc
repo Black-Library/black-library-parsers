@@ -26,6 +26,11 @@ ParserRR::ParserRR() :
     author_ = "unknown author";
 }
 
+ParserRR::~ParserRR()
+{
+    done_ = true;
+}
+
 ParserResult ParserRR::Parse(const ParserJob &parser_job)
 {
     const std::lock_guard<std::mutex> lock(mutex_);
@@ -34,7 +39,7 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
 
     uuid_ = parser_job.uuid;
 
-    std::cout << "Start ParserRR Parse: " << parser_job.url << std::endl;
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job.url << std::endl;
     std::string curl_result = CurlRequest(parser_job.url);
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,

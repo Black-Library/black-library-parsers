@@ -12,6 +12,7 @@
 #include "ParserAO3.h"
 #include "ParserFFN.h"
 #include "ParserRR.h"
+#include "ParserSBF.h"
 
 namespace black_library {
 
@@ -84,6 +85,14 @@ int ParserFactory::InitParserMap()
         ParserFactoryResult result;
 
         result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<RR::ParserRR>());
+
+        return result;
+    });
+    parser_map_.emplace(SBF_PARSER, 
+    [](void){
+        ParserFactoryResult result;
+
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<SBF::ParserSBF>());
 
         return result;
     });

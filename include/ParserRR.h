@@ -21,6 +21,7 @@ class ParserRR : public Parser
 {
 public:
     explicit ParserRR();
+    ~ParserRR();
 
     ParserResult Parse(const ParserJob &parser_job);
 
