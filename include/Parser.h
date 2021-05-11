@@ -37,7 +37,7 @@ public:
     virtual ~Parser() = default;
 
     virtual ParserResult Parse(const ParserJob &parser_job);
-    virtual void Stop();
+    void Stop();
 
     std::string CurlRequest(const std::string &url);
     xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
@@ -53,11 +53,14 @@ public:
     size_t GenerateWaitTime(size_t length);
 
 protected:
-    virtual std::string ParseTitle();
-    virtual std::string ParseAuthor();
+    virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
+    virtual void FindMetaData(xmlNodePtr root_node);
+    virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
+    virtual ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
 
     std::mt19937_64 generator_;
     std::uniform_int_distribution<int> distribution_;
+    std::vector<ParserIndexEntry> index_entries_;
 
     std::string title_;
     std::string nickname_;

@@ -62,21 +62,6 @@ ParserResult ParserAO3::Parse(const ParserJob &parser_job)
     return parser_result;
 }
 
-void ParserAO3::Stop()
-{
-    
-}
-
-std::string ParserAO3::ParseTitle()
-{
-    return "";
-}
-
-std::string ParserAO3::ParseAuthor()
-{
-    return "";
-}
-
 int ParserAO3::ParseChapter()
 {
     return 0;

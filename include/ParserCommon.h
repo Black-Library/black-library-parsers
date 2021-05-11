@@ -97,9 +97,11 @@ struct ParserXmlNodeSeek {
     bool found = false;
 };
 
-typedef std::function<void(ParserJobResult)> database_status_callback;
-typedef std::function<void(const std::string &uuid, job_status_rep job_status)> job_status_callback;
-typedef std::function<void(ParserJobResult)> manager_notify_callback;
+
+// TODO check using vs typedef
+using database_status_callback = std::function<void(ParserJobResult)>;
+using job_status_callback = std::function<void(const std::string &uuid, job_status_rep job_status)>;
+using manager_notify_callback = std::function<void(ParserJobResult)>;
 
 bool ContainsString(const std::string &haystack, const std::string &needle);
 
@@ -113,6 +115,7 @@ std::string GetSpaceString(size_t num_tabs);
 ParserXmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
 
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
+ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
 
 std::string TrimWhitespace(const std::string &target_string);
 

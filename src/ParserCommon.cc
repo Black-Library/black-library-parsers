@@ -207,6 +207,27 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
     return found;
 }
 
+ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
+{
+    ParserXmlNodeSeek seek;
+    xmlNodePtr current_node = NULL;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *) name.c_str()))
+        {
+            seek.seek_node = current_node;
+            seek.found = true;
+            break;
+        }
+    }
+
+    return seek;
+}
+
 std::string TrimWhitespace(const std::string& target_string)
 {
     auto leading_pos = target_string.find_first_not_of(" \t\r\n\0");

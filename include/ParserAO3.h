@@ -25,8 +25,6 @@ public:
     void Stop();
 
 protected:
-    std::string ParseTitle();
-    std::string ParseAuthor();
     int ParseChapter();
 
 private:

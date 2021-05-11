@@ -55,7 +55,8 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
 void Parser::Stop()
 {
-    
+    done_ = true;
+    std::cout << "Parser " << GetParserName(parser_type_) << " stop " << uuid_ << std::endl;
 }
 
 std::string Parser::CurlRequest(const std::string &url)
@@ -168,14 +169,30 @@ size_t Parser::GenerateWaitTime(size_t length)
     return wait_time;
 }
 
-std::string Parser::ParseTitle()
+ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
 {
-    return "no title";
+    (void) root_node;
+    ParserIndexEntry entry;
+    return entry;
 }
 
-std::string Parser::ParseAuthor()
+void Parser::FindMetaData(xmlNodePtr root_node)
 {
-    return "no author";
+    (void) root_node;
+}
+
+ParserChapterInfo Parser::ParseChapter(const ParserIndexEntry &entry)
+{
+    (void) entry;
+    ParserChapterInfo info;
+    return info;
+}
+
+ParserXmlNodeSeek Parser::SeekToChapterContent(xmlNodePtr root_node)
+{
+    (void) root_node;
+    ParserXmlNodeSeek node_seek;
+    return node_seek;
 }
 
 // Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c

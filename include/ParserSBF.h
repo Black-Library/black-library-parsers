@@ -23,26 +23,19 @@ public:
     explicit ParserSBF();
 
     ParserResult Parse(const ParserJob &parser_job);
-    void Stop();
 
 protected:
-    std::string ParseTitle();
-    std::string ParseAuthor();
-    ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
+    void FindChapterNodes(xmlNodePtr root_node);
+    std::string GetSBFChapterName(const std::string &data_url);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    std::string GetSBFChapterName(const std::string &data_url);
+    ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
     ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
-    ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
-    
-private:
-    std::vector<ParserIndexEntry> index_entries_;
+
 };
 
 } // namespace SBF
-
 } // namespace parsers
 } // namespace core
 } // namespace black_library
