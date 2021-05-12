@@ -68,7 +68,7 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
 
     current_node = head_seek.seek_node;
 
-    std::cout << "ParserRR: Find metadata" << std::endl;
+    std::cout << GetParserName(parser_type_) << ": Find metadata" << std::endl;
 
     FindMetaData(current_node->children);
 
@@ -96,19 +96,19 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
 
     current_node = body_seek.seek_node;
 
-    std::cout << "ParserRR: Find chapter nodes" << std::endl;
+    std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
 
     FindChapterNodes(current_node->children);
 
     xmlFreeDoc(doc_tree);
 
-    std::cout << "ParserRR: Found " << index_entries_.size() << " nodes" << std::endl;
+    std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
 
     size_t index = parser_job.start_chapter - 1;
 
     if (index > index_entries_.size())
     {
-        std::cout << "Error: ParserRR requested index greater than size" << std::endl;
+        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested index greater than size" << std::endl;
         parser_result.has_error = true;
         xmlFreeDoc(doc_tree);
         return parser_result;
@@ -134,7 +134,7 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
             if (index + 1 > index_entries_.size())
             {
                 done_ = true;
-                std::cout << "Parser " << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
+                std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
                 continue;
             }
 
@@ -142,10 +142,10 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
             wait_time = GenerateWaitTime(chapter_parse_info.length);
             if (chapter_parse_info.has_error)
             {
-                std::cout << "Error: ParserRR failed to parse chapter entry index: " << index << std::endl;
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
                 wait_time = 300;
             }
-            std::cout << "ParserRR: " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
+            std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
                       << " - waiting " << wait_time << " seconds" << std::endl;
             ++index;
         }
@@ -335,7 +335,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
     std::string rr_url = "https://www." + source_url_ + entry.data_url;
-    std::cout << "ParserRR ParseChapter: " << rr_url << std::endl;
+    std::cout << GetParserName(parser_type_) << " ParseChapter: " << rr_url << std::endl;
 
     std::string chapter_result = CurlRequest(rr_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,

@@ -40,7 +40,7 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     uuid_ = parser_job.uuid;
 
     std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job.url << std::endl;
-    std::string curl_result = CurlRequest(parser_job.url);
+    std::string curl_result = CurlRequest(parser_job.url + "threadmarks");
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -56,10 +56,41 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(current_node, "body");
+
+    if (!body_seek.found)
+    {
+        std::cout << "Could not find chapter index, exiting" << std::endl;
+        parser_result.has_error = true;
+        xmlFreeDoc(doc_tree);
+        return parser_result;
+    }
+
+    current_node = body_seek.seek_node;
+
     std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
 
-    ParserResult result;
-    return result;
+    std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
+
+    FindChapterNodes(current_node->children);
+
+    xmlFreeDoc(doc_tree);
+
+    std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
+
+    size_t index = parser_job.start_chapter - 1;
+
+    if (index > index_entries_.size())
+    {
+        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested index greater than size" << std::endl;
+        parser_result.has_error = true;
+        xmlFreeDoc(doc_tree);
+        return parser_result;
+    }
+
+    xmlCleanupParser();
+
+    return parser_result;
 }
 
 void ParserSBF::FindChapterNodes(xmlNodePtr root_node)
