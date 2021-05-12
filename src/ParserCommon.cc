@@ -160,7 +160,7 @@ std::string GetSpaceString(size_t num_tabs)
 
     for (size_t i = 0; i < num_tabs; ++i)
     {
-        tab_string += "    ";
+        tab_string += " ";
     }
 
     return tab_string;

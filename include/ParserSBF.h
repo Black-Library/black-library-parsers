@@ -21,6 +21,7 @@ class ParserSBF : public Parser
 {
 public:
     explicit ParserSBF();
+    ~ParserSBF();
 
     ParserResult Parse(const ParserJob &parser_job);
 

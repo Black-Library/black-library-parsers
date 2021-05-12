@@ -76,8 +76,6 @@ int ParserWorker::RunOnce()
     if (job_queue_.empty())
         return 0;
 
-    // TODO: use more than just the first parser
-
     pool_results_.emplace_back(
         pool_.enqueue([this]()
         {

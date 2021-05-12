@@ -2,6 +2,11 @@
  * ParserSBF.cc
  */
 
+#include <chrono>
+#include <iostream>
+#include <sstream>
+#include <thread>
+
 #include <ParserSBF.h>
 
 namespace black_library {
@@ -21,11 +26,37 @@ ParserSBF::ParserSBF() :
     author_ = "unknown author";
 }
 
+ParserSBF::~ParserSBF()
+{
+    done_ = true;
+}
+
 ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 {
-    (void) parser_job;
+    const std::lock_guard<std::mutex> lock(mutex_);
+    ParserResult parser_result;
+    done_ = false;
 
-    
+    uuid_ = parser_job.uuid;
+
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job.url << std::endl;
+    std::string curl_result = CurlRequest(parser_job.url);
+
+    xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
+        HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+    if (doc_tree == NULL)
+    {
+        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
+        parser_result.has_error = true;
+        return parser_result;
+    }
+
+    // const xmlChar* encoding = doc_tree->encoding;
+
+    xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
+    xmlNodePtr current_node = root_node->children;
+
+    std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
 
     ParserResult result;
     return result;
