@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <unordered_map>
 
 #include <Parser.h>
 
@@ -129,6 +130,13 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    std::unordered_map<std::string, std::string> url_map;
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "0", std::string(RR_0_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "1", std::string(RR_SHORT_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "2", std::string(RR_LONG_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
+
     std::shared_ptr<Parser> parser;
 
     if (opts.source == ParserCommon::AO3_PARSER)
@@ -143,15 +151,26 @@ int main(int argc, char* argv[])
     {
         parser = ParserCast(std::make_shared<ParserSBF>());
     }
+    else
+    {
+        std::cout << "could not match parser" << std::endl;
+        Usage(argv[0]);
+        exit(1);
+    }
+
+    auto iter = url_map.find(ParserCommon::GetParserName(parser->GetParserType()) + std::to_string(opts.length));
+
+    if (iter == url_map.end())
+    {
+        std::cout << "could not match url" << std::endl;
+        Usage(argv[0]);
+        exit(1);
+    }
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    std::string url;
-
-    url = SBF_LONG_URL;
-
     ParserJob parser_job;
-    parser_job.url = url;
+    parser_job.url = iter->second;
     parser->Parse(parser_job);
 
     curl_global_cleanup();
