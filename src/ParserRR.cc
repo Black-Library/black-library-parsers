@@ -334,10 +334,10 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
 ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
-    std::string rr_url = "https://www." + source_url_ + entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseChapter: " << rr_url << std::endl;
+    std::string chapter_url = "https://www." + source_url_ + entry.data_url;
+    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << std::endl;
 
-    std::string chapter_result = CurlRequest(rr_url);
+    std::string chapter_result = CurlRequest(chapter_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (chapter_doc_tree == NULL)
@@ -374,7 +374,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 
     if (chapter_name.empty())
     {
-        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) " chapter name" << std::endl;
+        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " chapter name" << std::endl;
         xmlFreeDoc(chapter_doc_tree);
         return output;
     }

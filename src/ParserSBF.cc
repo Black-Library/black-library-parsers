@@ -68,8 +68,6 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     current_node = body_seek.seek_node;
 
-    std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
-
     std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
 
     FindChapterNodes(current_node->children);
@@ -95,7 +93,43 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
 void ParserSBF::FindChapterNodes(xmlNodePtr root_node)
 {
-    (void) root_node;
+    xmlNodePtr current_node = NULL;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
+        {
+            if (NodeHasAttributeContent(current_node, "structItemContainer"))
+            {
+                std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
+
+                xmlNodePtr index_node = NULL;
+                uint16_t index_num = 0;
+                for (index_node = current_node->children; index_node; index_node = index_node->next)
+                {
+                    if (index_node->type == XML_ELEMENT_NODE)
+                    {
+                        ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
+                        if (index_entry.data_url.empty())
+                            continue;
+
+                        index_entry.index_num = index_num;
+                        index_entries_.emplace_back(index_entry);
+                        ++index_num;
+                    }
+                }
+
+                xmlFree(index_node);
+            }
+        }
+
+        FindChapterNodes(current_node->children);
+    }
+
+    xmlFree(current_node);
 }
 
 std::string ParserSBF::GetSBFChapterName(const std::string &data_url)
@@ -106,9 +140,22 @@ std::string ParserSBF::GetSBFChapterName(const std::string &data_url)
 
 ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 {
-    (void) root_node;
-    ParserIndexEntry entry;
-    return entry;
+    xmlNodePtr current_node = NULL;
+    // xmlNodePtr data_url_node = NULL;
+    // xmlNodePtr chapter_name_node = NULL;
+    ParserIndexEntry index_entry;
+
+    for (current_node = root_node->children; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
+        {
+        }
+    }
+
+    return index_entry;
 }
 
 void ParserSBF::FindMetaData(xmlNodePtr root_node)
@@ -122,7 +169,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
     std::string chapter_url = "https://www." + source_url_ + entry.data_url;
     std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << std::endl;
 
-    std::string chapter_result = CurlRequest(rr_url);
+    std::string chapter_result = CurlRequest(chapter_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (chapter_doc_tree == NULL)
@@ -133,7 +180,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 
     xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
     xmlNodePtr current_node = root_node->children;
-    xmlNodePtr length_node = NULL;
+    // xmlNodePtr length_node = NULL;
     size_t length = 0;
 
     output.length = length;
@@ -142,7 +189,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 
     if (chapter_name.empty())
     {
-        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) " chapter name" << std::endl;
+        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " chapter name" << std::endl;
         xmlFreeDoc(chapter_doc_tree);
         return output;
     }

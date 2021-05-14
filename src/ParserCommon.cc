@@ -89,7 +89,7 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
     return ss.str();
 }
 
-// limited to 999 chapters right now
+// limited to 999 chapters right now (no CH000)
 std::string GetChapterFileName(size_t index, const std::string &chapter_name)
 {
     char buffer [CHAPTER_FILENAME_BUFFER_SIZE];
