@@ -5,6 +5,8 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_COMMON_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_COMMON_H__
 
+#include <time.h>
+
 #include <functional>
 #include <string>
 
@@ -47,8 +49,8 @@ struct ParserChapterInfo {
 struct ParserIndexEntry {
     std::string data_url;
     std::string chapter_name;
+    time_t time_published;
     uint16_t index_num;
-    // TODO add date added
 };
 
 struct ParserJob {
@@ -86,10 +88,9 @@ struct ParserResult {
     bool has_error = true;
 };
 
-struct ParserXmlAttributePayload {
+struct ParserXmlAttributeResult {
     std::string result = "";
-    bool is_null = false;
-    bool attribute_found = false;
+    bool found = false;
 };
 
 struct ParserXmlNodeSeek {
@@ -112,8 +113,9 @@ std::string GetChapterFileName(size_t index, const std::string &chapter_name);
 std::string GetParserName(parser_rep rep);
 parser_rep GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);
-ParserXmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name);
+ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name);
 
+bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name);
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
 

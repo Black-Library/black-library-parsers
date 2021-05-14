@@ -72,6 +72,15 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     FindChapterNodes(current_node->children);
 
+    std::cout << "\tTitle: " << title_ << std::endl;
+    std::cout << "\tAuthor: " << author_ << std::endl;
+    std::cout << "\tNickname: " << nickname_ << std::endl;
+
+    parser_result.metadata.title = title_;
+    parser_result.metadata.author = author_;
+    parser_result.metadata.nickname = nickname_;
+    parser_result.metadata.source = black_library::core::common::SBF::name;
+
     xmlFreeDoc(doc_tree);
 
     std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
@@ -145,6 +154,25 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
     // xmlNodePtr chapter_name_node = NULL;
     ParserIndexEntry index_entry;
 
+    auto likes_result = GetXmlAttributeContentByName(root_node, "data-likes");
+    auto author_result = GetXmlAttributeContentByName(root_node, "data-content-author");
+    auto date_result = GetXmlAttributeContentByName(root_node, "data-content-date");
+
+    if (likes_result.found)
+    {
+        // TODO: add tracking of popularity/likes
+    }
+
+    if (author_result.found)
+    {
+        author_ = author_result.result;
+    }
+
+    if (date_result.found)
+    {
+        // index_entry.time_published = std::stol(date_result.result, nullptr, 0);
+    }
+
     for (current_node = root_node->children; current_node; current_node = current_node->next)
     {
         if (current_node->type != XML_ELEMENT_NODE)
@@ -152,6 +180,7 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 
         if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
         {
+            
         }
     }
 

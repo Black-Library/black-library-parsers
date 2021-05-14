@@ -286,45 +286,31 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
     {
         if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
         {
-            xmlAttrPtr attribute = current_node->properties;
-            while (attribute)
+            auto property_result = GetXmlAttributeContentByName(current_node, "property");
+            
+            if (!property_result.found)
+                continue;
+
+            if (property_result.result == "books:author")
             {
-                if (!xmlStrcmp(attribute->name, (const xmlChar *) "property"))
-                {
-                    xmlChar *attr_content = xmlNodeListGetString(current_node->doc, attribute->children, 1);
-                    if (attr_content != NULL)
-                    {
-                        if (!xmlStrcmp(attr_content, (const xmlChar *) "books:author"))
-                        {
-                            xmlAttrPtr author_attr = attribute->next;
-                            ParserXmlAttributePayload attr_result = GetXmlAttributeContentByName(author_attr, "content");
+                auto author_result = GetXmlAttributeContentByName(current_node, "content");
 
-                            if (attr_result.is_null || !attr_result.attribute_found)
-                                continue;
+                if (!author_result.found)
+                    continue;
 
-                            author_ = attr_result.result;
-                        }
-                        else if (!xmlStrcmp(attr_content, (const xmlChar *) "og:url"))
-                        {
-                            xmlAttrPtr title_attr = attribute->next;
-                            ParserXmlAttributePayload attr_result = GetXmlAttributeContentByName(title_attr, "content");
-
-                            if (attr_result.is_null || !attr_result.attribute_found)
-                                continue;
-
-                            std::string unprocessed_title = attr_result.result;
-                            size_t found = unprocessed_title.find_last_of("/\\");
-                            title_ = unprocessed_title.substr(found + 1, unprocessed_title.size());
-                        }
-                    }
-
-                    xmlFree(attr_content);
-                }
-
-                attribute = attribute->next;
+                author_ = author_result.result;
             }
+            else if (property_result.result == "og:url")
+            {
+                auto title_result = GetXmlAttributeContentByName(current_node, "content");
 
-            xmlFree(attribute);
+                if (!title_result.found)
+                    continue;
+
+                std::string unprocessed_title = title_result.result;
+                size_t found = unprocessed_title.find_last_of("/\\");
+                title_ = unprocessed_title.substr(found + 1, unprocessed_title.size());
+            }
         }
     }
 

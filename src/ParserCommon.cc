@@ -166,23 +166,58 @@ std::string GetSpaceString(size_t num_tabs)
     return tab_string;
 }
 
-ParserXmlAttributePayload GetXmlAttributeContentByName(xmlAttrPtr &attribute_ptr, const std::string &name)
+ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name)
 {
-    ParserXmlAttributePayload attr_result;
+    ParserXmlAttributeResult attr_result;
 
-    if (attribute_ptr == NULL)
-    {
-        attr_result.is_null = true;
-        return attr_result;
-    }
+    xmlAttrPtr attribute = root_node->properties;
 
-    if (!xmlStrcmp(attribute_ptr->name, (const xmlChar *) name.c_str()))
+    while (attribute)
     {
-        attr_result.result = std::string((char *)attribute_ptr->children->content);
-        attr_result.attribute_found = true;
+        const xmlChar *attr_name = attribute->name;
+        if (attr_name != NULL)
+        {
+            if (!target_name.compare(std::string((char *)attr_name)))
+            {
+                xmlChar *attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);                attr_result.found = true;
+                if (attr_content != NULL)
+                {
+                    attr_result.result = std::string((char *) attr_content);
+                    attr_result.found = true;
+                }
+                xmlFree(attr_content);
+                break;
+            }
+        }
+
+        attribute = attribute->next;
     }
 
     return attr_result;
+}
+
+bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name)
+{
+    xmlAttrPtr attribute = root_node->properties;
+    bool found = false;
+
+    while (attribute)
+    {
+        const xmlChar *attr_name = attribute->name;
+        if (attr_name != NULL)
+        {
+            if (!target_name.compare(std::string((char *)attr_name)))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        attribute = attribute->next;
+    }
+    xmlFree(attribute);
+
+    return found;
 }
 
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content)
