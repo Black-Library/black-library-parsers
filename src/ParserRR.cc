@@ -374,7 +374,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 
     if (chapter_name.empty())
     {
-        std::cout << "Error: Unable to generate RR chapter name" << std::endl;
+        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) " chapter name" << std::endl;
         xmlFreeDoc(chapter_doc_tree);
         return output;
     }
