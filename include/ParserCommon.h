@@ -118,6 +118,7 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
 bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name);
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
+ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::string &name);
 
 std::string TrimWhitespace(const std::string &target_string);
 

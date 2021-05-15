@@ -79,8 +79,11 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
             }
             xmlFree(content);
             string_size = content_string.size();
-            ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << 
-            ", Attributes: " << attribute_content_string << ", Content: " << content_string << ", Size: " << string_size << std::endl;
+            if (string_size > 0)
+            {
+                ss << GetSpaceString(depth) << "node type: Text, name: " << cur_node->name << 
+                ", Attributes: " << attribute_content_string << ", Content: " << content_string << ", Size: " << string_size << std::endl;
+            }
         }
 
         ss << GenerateXmlDocTreeStringHelper(cur_node->children, depth + 1);
@@ -160,7 +163,7 @@ std::string GetSpaceString(size_t num_tabs)
 
     for (size_t i = 0; i < num_tabs; ++i)
     {
-        tab_string += " ";
+        tab_string += "  ";
     }
 
     return tab_string;
@@ -258,6 +261,34 @@ ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name
             seek.found = true;
             break;
         }
+    }
+
+    return seek;
+}
+
+ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::string &name)
+{
+    ParserXmlNodeSeek seek;
+    xmlNodePtr current_node = NULL;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *) name.c_str()))
+        {
+            seek.seek_node = current_node;
+            seek.found = true;
+            break;
+        }
+
+        ParserXmlNodeSeek children_seek = SeekToNodeByNameRecursive(current_node->children, name);
+
+        if (children_seek.seek_node != NULL)
+            seek.seek_node = children_seek.seek_node;
+
+        seek.found = seek.found || children_seek.found;
     }
 
     return seek;

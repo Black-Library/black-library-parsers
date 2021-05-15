@@ -147,11 +147,12 @@ std::string ParserSBF::GetSBFChapterName(const std::string &data_url)
     return "";
 }
 
+// TODO: Extract index entry may fail, use std::optional to check
 ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
-    // xmlNodePtr data_url_node = NULL;
-    // xmlNodePtr chapter_name_node = NULL;
+    xmlNodePtr data_url_node = NULL;
+    xmlNodePtr chapter_name_node = NULL;
     ParserIndexEntry index_entry;
 
     auto likes_result = GetXmlAttributeContentByName(root_node, "data-likes");
@@ -159,19 +160,14 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
     auto date_result = GetXmlAttributeContentByName(root_node, "data-content-date");
 
     if (likes_result.found)
-    {
-        // TODO: add tracking of popularity/likes
-    }
+        // TODO: track/store the likes/popularity
+        // std::cout << likes_result.result << std::endl;
 
     if (author_result.found)
-    {
         author_ = author_result.result;
-    }
 
     if (date_result.found)
-    {
-        // index_entry.time_published = std::stol(date_result.result, nullptr, 0);
-    }
+        index_entry.time_published = std::stol(date_result.result);
 
     for (current_node = root_node->children; current_node; current_node = current_node->next)
     {
@@ -180,9 +176,43 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 
         if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
         {
-            
+            if (NodeHasAttributeContent(current_node, "structItem-cell structItem-cell--main"))
+            {
+                data_url_node = current_node;
+                break;
+            }
         }
     }
+
+    auto url_seek = SeekToNodeByNameRecursive(data_url_node->children, "a");
+
+    if (!url_seek.found)
+    {
+        return index_entry;
+    }
+
+    data_url_node = url_seek.seek_node;
+
+    auto url_result = GetXmlAttributeContentByName(data_url_node, "href");
+
+    if (!url_result.found)
+    {
+        return index_entry;
+    }
+    std::cout << url_result.result << std::endl;
+
+    chapter_name_node = data_url_node->children;
+
+    std::cout << GenerateXmlDocTreeString(chapter_name_node) << std::endl;
+
+    auto chapter_name_result = GetXmlAttributeContentByName(chapter_name_node, "Content");
+
+    if (!chapter_name_result.found)
+    {
+        std::cout << "could not find attribute" << std::endl;
+        return index_entry;
+    }
+    std::cout << chapter_name_result.result << std::endl;
 
     return index_entry;
 }
