@@ -169,6 +169,27 @@ std::string GetSpaceString(size_t num_tabs)
     return tab_string;
 }
 
+ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node)
+{
+    ParserXmlContentResult content_result;
+
+    xmlChar *content = xmlNodeGetContent(root_node);
+    if (content == NULL)
+    {
+        xmlFree(content);
+        return content_result;
+    }
+
+    std::string unclean = std::string((char *)content);
+    content_result.result = TrimWhitespace(unclean);
+
+    xmlFree(content);
+
+    content_result.found = true;
+
+    return content_result;
+}
+
 ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name)
 {
     ParserXmlAttributeResult attr_result;

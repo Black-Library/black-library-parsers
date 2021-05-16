@@ -199,19 +199,23 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
     {
         return index_entry;
     }
+
+    index_entry.data_url = url_result.result;
+
     std::cout << url_result.result << std::endl;
 
     chapter_name_node = data_url_node->children;
 
-    std::cout << GenerateXmlDocTreeString(chapter_name_node) << std::endl;
-
-    auto chapter_name_result = GetXmlAttributeContentByName(chapter_name_node, "Content");
+    auto chapter_name_result = GetXmlNodeContent(chapter_name_node);
 
     if (!chapter_name_result.found)
     {
         std::cout << "could not find attribute" << std::endl;
         return index_entry;
     }
+
+    index_entry.chapter_name = chapter_name_result.result;
+
     std::cout << chapter_name_result.result << std::endl;
 
     return index_entry;

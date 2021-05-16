@@ -8,6 +8,7 @@
 #include <time.h>
 
 #include <functional>
+#include <optional>
 #include <string>
 
 #include <libxml/tree.h>
@@ -93,6 +94,11 @@ struct ParserXmlAttributeResult {
     bool found = false;
 };
 
+struct ParserXmlContentResult {
+    std::string result = "";
+    bool found = false;
+};
+
 struct ParserXmlNodeSeek {
     xmlNodePtr seek_node = NULL;
     bool found = false;
@@ -113,6 +119,7 @@ std::string GetChapterFileName(size_t index, const std::string &chapter_name);
 std::string GetParserName(parser_rep rep);
 parser_rep GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);
+ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node);
 ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name);
 
 bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name);
