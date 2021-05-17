@@ -56,6 +56,23 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
+    ParserXmlNodeSeek head_seek = SeekToNodeByName(current_node, "head");
+
+    if (!head_seek.found)
+    {
+        std::cout << "Could not find head, exiting" << std::endl;
+        parser_result.has_error = true;
+        xmlFreeDoc(doc_tree);
+        return parser_result;
+    }
+
+    current_node = head_seek.seek_node;
+
+    FindMetaData(current_node->children);
+
+    // reset current node ptr to root node children
+    current_node = root_node->children;
+
     ParserXmlNodeSeek body_seek = SeekToNodeByName(current_node, "body");
 
     if (!body_seek.found)
@@ -72,6 +89,8 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     FindChapterNodes(current_node->children);
 
+    xmlFreeDoc(doc_tree);
+
     std::cout << "\tTitle: " << title_ << std::endl;
     std::cout << "\tAuthor: " << author_ << std::endl;
     std::cout << "\tNickname: " << nickname_ << std::endl;
@@ -81,18 +100,56 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     parser_result.metadata.nickname = nickname_;
     parser_result.metadata.source = black_library::core::common::SBF::name;
 
-    xmlFreeDoc(doc_tree);
-
     std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
 
     size_t index = parser_job.start_chapter - 1;
 
     if (index > index_entries_.size())
     {
-        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested index greater than size" << std::endl;
+        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested starting index greater than detected entries" << std::endl;
         parser_result.has_error = true;
-        xmlFreeDoc(doc_tree);
         return parser_result;
+    }
+
+    size_t seconds_counter = 0;
+    size_t wait_time = 0;
+
+    // TODO: make parser take 8ish hour break
+    while (!done_)
+    {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+    
+        if (done_)
+            break;
+
+        if (seconds_counter >= wait_time)
+            seconds_counter = 0;
+
+        if (seconds_counter == 0)
+        {
+            // TODO: let the fake reader finish waiting before exiting
+            if (index + 1 > index_entries_.size())
+            {
+                done_ = true;
+                std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
+                continue;
+            }
+
+            ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
+            wait_time = GenerateWaitTime(chapter_parse_info.length);
+            if (chapter_parse_info.has_error)
+            {
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
+                wait_time = 300;
+            }
+            std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
+                      << " - waiting " << wait_time << " seconds" << std::endl;
+            ++index;
+        }
+
+        ++seconds_counter;
+
+        std::this_thread::sleep_until(deadline);
     }
 
     xmlCleanupParser();
@@ -113,8 +170,6 @@ void ParserSBF::FindChapterNodes(xmlNodePtr root_node)
         {
             if (NodeHasAttributeContent(current_node, "structItemContainer"))
             {
-                std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
-
                 xmlNodePtr index_node = NULL;
                 uint16_t index_num = 0;
                 for (index_node = current_node->children; index_node; index_node = index_node->next)
@@ -202,28 +257,50 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 
     index_entry.data_url = url_result.result;
 
-    std::cout << url_result.result << std::endl;
-
     chapter_name_node = data_url_node->children;
 
     auto chapter_name_result = GetXmlNodeContent(chapter_name_node);
 
     if (!chapter_name_result.found)
     {
-        std::cout << "could not find attribute" << std::endl;
         return index_entry;
     }
 
     index_entry.chapter_name = chapter_name_result.result;
-
-    std::cout << chapter_name_result.result << std::endl;
 
     return index_entry;
 }
 
 void ParserSBF::FindMetaData(xmlNodePtr root_node)
 {
-    (void) root_node;
+    xmlNodePtr current_node = NULL;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
+    {
+        if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
+        {
+            auto property_result = GetXmlAttributeContentByName(current_node, "property");
+            
+            if (!property_result.found)
+                continue;
+
+            if (property_result.result == "og:url")
+            {
+                auto title_result = GetXmlAttributeContentByName(current_node, "content");
+
+                if (!title_result.found)
+                    continue;
+
+                std::string unprocessed_title = title_result.result;
+                size_t found_0 = unprocessed_title.find_last_of(".");
+                std::string removed_threadmarks = unprocessed_title.substr(0, found_0);
+                size_t found_1 = removed_threadmarks.find_last_of("/\\");
+                title_ = removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
+            }
+        }
+    }
+
+    xmlFree(current_node);
 }
 
 ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)

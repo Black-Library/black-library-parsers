@@ -108,9 +108,8 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
 
     if (index > index_entries_.size())
     {
-        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested index greater than size" << std::endl;
+        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested starting index greater than detected entries" << std::endl;
         parser_result.has_error = true;
-        xmlFreeDoc(doc_tree);
         return parser_result;
     }
 
