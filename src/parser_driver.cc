@@ -171,6 +171,7 @@ int main(int argc, char* argv[])
 
     ParserJob parser_job;
     parser_job.url = iter->second;
+    parser_job.uuid = "some-uuid";
     parser->Parse(parser_job);
 
     curl_global_cleanup();

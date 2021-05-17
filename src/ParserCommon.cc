@@ -239,7 +239,6 @@ bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name)
 
         attribute = attribute->next;
     }
-    xmlFree(attribute);
 
     return found;
 }

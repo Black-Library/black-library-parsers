@@ -209,70 +209,50 @@ std::string ParserRR::GetRRChapterName(const std::string &data_url)
 ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
-    xmlNodePtr data_url_node = NULL;
-    xmlNodePtr chapter_name_node = NULL;
     ParserIndexEntry index_entry;
 
-    for (current_node = root_node->children; current_node; current_node = current_node->next)
+    auto td_seek = SeekToNodeByName(root_node->children, "td");
+
+    if (!td_seek.found)
     {
-        if (current_node->type != XML_ELEMENT_NODE)
-            continue;
-
-        if (!xmlStrcmp(current_node->name, (const xmlChar *)"td"))
-        {
-            for (data_url_node = current_node->children; data_url_node; data_url_node = data_url_node->next)
-            {
-                if (data_url_node->type != XML_ELEMENT_NODE)
-                    continue;
-
-                if (!xmlStrcmp(data_url_node->name, (const xmlChar *)"a"))
-                {
-                    // get data url
-                    xmlAttrPtr attribute = data_url_node->properties;
-                    while (attribute)
-                    {
-                        if (!xmlStrcmp(attribute->name, (const xmlChar *) "href"))
-                        {
-                            xmlChar *attr_content = xmlNodeListGetString(data_url_node->doc, attribute->children, 1);
-                            if (attr_content != NULL)
-                            {
-                                index_entry.data_url = std::string((char *)attr_content);
-                            }
-                            xmlFree(attr_content);
-
-                            // get chapter name
-                            chapter_name_node = data_url_node->children;
-                            if (chapter_name_node->type != XML_TEXT_NODE)
-                                continue;
-
-                            xmlChar *content = xmlNodeGetContent(chapter_name_node);
-                            if (content != NULL)
-                            {
-                                std::string unclean = std::string((char *)content);
-                                index_entry.chapter_name = TrimWhitespace(unclean);
-                            }
-                            xmlFree(content);
-                        }
-                        // TODO: get time published
-                        // else if (!xmlStrcmp(attribute->name, (const xmlChar *) "class"))
-                        // {
-                        //     xmlChar *attr_content = xmlNodeListGetString(data_url_node->doc, attribute->children, 1);
-                        //     if (attr_content != NULL)
-                        //     {
-                        //         index_entry.date_published = std::string((char *)attr_content);
-                        //     }
-                        //     xmlFree(attr_content);
-                        // }
-                        attribute = attribute->next;
-                    }
-                    xmlFree(attribute);
-                }
-            }
-        }
+        return index_entry;
     }
 
-    xmlFree(current_node);
-    xmlFree(data_url_node);
+    current_node = td_seek.seek_node;
+
+    auto a_seek = SeekToNodeByName(current_node->children, "a");
+
+    if (!a_seek.found)
+    {
+        return index_entry;
+    }
+
+    current_node = a_seek.seek_node;
+
+    if (!NodeHasAttribute(current_node, "href"))
+    {
+        return index_entry;
+    }
+
+    auto url_result = GetXmlAttributeContentByName(current_node, "href");
+
+    if (!url_result.found)
+    {
+        return index_entry;
+    }
+
+    index_entry.data_url = url_result.result;
+
+    current_node = current_node->children;
+
+    auto chapter_name_result = GetXmlNodeContent(current_node);
+
+    if (!chapter_name_result.found)
+    {
+        return index_entry;
+    }
+
+    index_entry.chapter_name = chapter_name_result.result;
 
     return index_entry;
 }
@@ -320,7 +300,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
     std::string chapter_url = "https://www." + source_url_ + entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << std::endl;
+    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << entry.chapter_name << std::endl;
 
     std::string chapter_result = CurlRequest(chapter_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,

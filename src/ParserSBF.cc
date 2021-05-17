@@ -206,8 +206,6 @@ std::string ParserSBF::GetSBFChapterName(const std::string &data_url)
 ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
-    xmlNodePtr data_url_node = NULL;
-    xmlNodePtr chapter_name_node = NULL;
     ParserIndexEntry index_entry;
 
     auto likes_result = GetXmlAttributeContentByName(root_node, "data-likes");
@@ -233,22 +231,26 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
         {
             if (NodeHasAttributeContent(current_node, "structItem-cell structItem-cell--main"))
             {
-                data_url_node = current_node;
                 break;
             }
         }
     }
 
-    auto url_seek = SeekToNodeByNameRecursive(data_url_node->children, "a");
+    if (current_node == NULL)
+    {
+        return index_entry;
+    }
+
+    auto url_seek = SeekToNodeByNameRecursive(current_node->children, "a");
 
     if (!url_seek.found)
     {
         return index_entry;
     }
 
-    data_url_node = url_seek.seek_node;
+    current_node = url_seek.seek_node;
 
-    auto url_result = GetXmlAttributeContentByName(data_url_node, "href");
+    auto url_result = GetXmlAttributeContentByName(current_node, "href");
 
     if (!url_result.found)
     {
@@ -257,9 +259,9 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 
     index_entry.data_url = url_result.result;
 
-    chapter_name_node = data_url_node->children;
+    current_node = current_node->children;
 
-    auto chapter_name_result = GetXmlNodeContent(chapter_name_node);
+    auto chapter_name_result = GetXmlNodeContent(current_node);
 
     if (!chapter_name_result.found)
     {
@@ -307,7 +309,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
     std::string chapter_url = "https://" + source_url_ + entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << std::endl;
+    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << entry.chapter_name << std::endl;
 
     std::string chapter_result = CurlRequest(chapter_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
