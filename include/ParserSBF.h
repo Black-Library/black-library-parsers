@@ -27,12 +27,13 @@ public:
 
 protected:
     void FindChapterNodes(xmlNodePtr root_node);
-    std::string GetSBFChapterName(const std::string &data_url);
+    std::string GetSBFChapterName(const std::string &chapter_name);
+    std::string GetTargetId(const std::string &data_url);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
-    ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
+    ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node, const std::string &target_id);
 
 };
 

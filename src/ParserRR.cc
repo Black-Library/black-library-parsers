@@ -142,7 +142,6 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
             if (chapter_parse_info.has_error)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
-                wait_time = 300;
             }
             std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
                       << " - waiting " << wait_time << " seconds" << std::endl;

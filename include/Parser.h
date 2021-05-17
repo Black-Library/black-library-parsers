@@ -56,7 +56,6 @@ protected:
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
-    virtual ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
 
     std::mt19937_64 generator_;
     std::uniform_int_distribution<int> distribution_;

@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <locale>
 #include <sstream>
 #include <thread>
 
@@ -140,7 +141,6 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
             if (chapter_parse_info.has_error)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
-                wait_time = 300;
             }
             std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
                       << " - waiting " << wait_time << " seconds" << std::endl;
@@ -196,10 +196,25 @@ void ParserSBF::FindChapterNodes(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-std::string ParserSBF::GetSBFChapterName(const std::string &data_url)
+std::string ParserSBF::GetSBFChapterName(const std::string &chapter_name)
 {
-    (void) data_url;
-    return "";
+    std::locale loc;
+    std::string rr_chapter_name = chapter_name;
+
+    std::transform(rr_chapter_name.begin(), rr_chapter_name.end(), rr_chapter_name.begin(), 
+    [&loc](char ch)
+    {
+        return ch == ' ' ? '-' : std::tolower(ch, loc);
+    });
+
+    return rr_chapter_name;
+}
+
+std::string ParserSBF::GetTargetId(const std::string &data_url)
+{
+    auto pos = data_url.find_last_of("-");
+
+    return data_url.substr(pos + 1);
 }
 
 // TODO: Extract index entry may fail, use std::optional to check
@@ -320,14 +335,33 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
         return output;
     }
 
+    std::string target_id = GetTargetId(entry.data_url);
+
     xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
     xmlNodePtr current_node = root_node->children;
-    // xmlNodePtr length_node = NULL;
+    xmlNodePtr length_node = NULL;
     size_t length = 0;
+
+    ParserXmlNodeSeek chapter_seek = SeekToChapterContent(current_node, target_id);
+    if (!chapter_seek.found)
+    {
+        std::cout << "Error: Failed seek" << std::endl;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
+    }
+
+    current_node = chapter_seek.seek_node;
+
+    for (length_node = current_node->children; length_node; length_node = length_node->next)
+    {
+        if (length_node->type != XML_ELEMENT_NODE)
+            continue;
+        ++length;
+    }
 
     output.length = length;
 
-    std::string chapter_name = GetSBFChapterName(entry.data_url);
+    std::string chapter_name = GetSBFChapterName(entry.chapter_name);
 
     if (chapter_name.empty())
     {
@@ -351,11 +385,42 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 
     return output;}
 
-ParserXmlNodeSeek ParserSBF::SeekToChapterContent(xmlNodePtr root_node)
+ParserXmlNodeSeek ParserSBF::SeekToChapterContent(xmlNodePtr root_node, const std::string &target_id)
 {
-    (void) root_node;
-    ParserXmlNodeSeek node_seek;
-    return node_seek;
+    ParserXmlNodeSeek chapter_seek;
+    xmlNodePtr current_node = NULL;
+    bool found = false;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (NodeHasAttribute(current_node, "data-lb-id"))
+        {
+            auto post_id = GetXmlAttributeContentByName(current_node, "data-lb-id");
+            if (!post_id.found)
+                continue;
+
+            if (post_id.result.compare("post-" + target_id))
+            {
+                chapter_seek.seek_node = current_node;
+                // found = true;
+                break;
+            }
+        }
+
+        ParserXmlNodeSeek children_seek = SeekToChapterContent(current_node->children, target_id);
+
+        if (children_seek.seek_node != NULL)
+            chapter_seek.seek_node = children_seek.seek_node;
+
+        found = found || children_seek.found;
+    }
+
+    chapter_seek.found = found;
+
+    return chapter_seek;
 }
 
 } // namespace SBF

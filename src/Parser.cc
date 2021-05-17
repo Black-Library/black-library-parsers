@@ -162,7 +162,12 @@ size_t Parser::GenerateWaitTime(size_t length)
 {
     size_t wait_time = 0;
 
-    for (size_t i = 0; i < length; ++i)
+    size_t loops = length;
+
+    if (length == 0)
+        loops = 40;
+
+    for (size_t i = 0; i < loops; ++i)
     {
         wait_time += 5 + distribution_(generator_);
     }
@@ -187,13 +192,6 @@ ParserChapterInfo Parser::ParseChapter(const ParserIndexEntry &entry)
     (void) entry;
     ParserChapterInfo info;
     return info;
-}
-
-ParserXmlNodeSeek Parser::SeekToChapterContent(xmlNodePtr root_node)
-{
-    (void) root_node;
-    ParserXmlNodeSeek node_seek;
-    return node_seek;
 }
 
 // Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
