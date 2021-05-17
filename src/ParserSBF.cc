@@ -306,7 +306,7 @@ void ParserSBF::FindMetaData(xmlNodePtr root_node)
 ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 {
     ParserChapterInfo output;
-    std::string chapter_url = "https://www." + source_url_ + entry.data_url;
+    std::string chapter_url = "https://" + source_url_ + entry.data_url;
     std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << std::endl;
 
     std::string chapter_result = CurlRequest(chapter_url);
