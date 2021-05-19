@@ -19,7 +19,7 @@ static constexpr const char AO3_SHORT_URL[] = "https://archiveofourown.org/works
 static constexpr const char RR_0_URL[] = "https://www.royalroad.com/fiction/15614/daedalus";
 static constexpr const char RR_SHORT_URL[] = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
 static constexpr const char RR_LONG_URL[] = "https://www.royalroad.com/fiction/21220/mother-of-learning";
-static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/threads/i-woke-up-as-a-dungeon-now-what-dungeon-worm.620521/";
+static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/threads/intrepid-worm-au.337516/";
 
 namespace ParserCommon = black_library::core::parsers;
 

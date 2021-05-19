@@ -40,6 +40,10 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     uuid_ = parser_job.uuid;
 
+    parser_result.metadata.url = parser_job.url;
+    parser_result.metadata.uuid = uuid_;
+    parser_result.metadata.media_path = local_des_;
+
     std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job.url << std::endl;
     std::string curl_result = CurlRequest(parser_job.url + "threadmarks");
 
@@ -47,8 +51,7 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (doc_tree == NULL)
     {
-        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
-        parser_result.has_error = true;
+        std::cout << "Error: libxml HTMLparser unable to parse: " << parser_job.url << std::endl;
         return parser_result;
     }
 
@@ -61,8 +64,7 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     if (!head_seek.found)
     {
-        std::cout << "Could not find head, exiting" << std::endl;
-        parser_result.has_error = true;
+        std::cout << "Could not find head, exiting: " << parser_job.url << std::endl;
         xmlFreeDoc(doc_tree);
         return parser_result;
     }
@@ -78,15 +80,14 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     if (!body_seek.found)
     {
-        std::cout << "Could not find chapter index, exiting" << std::endl;
-        parser_result.has_error = true;
+        std::cout << "Could not find chapter index, exiting: " << parser_job.url << std::endl;
         xmlFreeDoc(doc_tree);
         return parser_result;
     }
 
     current_node = body_seek.seek_node;
 
-    std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
+    std::cout << GetParserName(parser_type_) << ": Find chapter nodes: " << parser_job.url << std::endl;
 
     FindChapterNodes(current_node->children);
 
@@ -108,7 +109,6 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     if (index > index_entries_.size())
     {
         std::cout << "Error: " <<  GetParserName(parser_type_) << " requested starting index greater than detected entries" << std::endl;
-        parser_result.has_error = true;
         return parser_result;
     }
 
@@ -153,6 +153,8 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     }
 
     xmlCleanupParser();
+
+    parser_result.has_error = false;
 
     return parser_result;
 }
