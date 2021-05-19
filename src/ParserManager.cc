@@ -134,7 +134,7 @@ int ParserManager::RunOnce()
         current_jobs_.erase(job_result.metadata.uuid);
 
         if (job_result.has_error)
-            std::cout << "ParserManager: Error in job with uuid: " << job_result.metadata.uuid << std::endl;
+            std::cout << "\tParserManager: Error in job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
 
         if (!job_result.has_error && database_status_callback_)
             database_status_callback_(job_result);

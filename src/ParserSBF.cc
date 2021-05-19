@@ -44,14 +44,17 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
     parser_result.metadata.uuid = uuid_;
     parser_result.metadata.media_path = local_des_;
 
-    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job.url << std::endl;
-    std::string curl_result = CurlRequest(parser_job.url + "threadmarks");
+    std::string target_url = parser_job.url + "threadmarks";
+
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << target_url << std::endl;
+
+    std::string curl_result = CurlRequest(target_url);
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (doc_tree == NULL)
     {
-        std::cout << "Error: libxml HTMLparser unable to parse: " << parser_job.url << std::endl;
+        std::cout << "Error: libxml HTMLparser unable to parse: " << target_url << std::endl;
         return parser_result;
     }
 
