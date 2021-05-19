@@ -84,8 +84,7 @@ struct ParserJobResult {
 struct ParserResult {
     ParserResultMetadata metadata;
 
-    std::string io_result;
-    std::string error_string;
+    std::string debug_string;
     bool has_error = true;
 };
 
