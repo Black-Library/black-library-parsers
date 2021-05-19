@@ -87,7 +87,7 @@ int ParserWorker::RunOnce()
 
             if (job_queue_.empty())
             {
-                ss << "ParserWorker: no jobs in queue" << std::endl;
+                ss << "ParserWorker: " << GetParserName(parser_type_) << " no jobs in queue" << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;
             }
@@ -113,21 +113,21 @@ int ParserWorker::RunOnce()
 
             if (!black_library::core::common::CheckFilePermission(storage_dir_))
             {
-                ss << "Error: parser worker could not access storage directory: " << storage_dir_ << std::endl;
+                ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access storage directory: " << storage_dir_ << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;              
             }
 
             if (!black_library::core::common::MakeDirectories(local_file_path))
             {
-                ss << "Error: parser worker could make local file path directory: " << local_file_path << std::endl;
+                ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could make local file path directory: " << local_file_path << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;              
             }
 
             if (!black_library::core::common::CheckFilePermission(local_file_path))
             {
-                ss << "Error: parser worker could not access uuid directory: " << local_file_path << std::endl;
+                ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access uuid directory: " << local_file_path << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;              
             }
@@ -186,13 +186,13 @@ int ParserWorker::AddJob(ParserJob parser_job)
 {
     if (parser_job.uuid.empty())
     {
-        std::cout << "Error: ParserWorker was sent parser_job with empty uuid" << std::endl;
+        std::cout << "Error: ParserWorker " << GetParserName(parser_type_) << " was sent parser_job with empty uuid" << std::endl;
         return -1;
     }
 
     if (parser_job.url.empty())
     {
-        std::cout << "Error: ParserWorker was sent parser_job with empty url" << std::endl;
+        std::cout << "Error: ParserWorker " << GetParserName(parser_type_) << " was sent parser_job with empty url" << std::endl;
         return -1;
     }
 
