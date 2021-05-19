@@ -111,6 +111,13 @@ int ParserWorker::RunOnce()
 
             parser->SetLocalFilePath(local_file_path);
 
+            if (!black_library::core::common::CheckFilePermission(storage_dir_))
+            {
+                ss << "Error: parser worker could not access storage directory: " << storage_dir_ << std::endl;
+                job_result.debug_string = ss.str();
+                return job_result;              
+            }
+
             if (!black_library::core::common::MakeDirectories(local_file_path))
             {
                 ss << "Error: parser worker could make local file path directory: " << local_file_path << std::endl;
@@ -168,7 +175,6 @@ int ParserWorker::RunOnce()
 
 int ParserWorker::Stop()
 {
-    // TODO: check to make sure pool_ does not leak memory   
     done_ = true;
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop" << std::endl;
