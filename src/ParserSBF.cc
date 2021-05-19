@@ -402,10 +402,11 @@ ParserXmlNodeSeek ParserSBF::SeekToChapterContent(xmlNodePtr root_node, const st
             if (!post_id.found)
                 continue;
 
-            if (post_id.result.compare("post-" + target_id))
+            // find by post_id
+            if (!post_id.result.compare("post-" + target_id))
             {
                 chapter_seek.seek_node = current_node;
-                // found = true;
+                found = true;
                 break;
             }
         }
