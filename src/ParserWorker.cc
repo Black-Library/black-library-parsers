@@ -62,11 +62,15 @@ int ParserWorker::RunOnce()
         if (res.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
         {
             ParserJobResult job_result = res.get();
-            std::cout << job_result.debug_string << std::endl;
 
             if (job_result.has_error)
-                // TODO: do something about error? notify?
+            {
+                std::cout << "ParserWorker: " << GetParserName(parser_type_) << " error: " << job_result.debug_string << std::endl;
+            }
+            else
+            {
                 std::cout << job_result.debug_string << std::endl;
+            }
 
             if (notify_callback_)
                 notify_callback_(job_result);
@@ -94,12 +98,13 @@ int ParserWorker::RunOnce()
 
             auto parser_job = job_queue_.pop();
 
+            job_result.metadata.url = parser_job.url;
+            job_result.metadata.uuid = parser_job.uuid;
+
             auto factory_result = parser_factory_->GetParserByUrl(parser_job.url);
 
             if (factory_result.has_error)
             {
-                job_result.metadata.url = parser_job.url;
-                job_result.metadata.uuid = parser_job.uuid;
                 ss << "Factory Error: " << factory_result.debug_string << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;

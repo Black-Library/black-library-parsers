@@ -63,7 +63,14 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
             [this](ParserJobResult result)
             {
                 result_queue_.push(result);
-                current_jobs_.find_and_replace(result.metadata.uuid, JOB_FINISHED);
+                if (result.has_error)
+                {
+                    current_jobs_.find_and_replace(result.metadata.uuid, JOB_ERROR);
+                }
+                else
+                {
+                    current_jobs_.find_and_replace(result.metadata.uuid, JOB_FINISHED);
+                }
             }
         );
     }
@@ -125,6 +132,9 @@ int ParserManager::RunOnce()
         auto job_result = result_queue_.pop();
         std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << std::endl;
         current_jobs_.erase(job_result.metadata.uuid);
+
+        if (job_result.has_error)
+            std::cout << "ParserManager: Error in job with uuid: " << job_result.metadata.uuid << std::endl;
 
         if (!job_result.has_error && database_status_callback_)
             database_status_callback_(job_result);
