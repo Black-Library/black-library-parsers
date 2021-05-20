@@ -56,7 +56,6 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 void Parser::Stop()
 {
     done_ = true;
-    std::cout << "Parser " << GetParserName(parser_type_) << " stop " << uuid_ << std::endl;
 }
 
 std::string Parser::CurlRequest(const std::string &url)
@@ -169,7 +168,7 @@ size_t Parser::GenerateWaitTime(size_t length)
 
     for (size_t i = 0; i < loops; ++i)
     {
-        wait_time += 4 + distribution_(generator_);
+        wait_time += 5 + distribution_(generator_);
     }
 
     return wait_time;

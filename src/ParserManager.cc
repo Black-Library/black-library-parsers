@@ -130,7 +130,13 @@ int ParserManager::RunOnce()
     while (!result_queue_.empty())
     {
         auto job_result = result_queue_.pop();
-        std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << std::endl;
+        if (job_result.metadata.uuid.empty() || job_result.metadata.url.empty())
+        {
+            std::cout << "ParserManager: got job result with empty uuid or url" << std::endl;
+            continue;
+        }
+
+        std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
         current_jobs_.erase(job_result.metadata.uuid);
 
         if (job_result.has_error)

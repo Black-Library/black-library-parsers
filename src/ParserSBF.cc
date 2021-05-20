@@ -117,6 +117,7 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     size_t seconds_counter = 0;
     size_t wait_time = 0;
+    size_t remaining_attempts = 5;
 
     // TODO: make parser take 8ish hour break
     while (!done_)
@@ -139,23 +140,36 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
                 continue;
             }
 
-            ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
-            wait_time = GenerateWaitTime(chapter_parse_info.length);
-            if (chapter_parse_info.has_error)
+            if (remaining_attempts <= 0)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
+                remaining_attempts = 5;
+                ++index;
+                continue;
             }
-            std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
-                      << " - waiting " << wait_time << " seconds" << std::endl;
-            ++index;
+
+            ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
+            --remaining_attempts;
+
+            wait_time = GenerateWaitTime(chapter_parse_info.length);
+
+            if (chapter_parse_info.has_error)
+            {
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts << std::endl;
+            }
+            else
+            {
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
+                        << " - waiting " << wait_time << " seconds" << std::endl;
+                remaining_attempts = 5;
+                ++index;
+            }
         }
 
         ++seconds_counter;
 
         std::this_thread::sleep_until(deadline);
     }
-
-    xmlCleanupParser();
 
     parser_result.has_error = false;
 
