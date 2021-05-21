@@ -53,15 +53,15 @@ int ParserWorker::Run()
 int ParserWorker::RunOnce()
 {
     // check if futures list is ready
-    for (auto & res : pool_results_)
+    for (auto & result : pool_results_)
     {
         // check if future is ready
-        if (!res.valid())
+        if (!result.valid())
             continue;
 
-        if (res.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        if (result.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
         {
-            ParserJobResult job_result = res.get();
+            ParserJobResult job_result = result.get();
 
             if (job_result.has_error)
             {
@@ -86,6 +86,9 @@ int ParserWorker::RunOnce()
             std::stringstream ss;
             ParserJobResult job_result;
             std::atomic_bool parser_error;
+
+            if (done_)
+                return job_result;
 
             parser_error = false;
 
@@ -183,6 +186,12 @@ int ParserWorker::RunOnce()
 int ParserWorker::Stop()
 {
     done_ = true;
+
+    for (auto & result : pool_results_)
+    {
+        if (result.valid())
+            result.wait();
+    }
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop" << std::endl;
 

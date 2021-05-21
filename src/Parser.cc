@@ -163,7 +163,7 @@ size_t Parser::GenerateWaitTime(size_t length)
 
     size_t loops = length;
 
-    if (length == 0)
+    if (length <= 20)
         loops = 40;
 
     for (size_t i = 0; i < loops; ++i)

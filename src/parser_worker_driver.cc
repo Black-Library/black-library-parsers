@@ -43,16 +43,26 @@ int main(int argc, char* argv[])
     auto factory = std::make_shared<black_library::core::parsers::ParserFactory>();
 
     dummy_worker dummy_worker_0(factory, "/mnt/store", black_library::core::parsers::ERROR_PARSER, 3);
-    dummy_worker dummy_worker_1(factory, "/mnt/store", black_library::core::parsers::RR_PARSER, 1);
+    dummy_worker dummy_worker_1(factory, "/mnt/store", black_library::core::parsers::RR_PARSER, 2);
 
     parser_worker = &dummy_worker_1;
 
-    black_library::core::parsers::ParserJob job;
+    black_library::core::parsers::ParserJob job_0;
+    black_library::core::parsers::ParserJob job_1;
+    black_library::core::parsers::ParserJob job_2;
 
-    job.uuid = "some-uuid-0";
-    job.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+    job_0.uuid = "some-uuid-0";
+    job_1.uuid = "some-uuid-1";
+    job_2.uuid = "some-uuid-2";
 
-    parser_worker->AddJob(job);
+    job_0.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+    job_1.url = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
+    job_2.url = "https://www.royalroad.com/fiction/16946/azarinth-healer";
+
+    parser_worker->AddJob(job_0);
+    parser_worker->AddJob(job_1);
+    parser_worker->AddJob(job_2);
+
     parser_worker->Run();
 
     curl_global_cleanup();

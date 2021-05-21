@@ -157,7 +157,7 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length 
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length
                         << " - waiting " << wait_time << " seconds" << std::endl;
                 remaining_attempts = 5;
                 ++index;
