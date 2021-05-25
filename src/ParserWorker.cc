@@ -21,6 +21,7 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
+    pool_erases_(),
     job_status_callback_(),
     notify_callback_(),
     storage_dir_(storage_dir),
@@ -52,9 +53,16 @@ int ParserWorker::Run()
 
 int ParserWorker::RunOnce()
 {
-    // check if futures list is ready
-    for (auto & result : pool_results_)
+    // clear pool_erases
+    while (!pool_erases_.empty())
     {
+        pool_erases_.pop();
+    }
+
+    // check if futures list is ready
+    for (size_t i = 0; i < pool_results_.size(); ++i)
+    {
+        auto & result = pool_results_[i];
         // check if future is ready
         if (!result.valid())
             continue;
@@ -66,15 +74,23 @@ int ParserWorker::RunOnce()
             if (job_result.has_error)
             {
                 std::cout << "ParserWorker: " << GetParserName(parser_type_) << " error: " << job_result.debug_string << std::endl;
+                pool_erases_.push(i);
             }
             else
             {
                 std::cout << job_result.debug_string << std::endl;
+                if (notify_callback_)
+                    notify_callback_(job_result);
+                pool_erases_.push(i);
             }
-
-            if (notify_callback_)
-                notify_callback_(job_result);
         }
+    }
+
+    while (!pool_erases_.empty())
+    {
+        size_t pos = pool_erases_.top();
+        pool_erases_.pop();
+        pool_results_.erase(pool_results_.begin() + pos);
     }
 
     if (job_queue_.empty())
@@ -165,7 +181,16 @@ int ParserWorker::RunOnce()
             auto parser_result = parser->Parse(parser_job);
 
             if (parser_result.has_error)
+            {
                 parser_error = true;
+                if (job_status_callback_)
+                    job_status_callback_(parser_job.uuid, JOB_ERROR);
+            }
+            else
+            {
+                if (job_status_callback_)
+                    job_status_callback_(parser_job.uuid, JOB_FINISHED);
+            }
 
             t.join();
 
@@ -214,6 +239,9 @@ int ParserWorker::AddJob(ParserJob parser_job)
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) <<
      " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.start_chapter << std::endl;
+
+    if (job_status_callback_)
+        job_status_callback_(parser_job.uuid, JOB_QUEUED);
 
     job_queue_.push(parser_job);
 

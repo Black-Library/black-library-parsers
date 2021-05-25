@@ -169,6 +169,28 @@ std::string GetSpaceString(size_t num_tabs)
     return tab_string;
 }
 
+std::string GetStatusName(job_status_rep job_status)
+{
+    switch (job_status)
+    {
+    case JOB_ERROR:
+        return "job_error";
+        break;
+    case JOB_QUEUED:
+        return "job_queued";
+        break;
+    case JOB_WORKING:
+        return "job_working";
+        break;
+    case JOB_FINISHED:
+        return "job_finished";
+        break;
+    default:
+        return "job_error";
+        break;
+    }
+}
+
 ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node)
 {
     ParserXmlContentResult content_result;

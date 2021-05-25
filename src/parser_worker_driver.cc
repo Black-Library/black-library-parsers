@@ -7,10 +7,13 @@
 #include <signal.h>
 
 #include <Parser.h>
+#include <ParserCommon.h>
 #include <ParserFactory.h>
 #include <ParserWorker.h>
 
 #include <ParserRR.h>
+
+namespace ParserCommon = black_library::core::parsers;
 
 black_library::core::parsers::ParserWorker *parser_worker;
 
@@ -31,6 +34,7 @@ int main(int argc, char* argv[])
             std::cout << std::string(argv[i]);
         }
         std::cout << std::endl;
+        exit(1);
     }
 
     signal(SIGINT, SigHandler);
@@ -58,6 +62,19 @@ int main(int argc, char* argv[])
     job_0.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
     job_1.url = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
     job_2.url = "https://www.royalroad.com/fiction/16946/azarinth-healer";
+
+    parser_worker->RegisterJobStatusCallback(
+            [](const std::string &uuid, ParserCommon::job_status_rep job_status)
+            {
+                std::cout << "JobStatusCallback uuid: " << uuid << " - " << ParserCommon::GetStatusName(job_status) << std::endl;
+            }
+    );
+    parser_worker->RegisterManagerNotifyCallback(
+            [](ParserCommon::ParserJobResult result)
+            {
+                std::cout << "ManagerNotifyCallback: " << result.metadata.uuid << " - " << result.metadata.url << std::endl;
+            }
+    );
 
     parser_worker->AddJob(job_0);
     parser_worker->AddJob(job_1);

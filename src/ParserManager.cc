@@ -63,14 +63,6 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
             [this](ParserJobResult result)
             {
                 result_queue_.push(result);
-                if (result.has_error)
-                {
-                    current_jobs_.find_and_replace(result.metadata.uuid, JOB_ERROR);
-                }
-                else
-                {
-                    current_jobs_.find_and_replace(result.metadata.uuid, JOB_FINISHED);
-                }
             }
         );
     }
@@ -119,7 +111,6 @@ int ParserManager::RunOnce()
         }
 
         worker->second->AddJob(job);
-        current_jobs_.emplace(job.uuid, JOB_QUEUED);
     }
 
     for (auto & worker : worker_map_)

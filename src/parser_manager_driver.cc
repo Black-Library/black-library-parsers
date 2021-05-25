@@ -95,20 +95,25 @@ int main(int argc, char* argv[])
 
     parser_manager = &manager;
 
-    black_library::core::parsers::ParserJob job;
+    parser_manager->RegisterDatabaseStatusCallback(
+        [](black_library::core::parsers::ParserJobResult result)
+        {
+            std::cout << "DatabaseStatusCallback: " << result.metadata.uuid << std::endl;
+        }
+    );
 
     parser_manager->AddJob("some-uuid-0", "https://www.royalroad.com/fiction/21220/mother-of-learning");
     parser_manager->AddJob("some-uuid-1", "https://www.royalroad.com/fiction/42266/elysium");
-    parser_manager->AddJob("some-uuid-2", "https://www.royalroad.com/fiction/30692/divinity");
-    parser_manager->AddJob("some-uuid-3", "https://www.royalroad.com/fiction/14167/metaworld-chronicles");
+    parser_manager->AddJob("some-uuid-2", "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead");
+    parser_manager->AddJob("some-uuid-3", "https://www.royalroad.com/fiction/30692/divinity");
+    parser_manager->AddJob("some-uuid-4", "https://www.royalroad.com/fiction/14167/metaworld-chronicles");
 
+    parser_manager->AddJob("some-uuid-10", "https://forums.spacebattles.com/threads/commander-pa-multicross-si.309838/");
+    parser_manager->AddJob("some-uuid-11", "https://forums.spacebattles.com/threads/be-thou-my-good.867883/");
+    parser_manager->AddJob("some-uuid-12", "https://forums.spacebattles.com/threads/mha-worlds-finest-bnhaxbatman-complete.868273/");
+    parser_manager->AddJob("some-uuid-13", "https://forums.spacebattles.com/threads/perchance-to-dream-mass-effect-commander.664360/");
 
-    parser_manager->AddJob("some-uuid-4", "https://forums.spacebattles.com/threads/commander-pa-multicross-si.309838/");
-    parser_manager->AddJob("some-uuid-5", "https://forums.spacebattles.com/threads/be-thou-my-good.867883/");
-    parser_manager->AddJob("some-uuid-6", "https://forums.spacebattles.com/threads/mha-worlds-finest-bnhaxbatman-complete.868273/");
-    parser_manager->AddJob("some-uuid-7", "https://forums.spacebattles.com/threads/perchance-to-dream-mass-effect-commander.664360/");
-
-    parser_manager->AddJob("some-uuid-8", "https://www.fanfiction.net/s/7347955/1/Dreaming-of-Sunshine");
+    parser_manager->AddJob("some-uuid-20", "https://www.fanfiction.net/s/7347955/1/Dreaming-of-Sunshine");
 
     parser_manager->Run();
 
