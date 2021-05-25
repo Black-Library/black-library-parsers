@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <memory>
+#include <queue>
 #include <vector>
 
 #include "BlockingQueue.h"
@@ -42,6 +43,7 @@ private:
     ThreadPool pool_;
     BlockingQueue<ParserJob> job_queue_;
     std::vector<std::future<ParserJobResult>> pool_results_;
+    std::priority_queue<size_t> pool_erases_;
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
     std::string storage_dir_;

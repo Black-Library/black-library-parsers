@@ -118,6 +118,7 @@ std::string GetChapterFileName(size_t index, const std::string &chapter_name);
 std::string GetParserName(parser_rep rep);
 parser_rep GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);
+std::string GetStatusName(job_status_rep job_status);
 ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node);
 ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name);
 
