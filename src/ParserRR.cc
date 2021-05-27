@@ -115,6 +115,7 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
 
     size_t seconds_counter = 0;
     size_t wait_time = 0;
+    size_t wait_time_total = 0;
     size_t remaining_attempts = 5;
 
     // TODO: make parser take 8ish hour break
@@ -150,15 +151,17 @@ ParserResult ParserRR::Parse(const ParserJob &parser_job)
             --remaining_attempts;
 
             wait_time = GenerateWaitTime(chapter_parse_info.length);
+            wait_time_total += wait_time;
 
             if (chapter_parse_info.has_error)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts << std::endl;
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts
+                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
             }
             else
             {
                 std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length
-                        << " - waiting " << wait_time << " seconds" << std::endl;
+                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
                 remaining_attempts = 5;
                 ++index;
             }
