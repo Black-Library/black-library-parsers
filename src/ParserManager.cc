@@ -56,7 +56,8 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
         worker.second->RegisterJobStatusCallback(
             [this](const std::string &uuid, job_status_rep job_status)
             {
-                current_jobs_.find_and_replace(uuid, job_status);
+                if (!current_jobs_.find_and_replace(uuid, job_status))
+                    std::cout << "Error: could not replace job status" << std::endl;
             }
         );
         worker.second->RegisterManagerNotifyCallback(
@@ -177,6 +178,10 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     {
         std::cout << "ParserManager already working on " << job.uuid << std::endl;
         return 0;
+    }
+    else
+    {
+        current_jobs_.emplace(job.uuid, JOB_MANAGER_QUEUED);
     }
 
     job_queue_.push(job);
