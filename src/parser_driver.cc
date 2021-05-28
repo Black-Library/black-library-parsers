@@ -19,6 +19,7 @@ static constexpr const char AO3_SHORT_URL[] = "https://archiveofourown.org/works
 static constexpr const char RR_0_URL[] = "https://www.royalroad.com/fiction/15614/daedalus";
 static constexpr const char RR_SHORT_URL[] = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
 static constexpr const char RR_LONG_URL[] = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+static constexpr const char SBF_SHORT_URL[] = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
 static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/threads/intrepid-worm-au.337516/";
 
 namespace ParserCommon = black_library::core::parsers;
@@ -135,6 +136,7 @@ int main(int argc, char* argv[])
     url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "0", std::string(RR_0_URL));
     url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "1", std::string(RR_SHORT_URL));
     url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "2", std::string(RR_LONG_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
     url_map.emplace(ParserCommon::GetParserName(ParserCommon::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
 
     std::shared_ptr<Parser> parser;
@@ -153,7 +155,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::cout << "could not match parser" << std::endl;
+        std::cout << "could not match parser source" << std::endl;
         Usage(argv[0]);
         exit(1);
     }

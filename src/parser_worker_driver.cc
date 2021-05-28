@@ -2,6 +2,8 @@
  * parser_worker_driver.cc
  */
 
+#include <getopt.h>
+
 #include <iostream>
 #include <memory>
 #include <signal.h>
@@ -11,11 +13,76 @@
 #include <ParserFactory.h>
 #include <ParserWorker.h>
 
-#include <ParserRR.h>
-
 namespace ParserCommon = black_library::core::parsers;
 
+struct options
+{
+    ParserCommon::parser_rep source;
+};
+
 black_library::core::parsers::ParserWorker *parser_worker;
+
+static void Usage(const char *prog)
+{
+    const char *p = strchr(prog, '/');
+    printf("usage: %s --(s)ource_target [-h]\n", p ? (p + 1) : prog);
+}
+
+static int ParseOptions(int argc, char **argv, struct options *opts)
+{
+    static const char *const optstr = "hs:";
+    static const struct option long_opts[] = {
+        { "help", no_argument, 0, 'h' },
+        { "source_target", required_argument, 0, 's' },
+        { 0, 0, 0, 0 }
+    };
+
+    if (!argv || !opts)
+        return -1;
+
+    int opt = 0;
+    while ((opt = getopt_long(argc, argv, optstr, long_opts, 0)) >= 0)
+    {
+        switch (opt)
+        {
+            case 'h':
+                Usage(argv[0]);
+                exit(0);
+                break;
+            case 's':
+                if (std::string(optarg) == "ao3")
+                {
+                    opts->source = ParserCommon::AO3_PARSER;
+                }
+                else if (std::string(optarg) == "rr")
+                {
+                    opts->source = ParserCommon::RR_PARSER;
+                }
+                else if (std::string(optarg) == "sbf")
+                {
+                    opts->source = ParserCommon::SBF_PARSER;
+                }
+                else
+                {
+                    std::cout << "Could not match source" << std::endl;
+                    Usage(argv[0]);
+                    exit(1);
+                }
+                break;
+            default:
+                exit(1);
+                break;
+        }
+    }
+
+    if (optind < argc)
+    {
+        fprintf(stderr, "trailing options..\n");
+        exit(1);
+    }
+
+    return 0;
+}
 
 void SigHandler(int sig)
 {
@@ -25,15 +92,17 @@ void SigHandler(int sig)
 
 int main(int argc, char* argv[])
 {
-    // check to see if there are any extra arguments
-    if (argc > 1)
+    struct options opts;
+
+    if (argc < 2)
     {
-        std::cout << "extra arguments ";
-        for (int i = 0; i < argc; ++i)
-        {
-            std::cout << std::string(argv[i]);
-        }
-        std::cout << std::endl;
+        Usage(argv[0]);
+        exit(1);
+    }
+
+    if (ParseOptions(argc, argv, &opts))
+    {
+        Usage(argv[0]);
         exit(1);
     }
 
@@ -47,7 +116,13 @@ int main(int argc, char* argv[])
     auto factory = std::make_shared<black_library::core::parsers::ParserFactory>();
 
     dummy_worker dummy_worker_0(factory, "/mnt/store", black_library::core::parsers::ERROR_PARSER, 3);
-    dummy_worker dummy_worker_1(factory, "/mnt/store", black_library::core::parsers::RR_PARSER, 2);
+
+    if (opts.source == ParserCommon::ERROR_PARSER)
+    {
+        std::cout << "could not match parser source" << std::endl;
+    }
+
+    dummy_worker dummy_worker_1(factory, "/mnt/store", opts.source, 2);
 
     parser_worker = &dummy_worker_1;
 
@@ -59,9 +134,30 @@ int main(int argc, char* argv[])
     job_1.uuid = "some-uuid-1";
     job_2.uuid = "some-uuid-2";
 
-    job_0.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
-    job_1.url = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
-    job_2.url = "https://www.royalroad.com/fiction/16946/azarinth-healer";
+    if (opts.source == ParserCommon::AO3_PARSER)
+    {
+        job_0.url = "";
+        job_1.url = "";
+        job_2.url = ""; 
+    }
+    else if (opts.source == ParserCommon::RR_PARSER)
+    {
+        job_0.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
+        job_1.url = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
+        job_2.url = "https://www.royalroad.com/fiction/16946/azarinth-healer";
+    }
+    else if (opts.source == ParserCommon::SBF_PARSER)
+    {
+        job_0.url = "https://forums.spacebattles.com/threads/be-thou-my-good.867883/";
+        job_1.url = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
+        job_2.url = "https://forums.spacebattles.com/threads/commander-pa-multicross-si.309838/";
+    }
+    else
+    {
+        std::cout << "could not match parser source" << std::endl;
+        Usage(argv[0]);
+        exit(1);
+    }
 
     parser_worker->RegisterJobStatusCallback(
             [](const std::string &uuid, ParserCommon::job_status_rep job_status)

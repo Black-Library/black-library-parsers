@@ -96,8 +96,10 @@ int ParserWorker::RunOnce()
     if (job_queue_.empty())
         return 0;
 
+    auto parser_job = job_queue_.pop();
+
     pool_results_.emplace_back(
-        pool_.enqueue([this]()
+        pool_.enqueue([this, parser_job]()
         {
             std::stringstream ss;
             ParserJobResult job_result;
@@ -107,15 +109,6 @@ int ParserWorker::RunOnce()
                 return job_result;
 
             parser_error = false;
-
-            if (job_queue_.empty())
-            {
-                ss << "ParserWorker: " << GetParserName(parser_type_) << " no jobs in queue" << std::endl;
-                job_result.debug_string = ss.str();
-                return job_result;
-            }
-
-            auto parser_job = job_queue_.pop();
 
             job_result.metadata.url = parser_job.url;
             job_result.metadata.uuid = parser_job.uuid;
@@ -159,7 +152,7 @@ int ParserWorker::RunOnce()
             ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid <<  std::endl;
             
             std::thread t([this, parser, &parser_job, &parser_error](){
-
+            
                 while (!done_ && !parser->GetDone() && !parser_error)
                 {
                     const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
@@ -179,6 +172,13 @@ int ParserWorker::RunOnce()
                 job_status_callback_(parser_job.uuid, JOB_WORKING);
 
             auto parser_result = parser->Parse(parser_job);
+
+            // ParserResult parser_result;
+            // parser_result.has_error = false;
+            // parser_result.metadata.uuid = parser_job.uuid;
+            // parser_result.metadata.url = parser_job.url;
+
+            // parser->Stop();
 
             if (parser_result.has_error)
             {
@@ -215,10 +215,13 @@ int ParserWorker::Stop()
     for (auto & result : pool_results_)
     {
         if (result.valid())
+        {
+            std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop one" << std::endl;
             result.wait();
+        }
     }
 
-    std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop" << std::endl;
+    std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop all" << std::endl;
 
     return 0;
 }
@@ -241,7 +244,7 @@ int ParserWorker::AddJob(ParserJob parser_job)
      " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.start_chapter << std::endl;
 
     if (job_status_callback_)
-        job_status_callback_(parser_job.uuid, JOB_QUEUED);
+        job_status_callback_(parser_job.uuid, JOB_WORKER_QUEUED);
 
     job_queue_.push(parser_job);
 

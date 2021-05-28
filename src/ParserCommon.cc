@@ -176,8 +176,11 @@ std::string GetStatusName(job_status_rep job_status)
     case JOB_ERROR:
         return "job_error";
         break;
-    case JOB_QUEUED:
-        return "job_queued";
+    case JOB_MANAGER_QUEUED:
+        return "job_manager_queued";
+        break;
+    case JOB_WORKER_QUEUED:
+        return "job_worker_queued";
         break;
     case JOB_WORKING:
         return "job_working";

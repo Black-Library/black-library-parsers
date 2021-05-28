@@ -21,7 +21,8 @@ namespace parsers {
 
 typedef enum {
     JOB_ERROR,
-    JOB_QUEUED,
+    JOB_MANAGER_QUEUED,
+    JOB_WORKER_QUEUED,
     JOB_WORKING,
     JOB_FINISHED,
 

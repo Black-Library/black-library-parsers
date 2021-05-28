@@ -12,21 +12,30 @@
 #include <queue>
 
 template <typename T>
-class BlockingQueue {
+class BlockingQueue
+{
 private:
     std::mutex mutex_;
     std::queue<T> queue_;
 public:
-    T pop() {
+    T pop()
+    {
         const std::lock_guard<std::mutex> lock(mutex_);
         T value = queue_.front();
         queue_.pop();
         return value;
     }
 
-    void push(T value) {
+    void push(T value)
+    {
         const std::lock_guard<std::mutex> lock(mutex_);
         queue_.push(value);
+    }
+
+    T front()
+    {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        return queue_.front();
     }
 
     size_t size()
