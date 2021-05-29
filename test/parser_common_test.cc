@@ -49,8 +49,6 @@ TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
     REQUIRE( TrimWhitespace("\ta\t") == "a" );
     REQUIRE( TrimWhitespace("\ra\r") == "a" );
     REQUIRE( TrimWhitespace("\na\n") == "a" );
-    // TODO: improve encoding to make this a reasonable test
-    // REQUIRE( TrimWhitespace("\0a\0") == "a" );
     REQUIRE( TrimWhitespace("") == "" );
 }
 

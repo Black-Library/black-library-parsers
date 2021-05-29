@@ -290,6 +290,26 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
     return found;
 }
 
+std::string SanitizeFileName(const std::string &file_name)
+{
+    std::string sanatized_file_name = file_name;
+    std::string unallowed = " /\\*?<>:;=[]!@|";
+
+    if (sanatized_file_name.front() == '-')
+    {
+        sanatized_file_name.erase(sanatized_file_name.begin());
+    }
+
+    std::transform(sanatized_file_name.begin(), sanatized_file_name.end(), sanatized_file_name.begin(), 
+    [&unallowed](char ch)
+    {
+        return (std::find(unallowed.begin(), unallowed.end(), ch) != unallowed.end()) ? '-' : ch;
+    });
+
+
+    return sanatized_file_name;
+}
+
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
 {
     ParserXmlNodeSeek seek;

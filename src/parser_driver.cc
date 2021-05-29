@@ -40,19 +40,21 @@ inline std::shared_ptr<Parser> ParserCast(T const &p)
 struct options
 {
     ParserCommon::parser_rep source;
+    size_t starting_chapter = 1;
     uint8_t length;
 };
 
 static void Usage(const char *prog)
 {
     const char *p = strchr(prog, '/');
-    printf("usage: %s --(s)ource_target -(l)ength 0-2 [-h]\n", p ? (p + 1) : prog);
+    printf("usage: %s --(s)ource_target --(l)ength 0-2 --[c]hapter_start [-h]\n", p ? (p + 1) : prog);
 }
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
-    static const char *const optstr = "hl:s:";
+    static const char *const optstr = "c:hl:s:";
     static const struct option long_opts[] = {
+        { "chapter_start", required_argument, 0, 'c' },
         { "help", no_argument, 0, 'h' },
         { "length", required_argument, 0, 'l' },
         { "source_target", required_argument, 0, 's' },
@@ -67,6 +69,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
     {
         switch (opt)
         {
+            case 'c':
+                if (atoi(optarg) < 0)
+                {
+                    std::cout << "starting chapter out of range" << std::endl;
+                    Usage(argv[0]);
+                    exit(1);
+                }
+                opts->starting_chapter = atoi(optarg);
+                break;
             case 'h':
                 Usage(argv[0]);
                 exit(0);
@@ -174,6 +185,7 @@ int main(int argc, char* argv[])
     ParserJob parser_job;
     parser_job.url = iter->second;
     parser_job.uuid = "some-uuid";
+    parser_job.start_chapter = opts.starting_chapter;
     parser->Parse(parser_job);
 
     curl_global_cleanup();

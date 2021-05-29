@@ -351,6 +351,8 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 
     std::string chapter_name = GetRRChapterName(entry.data_url);
 
+    chapter_name = SanitizeFileName(chapter_name);
+
     if (chapter_name.empty())
     {
         std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " chapter name" << std::endl;
@@ -364,6 +366,14 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
     std::string file_name = local_des_ + chapter_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     chapter_file = fopen(file_name.c_str(), "w+");
+
+    if (chapter_file == NULL)
+    {
+        std::cout << "Error: could not open file with name: " << file_name << std::endl;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
+    }
+
     xmlElemDump(chapter_file, chapter_doc_tree, current_node);
     fclose(chapter_file);
 

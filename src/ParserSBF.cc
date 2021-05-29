@@ -74,6 +74,8 @@ ParserResult ParserSBF::Parse(const ParserJob &parser_job)
 
     current_node = head_seek.seek_node;
 
+    std::cout << GetParserName(parser_type_) << ": Find metadata" << std::endl;
+
     FindMetaData(current_node->children);
 
     // reset current node ptr to root node children
@@ -385,6 +387,8 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 
     std::string chapter_name = GetSBFChapterName(entry.chapter_name);
 
+    chapter_name = SanitizeFileName(chapter_name);
+
     if (chapter_name.empty())
     {
         std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " chapter name" << std::endl;
@@ -398,14 +402,25 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
     std::string file_name = local_des_ + chapter_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     chapter_file = fopen(file_name.c_str(), "w+");
+    std::cout << "foo" << std::endl;
+
+    if (chapter_file == NULL)
+    {
+        std::cout << "Error: could not open file with name: " << file_name << std::endl;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
+    }
+
     xmlElemDump(chapter_file, chapter_doc_tree, current_node);
+    // TODO: figure out how to handle seg faults/other errors in threadpool/thread
     fclose(chapter_file);
 
     xmlFreeDoc(chapter_doc_tree);
 
     output.has_error = false;
 
-    return output;}
+    return output;
+}
 
 ParserXmlNodeSeek ParserSBF::SeekToChapterContent(xmlNodePtr root_node, const std::string &target_id)
 {

@@ -125,6 +125,9 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
 
 bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name);
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content);
+
+std::string SanitizeFileName(const std::string &file_name);
+
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
 ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::string &name);
 
