@@ -124,7 +124,7 @@ int ParserWorker::RunOnce()
 
             auto parser = factory_result.parser_result;
 
-            std::string local_file_path = storage_dir_ + "/" + parser_job.uuid + "/";
+            std::string local_file_path = storage_dir_ + '/' + parser_job.uuid + '/';
 
             parser->SetLocalFilePath(local_file_path);
 

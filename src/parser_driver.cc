@@ -4,6 +4,7 @@
 
 #include <getopt.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <iostream>
 #include <memory>
@@ -47,7 +48,7 @@ struct options
 static void Usage(const char *prog)
 {
     const char *p = strchr(prog, '/');
-    printf("usage: %s --(s)ource_target --(l)ength 0-2 --[c]hapter_start [-h]\n", p ? (p + 1) : prog);
+    printf("usage: %s --(s)ource_target source --(l)ength 0-2 --[c]hapter_start [-h]\n", p ? (p + 1) : prog);
 }
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
