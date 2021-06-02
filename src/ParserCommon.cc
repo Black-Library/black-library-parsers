@@ -194,6 +194,42 @@ std::string GetStatusName(job_status_rep job_status)
     }
 }
 
+xmlNodePtr GetXmlElementAttr(xmlNodePtr root, std::string attr, std::string value) {
+    if (memcmp(root->name, "text", 4) == 0 || memcmp(root->name, "style", 5) == 0 ||
+        memcmp(root->name, "script", 6) == 0)
+    {
+        return NULL;
+    }
+
+    xmlAttr* prop = root->properties;
+    while (prop)
+    {
+        if (memcmp(prop->name, attr.c_str(), attr.length()) == 0 &&
+            memcmp(prop->children->content, value.c_str(), value.length()) == 0)
+        {
+            return root;
+        }
+
+        prop = prop->next;
+    }
+
+    xmlNode* current_node = root->children;
+
+    while (current_node)
+    {
+        xmlNode* node = GetXmlElementAttr(current_node, attr, value);
+
+        if (node)
+        {
+            return node;
+        }
+
+        current_node = current_node->next;
+    }
+
+    return NULL;
+}
+
 ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node)
 {
     ParserXmlContentResult content_result;

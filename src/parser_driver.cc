@@ -187,6 +187,14 @@ int main(int argc, char* argv[])
     parser_job.url = iter->second;
     parser_job.uuid = "some-uuid";
     parser_job.start_chapter = opts.starting_chapter;
+
+    parser->RegisterChapterNumberCallback(
+        [](const std::string &uuid, size_t chapter_num)
+        {
+            std::cout << "ChapterNumberCallback: " << uuid << " - " << chapter_num << std::endl;
+        }
+    );
+
     parser->Parse(parser_job);
 
     curl_global_cleanup();

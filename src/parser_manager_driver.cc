@@ -95,6 +95,12 @@ int main(int argc, char* argv[])
 
     parser_manager = &manager;
 
+    parser_manager->RegisterChapterNumberCallback(
+        [](const std::string &uuid, size_t chapter_num)
+        {
+            std::cout << "ChapterNumberCallback: " << uuid << " - " << chapter_num << std::endl;
+        }
+    );
     parser_manager->RegisterDatabaseStatusCallback(
         [](black_library::core::parsers::ParserJobResult result)
         {

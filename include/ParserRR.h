@@ -23,13 +23,11 @@ public:
     explicit ParserRR();
     ~ParserRR();
 
-    ParserResult Parse(const ParserJob &parser_job);
-
 protected:
-    void FindChapterNodes(xmlNodePtr root_node);
     std::string GetRRChapterName(const std::string &data_url);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
+    void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
     ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);

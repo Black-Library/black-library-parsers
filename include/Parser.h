@@ -35,24 +35,26 @@ public:
     Parser(const Parser &parser);
     virtual ~Parser() = default;
 
-    virtual ParserResult Parse(const ParserJob &parser_job);
+    ParserResult Parse(const ParserJob &parser_job);
     void Stop();
 
     std::string CurlRequest(const std::string &url);
-    xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
 
     void SetLocalFilePath(const std::string &local_des);
 
     bool GetDone();
-    std::string GetLocalDes();
     parser_rep GetParserType();
+    std::string GetSourceName();
     std::string GetSourceUrl();
-    std::string GetTitle();
 
     size_t GenerateWaitTime(size_t length);
 
+    int RegisterChapterNumberCallback(const chapter_number_callback &callback);
+
 protected:
+    virtual std::string AppendTargetUrl(const std::string &job_url);
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
+    virtual void FindChapterNodes(xmlNodePtr root_node);
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
 
@@ -60,8 +62,11 @@ protected:
     std::uniform_int_distribution<int> distribution_;
     std::vector<ParserIndexEntry> index_entries_;
 
+    chapter_number_callback chapter_number_callback_;
+
     std::string title_;
     std::string nickname_;
+    std::string source_name_;
     std::string source_url_;
     std::string author_;
 

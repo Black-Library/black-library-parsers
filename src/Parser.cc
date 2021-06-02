@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <iostream>
+#include <thread>
 
 #include <Parser.h>
 
@@ -31,6 +32,7 @@ Parser::Parser(parser_rep parser_type)
 
     generator_ = std::mt19937_64(seed);
     distribution_ = std::uniform_int_distribution<int>(0, 2);
+    source_name_ = black_library::core::common::ERROR::source_name;
     done_ = false;
 }
 
@@ -44,11 +46,153 @@ Parser::Parser(const Parser &parser) :
 
 ParserResult Parser::Parse(const ParserJob &parser_job)
 {
-    (void) parser_job;
     const std::lock_guard<std::mutex> lock(mutex_);
     ParserResult parser_result;
+    done_ = false;
 
-    std::cout << parser_job.url << " - parse" << std::endl;
+    uuid_ = parser_job.uuid;
+
+    parser_result.metadata.url = parser_job.url;
+    parser_result.metadata.uuid = parser_job.uuid;
+    parser_result.metadata.media_path = local_des_;
+
+    const auto target_url = AppendTargetUrl(parser_job.url);
+
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << target_url << std::endl;
+
+    const auto curl_result = CurlRequest(target_url);
+
+    xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
+        HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+    if (doc_tree == NULL)
+    {
+        std::cout << "Error: libxml HTMLparser unable to parse: " << parser_job.url << std::endl;
+        return parser_result;
+    }
+
+    // const xmlChar* encoding = doc_tree->encoding;
+
+    xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
+    xmlNodePtr current_node = root_node->children;
+
+    ParserXmlNodeSeek head_seek = SeekToNodeByName(current_node, "head");
+
+    if (!head_seek.found)
+    {
+        std::cout << "Could not find head, exiting" << std::endl;
+        xmlFreeDoc(doc_tree);
+        return parser_result;
+    }
+
+    current_node = head_seek.seek_node;
+
+    std::cout << GetParserName(parser_type_) << ": Find metadata" << std::endl;
+
+    FindMetaData(current_node->children);
+
+    std::cout << "\tTitle: " << title_ << std::endl;
+    std::cout << "\tAuthor: " << author_ << std::endl;
+    std::cout << "\tNickname: " << nickname_ << std::endl;
+
+    parser_result.metadata.title = title_;
+    parser_result.metadata.author = author_;
+    parser_result.metadata.nickname = nickname_;
+    parser_result.metadata.source = GetSourceName();
+
+    // reset current node ptr to root node children
+    current_node = root_node->children;
+
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(current_node, "body");
+
+    if (!body_seek.found)
+    {
+        std::cout << "Could not find chapter index, exiting" << std::endl;
+        xmlFreeDoc(doc_tree);
+        return parser_result;
+    }
+
+    current_node = body_seek.seek_node;
+
+    std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
+
+    FindChapterNodes(current_node->children);
+
+    xmlFreeDoc(doc_tree);
+
+    std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
+
+    size_t index = parser_job.start_chapter - 1;
+
+    if (index > index_entries_.size())
+    {
+        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested starting index greater than detected entries" << std::endl;
+        return parser_result;
+    }
+
+    size_t seconds_counter = 0;
+    size_t wait_time = 0;
+    size_t wait_time_total = 0;
+    size_t remaining_attempts = 5;
+
+    // TODO: make parser take 8ish hour break
+    while (!done_)
+    {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+    
+        if (done_)
+            break;
+
+        if (seconds_counter >= wait_time)
+            seconds_counter = 0;
+
+        if (seconds_counter == 0)
+        {
+            // TODO: let the fake reader finish waiting before exiting
+            if (index + 1 > index_entries_.size())
+            {
+                done_ = true;
+                std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
+                continue;
+            }
+
+            if (remaining_attempts <= 0)
+            {
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
+                remaining_attempts = 5;
+                ++index;
+                continue;
+            }
+
+            ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
+            --remaining_attempts;
+
+            wait_time = GenerateWaitTime(chapter_parse_info.length);
+            wait_time_total += wait_time;
+
+            if (chapter_parse_info.has_error)
+            {
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts
+                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+            }
+            else
+            {
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length
+                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+
+                if (chapter_number_callback_)
+                    chapter_number_callback_(uuid_, index + 1);
+
+                remaining_attempts = 5;
+                ++index;
+            }
+        }
+
+        ++seconds_counter;
+
+        std::this_thread::sleep_until(deadline);
+    }
+
+    parser_result.has_error = false;
 
     return parser_result;
 }
@@ -89,42 +233,6 @@ std::string Parser::CurlRequest(const std::string &url)
     return html_raw;
 }
 
-xmlNode* Parser::GetElementAttr(xmlNode* root, std::string attr, std::string value) {
-    if (memcmp(root->name, "text", 4) == 0 || memcmp(root->name, "style", 5) == 0 ||
-        memcmp(root->name, "script", 6) == 0)
-    {
-        return NULL;
-    }
-
-    xmlAttr* prop = root->properties;
-    while (prop)
-    {
-        if (memcmp(prop->name, attr.c_str(), attr.length()) == 0 &&
-            memcmp(prop->children->content, value.c_str(), value.length()) == 0)
-        {
-            return root;
-        }
-
-        prop = prop->next;
-    }
-
-    xmlNode* current_node = root->children;
-
-    while (current_node)
-    {
-        xmlNode* node = GetElementAttr(current_node, attr, value);
-
-        if (node)
-        {
-            return node;
-        }
-
-        current_node = current_node->next;
-    }
-
-    return NULL;
-}
-
 void Parser::SetLocalFilePath(const std::string &local_des)
 {
     const std::lock_guard<std::mutex> lock(mutex_);
@@ -136,25 +244,19 @@ bool Parser::GetDone()
     return done_;
 }
 
-std::string Parser::GetLocalDes()
-{
-    const std::lock_guard<std::mutex> lock(mutex_);
-    return local_des_;
-}
-
 parser_rep Parser::GetParserType()
 {
     return parser_type_;
 }
 
+std::string Parser::GetSourceName()
+{
+    return source_name_;
+}
+
 std::string Parser::GetSourceUrl()
 {
     return source_url_;
-}
-
-std::string Parser::GetTitle()
-{
-    return title_;
 }
 
 size_t Parser::GenerateWaitTime(size_t length)
@@ -174,11 +276,29 @@ size_t Parser::GenerateWaitTime(size_t length)
     return wait_time;
 }
 
+int Parser::RegisterChapterNumberCallback(const chapter_number_callback &callback)
+{
+    chapter_number_callback_ = callback;
+
+    return 0;
+}
+
+
+std::string Parser::AppendTargetUrl(const std::string &job_url)
+{
+    return job_url;
+}
+
 ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
 {
     (void) root_node;
     ParserIndexEntry entry;
     return entry;
+}
+
+void Parser::FindChapterNodes(xmlNodePtr root_node)
+{
+    (void) root_node;
 }
 
 void Parser::FindMetaData(xmlNodePtr root_node)

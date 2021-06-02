@@ -40,18 +40,19 @@ public:
     int AddJob(const std::string &uuid, const std::string &url, const size_t &start_chapter);
     bool GetDone();
 
+    int RegisterChapterNumberCallback(const chapter_number_callback &callback);
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
 
 private:
     int AddResult(ParserJobResult result);
     int AddWorker(parser_rep parser_type, size_t num_parsers);
-    int RegisterWorkerCallbacks();
 
     std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
     std::shared_ptr<ParserFactory> parser_factory_;
     BlockingUnorderedMap<std::string, job_status_rep> current_jobs_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
+    chapter_number_callback chapter_number_callback_;
     database_status_callback database_status_callback_;
     std::string config_;
     std::string storage_dir_;

@@ -22,6 +22,7 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     job_queue_(),
     pool_results_(),
     pool_erases_(),
+    chapter_number_callback_(),
     job_status_callback_(),
     notify_callback_(),
     storage_dir_(storage_dir),
@@ -171,6 +172,9 @@ int ParserWorker::RunOnce()
             if (job_status_callback_)
                 job_status_callback_(parser_job.uuid, JOB_WORKING);
 
+            if (chapter_number_callback_)
+                parser->RegisterChapterNumberCallback(chapter_number_callback_);
+
             auto parser_result = parser->Parse(parser_job);
 
             // ParserResult parser_result;
@@ -247,6 +251,13 @@ int ParserWorker::AddJob(ParserJob parser_job)
         job_status_callback_(parser_job.uuid, JOB_WORKER_QUEUED);
 
     job_queue_.push(parser_job);
+
+    return 0;
+}
+
+int ParserWorker::RegisterChapterNumberCallback(const chapter_number_callback &callback)
+{
+    chapter_number_callback_ = callback;
 
     return 0;
 }

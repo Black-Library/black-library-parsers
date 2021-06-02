@@ -106,9 +106,10 @@ struct ParserXmlNodeSeek {
 
 
 // TODO check using vs typedef
-using database_status_callback = std::function<void(ParserJobResult)>;
+using database_status_callback = std::function<void(ParserJobResult result)>;
 using job_status_callback = std::function<void(const std::string &uuid, job_status_rep job_status)>;
-using manager_notify_callback = std::function<void(ParserJobResult)>;
+using manager_notify_callback = std::function<void(ParserJobResult result)>;
+using chapter_number_callback = std::function<void(const std::string &uuid, size_t chapter_num)>;
 
 bool ContainsString(const std::string &haystack, const std::string &needle);
 
@@ -120,6 +121,7 @@ std::string GetParserName(parser_rep rep);
 parser_rep GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);
 std::string GetStatusName(job_status_rep job_status);
+xmlNodePtr GetXmlElementAttr(xmlNodePtr root, std::string attr, std::string value);
 ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node);
 ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name);
 

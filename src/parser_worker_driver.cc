@@ -159,17 +159,23 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    parser_worker->RegisterChapterNumberCallback(
+        [](const std::string &uuid, size_t chapter_num)
+        {
+            std::cout << "ChapterNumberCallback: " << uuid << " - " << chapter_num << std::endl;
+        }
+    );
     parser_worker->RegisterJobStatusCallback(
-            [](const std::string &uuid, ParserCommon::job_status_rep job_status)
-            {
-                std::cout << "JobStatusCallback uuid: " << uuid << " - " << ParserCommon::GetStatusName(job_status) << std::endl;
-            }
+        [](const std::string &uuid, ParserCommon::job_status_rep job_status)
+        {
+            std::cout << "JobStatusCallback uuid: " << uuid << " - " << ParserCommon::GetStatusName(job_status) << std::endl;
+        }
     );
     parser_worker->RegisterManagerNotifyCallback(
-            [](ParserCommon::ParserJobResult result)
-            {
-                std::cout << "ManagerNotifyCallback: " << result.metadata.uuid << " - " << result.metadata.url << std::endl;
-            }
+        [](ParserCommon::ParserJobResult result)
+        {
+            std::cout << "ManagerNotifyCallback: " << result.metadata.uuid << " - " << result.metadata.url << std::endl;
+        }
     );
 
     parser_worker->AddJob(job_0);
