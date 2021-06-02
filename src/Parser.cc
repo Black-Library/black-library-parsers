@@ -270,7 +270,7 @@ size_t Parser::GenerateWaitTime(size_t length)
 
     for (size_t i = 0; i < loops; ++i)
     {
-        wait_time += 5 + distribution_(generator_);
+        wait_time += 3 + distribution_(generator_);
     }
 
     return wait_time;

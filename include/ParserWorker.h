@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <vector>
 
@@ -50,6 +51,7 @@ private:
     manager_notify_callback notify_callback_;
     std::string storage_dir_;
     std::shared_ptr<ParserFactory> parser_factory_;
+    std::mutex mutex_;
     parser_rep parser_type_;
     std::atomic_bool done_;
 };
