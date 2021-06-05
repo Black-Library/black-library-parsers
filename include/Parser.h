@@ -30,8 +30,8 @@ namespace parsers {
 class Parser
 {
 public:
-    Parser(parser_rep parser_type);
-    Parser() : Parser(ERROR_PARSER){};
+    Parser(parser_t parser_type);
+    Parser() : Parser(parser_t::ERROR_PARSER){};
     Parser(const Parser &parser);
     virtual ~Parser() = default;
 
@@ -43,7 +43,7 @@ public:
     void SetLocalFilePath(const std::string &local_des);
 
     bool GetDone();
-    parser_rep GetParserType();
+    parser_t GetParserType();
     std::string GetSourceName();
     std::string GetSourceUrl();
 
@@ -70,10 +70,11 @@ protected:
     std::string source_url_;
     std::string author_;
 
+    std::string root_url_;
     std::string uuid_;
     std::string local_des_;
     std::mutex mutex_;
-    parser_rep parser_type_;
+    parser_t parser_type_;
     std::atomic_bool done_;
 
 private:

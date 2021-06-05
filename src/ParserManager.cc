@@ -48,9 +48,9 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
 
     std::cout << "Using storage dir: " << storage_dir_ << std::endl;
 
-    AddWorker(AO3_PARSER, 3);
-    AddWorker(RR_PARSER, 3);
-    AddWorker(SBF_PARSER, 3);
+    AddWorker(parser_t::AO3_PARSER, 3);
+    AddWorker(parser_t::RR_PARSER, 3);
+    AddWorker(parser_t::SBF_PARSER, 3);
 
     for (auto & worker : worker_map_)
     {
@@ -62,7 +62,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
             }
         );
         worker.second->RegisterJobStatusCallback(
-            [this](const std::string &uuid, job_status_rep job_status)
+            [this](const std::string &uuid, job_status_t job_status)
             {
                 if (!current_jobs_.find_and_replace(uuid, job_status))
                     std::cout << "Error: could not replace job status" << std::endl;
@@ -105,7 +105,7 @@ int ParserManager::RunOnce()
         auto job = job_queue_.pop();
         auto parser_type = GetParserTypeByUrl(job.url);
 
-        if (parser_type == ERROR_PARSER)
+        if (parser_type == parser_t::ERROR_PARSER)
         {
             std::cout << "Error: could not match url to parser" << std::endl;
             continue;
@@ -189,7 +189,7 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     }
     else
     {
-        current_jobs_.emplace(job.uuid, JOB_MANAGER_QUEUED);
+        current_jobs_.emplace(job.uuid, job_status_t::JOB_MANAGER_QUEUED);
     }
 
     job_queue_.push(job);
@@ -202,8 +202,8 @@ bool ParserManager::GetDone()
     return done_;
 }
 
-int ParserManager::AddWorker(parser_rep parser_type, size_t num_parsers)
-{   
+int ParserManager::AddWorker(parser_t parser_type, size_t num_parsers)
+{
     std::cout << "ParserManager AddWorker: " << GetParserName(parser_type) << " num: " << num_parsers << std::endl;
 
     worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, storage_dir_, parser_type, num_parsers));

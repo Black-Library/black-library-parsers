@@ -17,7 +17,7 @@ namespace ParserCommon = black_library::core::parsers;
 
 struct options
 {
-    ParserCommon::parser_rep source;
+    ParserCommon::parser_t source;
 };
 
 black_library::core::parsers::ParserWorker *parser_worker;
@@ -52,15 +52,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
             case 's':
                 if (std::string(optarg) == "ao3")
                 {
-                    opts->source = ParserCommon::AO3_PARSER;
+                    opts->source = ParserCommon::parser_t::AO3_PARSER;
                 }
                 else if (std::string(optarg) == "rr")
                 {
-                    opts->source = ParserCommon::RR_PARSER;
+                    opts->source = ParserCommon::parser_t::RR_PARSER;
                 }
                 else if (std::string(optarg) == "sbf")
                 {
-                    opts->source = ParserCommon::SBF_PARSER;
+                    opts->source = ParserCommon::parser_t::SBF_PARSER;
                 }
                 else
                 {
@@ -115,9 +115,9 @@ int main(int argc, char* argv[])
 
     auto factory = std::make_shared<black_library::core::parsers::ParserFactory>();
 
-    dummy_worker dummy_worker_0(factory, "/mnt/store", black_library::core::parsers::ERROR_PARSER, 3);
+    dummy_worker dummy_worker_0(factory, "/mnt/store", black_library::core::parsers::parser_t::ERROR_PARSER, 3);
 
-    if (opts.source == ParserCommon::ERROR_PARSER)
+    if (opts.source == ParserCommon::parser_t::ERROR_PARSER)
     {
         std::cout << "could not match parser source" << std::endl;
     }
@@ -134,19 +134,19 @@ int main(int argc, char* argv[])
     job_1.uuid = "some-uuid-1";
     job_2.uuid = "some-uuid-2";
 
-    if (opts.source == ParserCommon::AO3_PARSER)
+    if (opts.source == ParserCommon::parser_t::AO3_PARSER)
     {
         job_0.url = "";
         job_1.url = "";
-        job_2.url = ""; 
+        job_2.url = "";
     }
-    else if (opts.source == ParserCommon::RR_PARSER)
+    else if (opts.source == ParserCommon::parser_t::RR_PARSER)
     {
         job_0.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";
         job_1.url = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
         job_2.url = "https://www.royalroad.com/fiction/16946/azarinth-healer";
     }
-    else if (opts.source == ParserCommon::SBF_PARSER)
+    else if (opts.source == ParserCommon::parser_t::SBF_PARSER)
     {
         job_0.url = "https://forums.spacebattles.com/threads/be-thou-my-good.867883/";
         job_1.url = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
         }
     );
     parser_worker->RegisterJobStatusCallback(
-        [](const std::string &uuid, ParserCommon::job_status_rep job_status)
+        [](const std::string &uuid, ParserCommon::job_status_t job_status)
         {
             std::cout << "JobStatusCallback uuid: " << uuid << " - " << ParserCommon::GetStatusName(job_status) << std::endl;
         }

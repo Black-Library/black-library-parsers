@@ -31,12 +31,12 @@ public:
     ~ParserFactory();
 
     ParserFactoryResult GetParserByUrl(const std::string &url);
-    ParserFactoryResult GetParserByType(parser_rep parser_type);
+    ParserFactoryResult GetParserByType(parser_t parser_type);
 
 protected:
     int InitParserMap();
 
-    std::unordered_map<parser_rep, factory_function> parser_map_;
+    std::unordered_map<parser_t, factory_function> parser_map_;
 
 private:
 };

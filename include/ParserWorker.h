@@ -26,7 +26,7 @@ namespace parsers {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const std::string &storage_dir, parser_rep parser_type, size_t num_parsers);
+    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const std::string &storage_dir, parser_t parser_type, size_t num_parsers);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
@@ -52,7 +52,7 @@ private:
     std::string storage_dir_;
     std::shared_ptr<ParserFactory> parser_factory_;
     std::mutex mutex_;
-    parser_rep parser_type_;
+    parser_t parser_type_;
     std::atomic_bool done_;
 };
 

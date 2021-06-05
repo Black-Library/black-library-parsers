@@ -19,7 +19,7 @@ namespace parsers {
 namespace SBF {
 
 ParserSBF::ParserSBF() :
-    Parser(SBF_PARSER)
+    Parser(parser_t::SBF_PARSER)
 {
     title_ = "SBF_Parser_title";
     nickname_ = "";
@@ -38,7 +38,7 @@ std::string ParserSBF::GetSBFChapterName(const std::string &chapter_name)
     std::locale loc;
     std::string rr_chapter_name = chapter_name;
 
-    std::transform(rr_chapter_name.begin(), rr_chapter_name.end(), rr_chapter_name.begin(), 
+    std::transform(rr_chapter_name.begin(), rr_chapter_name.end(), rr_chapter_name.begin(),
     [&loc](char ch)
     {
         return ch == ' ' ? '-' : std::tolower(ch, loc);
@@ -178,7 +178,7 @@ void ParserSBF::FindMetaData(xmlNodePtr root_node)
         if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
         {
             auto property_result = GetXmlAttributeContentByName(current_node, "property");
-            
+
             if (!property_result.found)
                 continue;
 

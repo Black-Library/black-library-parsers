@@ -15,7 +15,7 @@ namespace core {
 
 namespace parsers {
 
-Parser::Parser(parser_rep parser_type)
+Parser::Parser(parser_t parser_type)
 {
     parser_type_ = parser_type;
 
@@ -56,11 +56,11 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     parser_result.metadata.uuid = parser_job.uuid;
     parser_result.metadata.media_path = local_des_;
 
-    const auto target_url = AppendTargetUrl(parser_job.url);
+    root_url_ = AppendTargetUrl(parser_job.url);
 
-    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << target_url << std::endl;
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << root_url_ << std::endl;
 
-    const auto curl_result = CurlRequest(target_url);
+    const auto curl_result = CurlRequest(root_url_);
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -138,7 +138,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     while (!done_)
     {
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
-    
+
         if (done_)
             break;
 
@@ -181,7 +181,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
                 if (chapter_number_callback_)
                     chapter_number_callback_(uuid_, index + 1);
-                
+
                 parser_result.metadata.series_length = index + 1;
 
                 remaining_attempts = 5;
@@ -246,7 +246,7 @@ bool Parser::GetDone()
     return done_;
 }
 
-parser_rep Parser::GetParserType()
+parser_t Parser::GetParserType()
 {
     return parser_type_;
 }

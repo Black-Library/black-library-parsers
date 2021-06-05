@@ -45,11 +45,11 @@ public:
 
 private:
     int AddResult(ParserJobResult result);
-    int AddWorker(parser_rep parser_type, size_t num_parsers);
+    int AddWorker(parser_t parser_type, size_t num_parsers);
 
-    std::unordered_map<parser_rep, std::shared_ptr<ParserWorker>> worker_map_;
+    std::unordered_map<parser_t, std::shared_ptr<ParserWorker>> worker_map_;
     std::shared_ptr<ParserFactory> parser_factory_;
-    BlockingUnorderedMap<std::string, job_status_rep> current_jobs_;
+    BlockingUnorderedMap<std::string, job_status_t> current_jobs_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
     chapter_number_callback chapter_number_callback_;

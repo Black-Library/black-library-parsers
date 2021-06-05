@@ -40,7 +40,7 @@ inline std::shared_ptr<Parser> ParserCast(T const &p)
 
 struct options
 {
-    ParserCommon::parser_rep source;
+    ParserCommon::parser_t source;
     size_t starting_chapter = 1;
     uint8_t length;
 };
@@ -95,15 +95,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
             case 's':
                 if (std::string(optarg) == "ao3")
                 {
-                    opts->source = ParserCommon::AO3_PARSER;
+                    opts->source = ParserCommon::parser_t::AO3_PARSER;
                 }
                 else if (std::string(optarg) == "rr")
                 {
-                    opts->source = ParserCommon::RR_PARSER;
+                    opts->source = ParserCommon::parser_t::RR_PARSER;
                 }
                 else if (std::string(optarg) == "sbf")
                 {
-                    opts->source = ParserCommon::SBF_PARSER;
+                    opts->source = ParserCommon::parser_t::SBF_PARSER;
                 }
                 else
                 {
@@ -144,24 +144,24 @@ int main(int argc, char* argv[])
     }
 
     std::unordered_map<std::string, std::string> url_map;
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "0", std::string(RR_0_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "1", std::string(RR_SHORT_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::RR_PARSER) + "2", std::string(RR_LONG_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::RR_PARSER) + "0", std::string(RR_0_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::RR_PARSER) + "1", std::string(RR_SHORT_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::RR_PARSER) + "2", std::string(RR_LONG_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
+    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
 
     std::shared_ptr<Parser> parser;
 
-    if (opts.source == ParserCommon::AO3_PARSER)
+    if (opts.source == ParserCommon::parser_t::AO3_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserAO3>());
     }
-    else if (opts.source == ParserCommon::RR_PARSER)
+    else if (opts.source == ParserCommon::parser_t::RR_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserRR>());
     }
-    else if (opts.source == ParserCommon::SBF_PARSER)
+    else if (opts.source == ParserCommon::parser_t::SBF_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserSBF>());
     }
@@ -177,6 +177,7 @@ int main(int argc, char* argv[])
     if (iter == url_map.end())
     {
         std::cout << "could not match url" << std::endl;
+        std::cout << ParserCommon::GetParserName(parser->GetParserType()) << std::endl;
         Usage(argv[0]);
         exit(1);
     }
