@@ -25,7 +25,7 @@ ParserSBF::ParserSBF() :
     nickname_ = "";
     source_name_ = black_library::core::common::SBF::source_name;
     source_url_ = black_library::core::common::SBF::source_url;
-    author_ = "unknown author";
+    author_ = "unknown-author";
 }
 
 ParserSBF::~ParserSBF()

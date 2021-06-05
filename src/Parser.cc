@@ -90,15 +90,6 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     FindMetaData(current_node->children);
 
-    std::cout << "\tTitle: " << title_ << std::endl;
-    std::cout << "\tAuthor: " << author_ << std::endl;
-    std::cout << "\tNickname: " << nickname_ << std::endl;
-
-    parser_result.metadata.title = title_;
-    parser_result.metadata.author = author_;
-    parser_result.metadata.nickname = nickname_;
-    parser_result.metadata.source = GetSourceName();
-
     // reset current node ptr to root node children
     current_node = root_node->children;
 
@@ -116,6 +107,15 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
 
     FindChapterNodes(current_node->children);
+
+    std::cout << "\tTitle: " << title_ << std::endl;
+    std::cout << "\tAuthor: " << author_ << std::endl;
+    std::cout << "\tNickname: " << nickname_ << std::endl;
+
+    parser_result.metadata.title = title_;
+    parser_result.metadata.author = author_;
+    parser_result.metadata.nickname = nickname_;
+    parser_result.metadata.source = GetSourceName();
 
     xmlFreeDoc(doc_tree);
 
@@ -181,6 +181,8 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
                 if (chapter_number_callback_)
                     chapter_number_callback_(uuid_, index + 1);
+                
+                parser_result.metadata.series_length = index + 1;
 
                 remaining_attempts = 5;
                 ++index;

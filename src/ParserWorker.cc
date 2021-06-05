@@ -178,13 +178,6 @@ int ParserWorker::RunOnce()
 
             auto parser_result = parser->Parse(parser_job);
 
-            // ParserResult parser_result;
-            // parser_result.has_error = false;
-            // parser_result.metadata.uuid = parser_job.uuid;
-            // parser_result.metadata.url = parser_job.url;
-
-            // parser->Stop();
-
             if (parser_result.has_error)
             {
                 parser_error = true;
