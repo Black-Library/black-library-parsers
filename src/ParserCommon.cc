@@ -197,7 +197,8 @@ std::string GetStatusName(job_status_t job_status)
     }
 }
 
-ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value) {
+ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value)
+{
     ParserXmlNodeSeek result;
     if (!xmlStrcmp(root->name, (const xmlChar *) "text") || !xmlStrcmp(root->name, (const xmlChar *) "style") ||
         !xmlStrcmp(root->name, (const xmlChar *) "script"))
@@ -401,7 +402,8 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
     return seek;
 }
 
-ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...) {
+ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...)
+{
     ParserXmlNodeSeek result;
 
     // SeekToNodeByPattern(node, 7, XML_NAME, "div", XML_ATTRIBUTE, "id", "main", XML_CONTENT, "stuff");
@@ -411,7 +413,7 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...) {
     auto checkNode = [valist, root_node, num]()
     {
         int i;
-        for(i = 0; i < num - 1; i += 2)
+        for (i = 0; i < num - 1; i += 2)
         {
             switch (va_arg(valist, pattern_seek_t))
             {
@@ -437,7 +439,8 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...) {
                         if (xmlStrcmp(prop->name, va_arg(valist, const xmlChar *)) ||
                             (xmlStrcmp(prop->children->content, va_arg(valist, const xmlChar *))))
                         {
-                            if(!prop->next) {
+                            if (!prop->next)
+                            {
                                 return false;
                             }
                         }
@@ -450,7 +453,8 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...) {
                 case pattern_seek_t::XML_CONTENT:
                 {
                     ParserXmlContentResult content_result = GetXmlNodeContent(root_node);
-                    if(xmlStrcmp((const xmlChar *) content_result.result.c_str(), va_arg(valist, const xmlChar *))) {
+                    if(xmlStrcmp((const xmlChar *) content_result.result.c_str(), va_arg(valist, const xmlChar *)))
+                    {
                         return false;
                     }
                     break;
@@ -461,7 +465,8 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...) {
         return true;
     };
 
-    if(checkNode()) {
+    if (checkNode())
+    {
         result.seek_node = root_node;
         result.found = true;
         return result;

@@ -19,7 +19,7 @@ namespace core {
 
 namespace parsers {
 
-enum class job_status_t{
+enum class job_status_t {
     JOB_ERROR,
     JOB_MANAGER_QUEUED,
     JOB_WORKER_QUEUED,
@@ -29,7 +29,7 @@ enum class job_status_t{
     _NUM_JOB_STATUS_TYPES_
 };
 
-enum class parser_t{
+enum class parser_t {
     ERROR_PARSER,
     AO3_PARSER,
     FFN_PARSER,
@@ -39,7 +39,7 @@ enum class parser_t{
     _NUM_PARSERS_TYPE
 };
 
-enum class pattern_seek_t{
+enum class pattern_seek_t {
     XML_NAME,
     XML_ATTRIBUTE,
     XML_CONTENT
