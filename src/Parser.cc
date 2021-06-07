@@ -173,14 +173,17 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+            
+                if (remaining_attempts == 0 && progress_number_callback_)
+                    progress_number_callback_(uuid_, index + 1, true);
             }
             else
             {
                 std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
-                if (chapter_number_callback_)
-                    chapter_number_callback_(uuid_, index + 1);
+                if (progress_number_callback_)
+                    progress_number_callback_(uuid_, index + 1, false);
 
                 parser_result.metadata.series_length = index + 1;
 
@@ -278,9 +281,9 @@ size_t Parser::GenerateWaitTime(size_t length)
     return wait_time;
 }
 
-int Parser::RegisterChapterNumberCallback(const chapter_number_callback &callback)
+int Parser::RegisterProgressNumberCallback(const progress_number_callback &callback)
 {
-    chapter_number_callback_ = callback;
+    progress_number_callback_ = callback;
 
     return 0;
 }

@@ -22,7 +22,7 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     job_queue_(),
     pool_results_(),
     pool_erases_(),
-    chapter_number_callback_(),
+    progress_number_callback_(),
     job_status_callback_(),
     notify_callback_(),
     storage_dir_(storage_dir),
@@ -173,8 +173,8 @@ int ParserWorker::RunOnce()
             if (job_status_callback_)
                 job_status_callback_(parser_job.uuid, job_status_t::JOB_WORKING);
 
-            if (chapter_number_callback_)
-                parser->RegisterChapterNumberCallback(chapter_number_callback_);
+            if (progress_number_callback_)
+                parser->RegisterProgressNumberCallback(progress_number_callback_);
 
             auto parser_result = parser->Parse(parser_job);
 
@@ -250,9 +250,9 @@ int ParserWorker::AddJob(ParserJob parser_job)
     return 0;
 }
 
-int ParserWorker::RegisterChapterNumberCallback(const chapter_number_callback &callback)
+int ParserWorker::RegisterProgressNumberCallback(const progress_number_callback &callback)
 {
-    chapter_number_callback_ = callback;
+    progress_number_callback_ = callback;
 
     return 0;
 }

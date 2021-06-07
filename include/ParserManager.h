@@ -40,7 +40,7 @@ public:
     int AddJob(const std::string &uuid, const std::string &url, const size_t &start_chapter);
     bool GetDone();
 
-    int RegisterChapterNumberCallback(const chapter_number_callback &callback);
+    int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
 
 private:
@@ -52,7 +52,7 @@ private:
     BlockingUnorderedMap<std::string, job_status_t> current_jobs_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
-    chapter_number_callback chapter_number_callback_;
+    progress_number_callback progress_number_callback_;
     database_status_callback database_status_callback_;
     std::string config_;
     std::string storage_dir_;

@@ -49,7 +49,7 @@ public:
 
     size_t GenerateWaitTime(size_t length);
 
-    int RegisterChapterNumberCallback(const chapter_number_callback &callback);
+    int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 protected:
     virtual std::string AppendTargetUrl(const std::string &job_url);
@@ -62,7 +62,7 @@ protected:
     std::uniform_int_distribution<int> distribution_;
     std::vector<ParserIndexEntry> index_entries_;
 
-    chapter_number_callback chapter_number_callback_;
+    progress_number_callback progress_number_callback_;
 
     std::string title_;
     std::string nickname_;

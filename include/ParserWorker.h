@@ -35,7 +35,7 @@ public:
 
     int AddJob(ParserJob parser_job);
 
-    int RegisterChapterNumberCallback(const chapter_number_callback &callback);
+    int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterJobStatusCallback(const job_status_callback &callback);
     int RegisterManagerNotifyCallback(const manager_notify_callback &callback);
 
@@ -46,7 +46,7 @@ private:
     BlockingQueue<ParserJob> job_queue_;
     std::vector<std::future<ParserJobResult>> pool_results_;
     std::priority_queue<size_t> pool_erases_;
-    chapter_number_callback chapter_number_callback_;
+    progress_number_callback progress_number_callback_;
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
     std::string storage_dir_;

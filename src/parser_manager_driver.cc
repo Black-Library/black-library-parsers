@@ -95,10 +95,10 @@ int main(int argc, char* argv[])
 
     parser_manager = &manager;
 
-    parser_manager->RegisterChapterNumberCallback(
-        [](const std::string &uuid, size_t chapter_num)
+    parser_manager->RegisterProgressNumberCallback(
+        [](const std::string &uuid, size_t progress_num, bool error)
         {
-            std::cout << "ChapterNumberCallback: " << uuid << " - " << chapter_num << std::endl;
+            std::cout << "ProgressNumberCallback: " << uuid << " - " << progress_num << " - " << error << std::endl;
         }
     );
     parser_manager->RegisterDatabaseStatusCallback(

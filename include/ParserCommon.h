@@ -115,7 +115,7 @@ struct ParserTimeResult {
 using database_status_callback = std::function<void(ParserJobResult result)>;
 using job_status_callback = std::function<void(const std::string &uuid, job_status_t job_status)>;
 using manager_notify_callback = std::function<void(ParserJobResult result)>;
-using chapter_number_callback = std::function<void(const std::string &uuid, size_t chapter_num)>;
+using progress_number_callback = std::function<void(const std::string &uuid, size_t progress_num, bool error)>;
 
 bool ContainsString(const std::string &haystack, const std::string &needle);
 

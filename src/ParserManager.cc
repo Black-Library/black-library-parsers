@@ -23,7 +23,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
     current_jobs_(),
     job_queue_(),
     result_queue_(),
-    chapter_number_callback_(),
+    progress_number_callback_(),
     database_status_callback_(),
     config_(config),
     storage_dir_(storage_dir),
@@ -54,11 +54,11 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
 
     for (auto & worker : worker_map_)
     {
-        worker.second->RegisterChapterNumberCallback(
-            [this](const std::string &uuid, size_t chapter_num)
+        worker.second->RegisterProgressNumberCallback(
+            [this](const std::string &uuid, size_t progress_num, bool error)
             {
-                if (chapter_number_callback_)
-                    chapter_number_callback_(uuid, chapter_num);
+                if (progress_number_callback_)
+                    progress_number_callback_(uuid, progress_num, error);
             }
         );
         worker.second->RegisterJobStatusCallback(
@@ -211,9 +211,9 @@ int ParserManager::AddWorker(parser_t parser_type, size_t num_parsers)
     return 0;
 }
 
-int ParserManager::RegisterChapterNumberCallback(const chapter_number_callback &callback)
+int ParserManager::RegisterProgressNumberCallback(const progress_number_callback &callback)
 {
-    chapter_number_callback_ = callback;
+    progress_number_callback_ = callback;
 
     return 0;
 }
