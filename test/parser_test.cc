@@ -21,7 +21,7 @@ TEST_CASE( "RR parser tests (pass)", "[single-file]" )
 {
     RR::ParserRR parser;
     parser.SetLocalFilePath("foo");
-    REQUIRE(parser.GetParserType() == RR_PARSER);
+    REQUIRE(parser.GetParserType() == parser_t::RR_PARSER);
     REQUIRE(parser.GetSourceUrl() == black_library::core::common::RR::source_url);
 }
 

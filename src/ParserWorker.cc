@@ -17,7 +17,7 @@ namespace core {
 
 namespace parsers {
 
-ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const std::string &storage_dir, parser_rep parser_type, size_t num_parsers) :
+ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const std::string &storage_dir, parser_t parser_type, size_t num_parsers) :
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
@@ -134,27 +134,27 @@ int ParserWorker::RunOnce()
             {
                 ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access storage directory: " << storage_dir_ << std::endl;
                 job_result.debug_string = ss.str();
-                return job_result;              
+                return job_result;
             }
 
             if (!black_library::core::common::MakeDirectories(local_file_path))
             {
                 ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could make local file path directory: " << local_file_path << std::endl;
                 job_result.debug_string = ss.str();
-                return job_result;              
+                return job_result;
             }
 
             if (!black_library::core::common::CheckFilePermission(local_file_path))
             {
                 ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access uuid directory: " << local_file_path << std::endl;
                 job_result.debug_string = ss.str();
-                return job_result;              
+                return job_result;
             }
 
             ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid <<  std::endl;
-            
+
             std::thread t([this, parser, &parser_job, &parser_error](){
-            
+
                 while (!done_ && !parser->GetDone() && !parser_error)
                 {
                     const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
@@ -171,7 +171,7 @@ int ParserWorker::RunOnce()
             });
 
             if (job_status_callback_)
-                job_status_callback_(parser_job.uuid, JOB_WORKING);
+                job_status_callback_(parser_job.uuid, job_status_t::JOB_WORKING);
 
             if (chapter_number_callback_)
                 parser->RegisterChapterNumberCallback(chapter_number_callback_);
@@ -182,12 +182,12 @@ int ParserWorker::RunOnce()
             {
                 parser_error = true;
                 if (job_status_callback_)
-                    job_status_callback_(parser_job.uuid, JOB_ERROR);
+                    job_status_callback_(parser_job.uuid, job_status_t::JOB_ERROR);
             }
             else
             {
                 if (job_status_callback_)
-                    job_status_callback_(parser_job.uuid, JOB_FINISHED);
+                    job_status_callback_(parser_job.uuid, job_status_t::JOB_FINISHED);
             }
 
             t.join();
@@ -202,7 +202,7 @@ int ParserWorker::RunOnce()
             return job_result;
         })
     );
-    
+
     return 0;
 }
 
@@ -243,7 +243,7 @@ int ParserWorker::AddJob(ParserJob parser_job)
      " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.start_chapter << std::endl;
 
     if (job_status_callback_)
-        job_status_callback_(parser_job.uuid, JOB_WORKER_QUEUED);
+        job_status_callback_(parser_job.uuid, job_status_t::JOB_WORKER_QUEUED);
 
     job_queue_.push(parser_job);
 

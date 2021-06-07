@@ -18,7 +18,7 @@ namespace AO3 {
 class ParserAO3 : public Parser
 {
 public:
-    ParserAO3();
+    explicit ParserAO3();
     ~ParserAO3();
 
     ParserResult Parse(const ParserJob &parser_job);
@@ -26,8 +26,14 @@ public:
 
 protected:
     int ParseChapter();
+    std::string AppendTargetUrl(const std::string &job_url);
+    void FindChapterNodes(xmlNodePtr root_node);
+    void FindMetaData(xmlNodePtr root_node);
+    virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
+    ParserTimeResult getPublishedTime(xmlNodePtr root_node);
 
 private:
+    
 };
 
 } // namespace AO3

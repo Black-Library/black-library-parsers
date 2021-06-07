@@ -37,7 +37,7 @@ ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
 
     auto parser_type = GetParserTypeByUrl(url);
 
-    if (parser_type == ERROR_PARSER)
+    if (parser_type == parser_t::ERROR_PARSER)
     {
         result.has_error = true;
         result.debug_string = "Error: ParserFactory could not match url\n";
@@ -47,7 +47,7 @@ ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
     return GetParserByType(parser_type);
 }
 
-ParserFactoryResult ParserFactory::GetParserByType(parser_rep parser_type)
+ParserFactoryResult ParserFactory::GetParserByType(parser_t parser_type)
 {
     ParserFactoryResult result;
     std::stringstream ss;
@@ -72,7 +72,7 @@ ParserFactoryResult ParserFactory::GetParserByType(parser_rep parser_type)
 
 int ParserFactory::InitParserMap()
 {
-    parser_map_.emplace(AO3_PARSER, 
+    parser_map_.emplace(parser_t::AO3_PARSER,
     [](void){
         ParserFactoryResult result;
 
@@ -80,7 +80,7 @@ int ParserFactory::InitParserMap()
 
         return result;
     });
-    parser_map_.emplace(RR_PARSER, 
+    parser_map_.emplace(parser_t::RR_PARSER,
     [](void){
         ParserFactoryResult result;
 
@@ -88,7 +88,7 @@ int ParserFactory::InitParserMap()
 
         return result;
     });
-    parser_map_.emplace(SBF_PARSER, 
+    parser_map_.emplace(parser_t::SBF_PARSER,
     [](void){
         ParserFactoryResult result;
 

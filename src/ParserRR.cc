@@ -18,7 +18,7 @@ namespace parsers {
 namespace RR {
 
 ParserRR::ParserRR() :
-    Parser(RR_PARSER)
+    Parser(parser_t::RR_PARSER)
 {
     title_ = "RR_Parser_title";
     nickname_ = "";
@@ -135,7 +135,7 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
         if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
         {
             auto property_result = GetXmlAttributeContentByName(current_node, "property");
-            
+
             if (!property_result.found)
                 continue;
 

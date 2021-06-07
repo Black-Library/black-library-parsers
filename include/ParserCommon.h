@@ -19,7 +19,7 @@ namespace core {
 
 namespace parsers {
 
-typedef enum {
+enum class job_status_t {
     JOB_ERROR,
     JOB_MANAGER_QUEUED,
     JOB_WORKER_QUEUED,
@@ -27,11 +27,9 @@ typedef enum {
     JOB_FINISHED,
 
     _NUM_JOB_STATUS_TYPES_
-} job_status_t;
+};
 
-typedef uint8_t job_status_rep;
-
-typedef enum {
+enum class parser_t {
     ERROR_PARSER,
     AO3_PARSER,
     FFN_PARSER,
@@ -39,9 +37,13 @@ typedef enum {
     RR_PARSER,
 
     _NUM_PARSERS_TYPE
-} parser_t;
+};
 
-typedef uint8_t parser_rep;
+enum class pattern_seek_t {
+    XML_NAME,
+    XML_ATTRIBUTE,
+    XML_CONTENT
+};
 
 struct ParserChapterInfo {
     size_t length = 0;
@@ -104,10 +106,14 @@ struct ParserXmlNodeSeek {
     bool found = false;
 };
 
+struct ParserTimeResult {
+    time_t time = {0};
+    bool found = false;
+};
 
 // TODO check using vs typedef
 using database_status_callback = std::function<void(ParserJobResult result)>;
-using job_status_callback = std::function<void(const std::string &uuid, job_status_rep job_status)>;
+using job_status_callback = std::function<void(const std::string &uuid, job_status_t job_status)>;
 using manager_notify_callback = std::function<void(ParserJobResult result)>;
 using chapter_number_callback = std::function<void(const std::string &uuid, size_t chapter_num)>;
 
@@ -117,11 +123,11 @@ std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 
 std::string GetChapterFileName(size_t index, const std::string &chapter_name);
-std::string GetParserName(parser_rep rep);
-parser_rep GetParserTypeByUrl(const std::string &url);
+std::string GetParserName(parser_t rep);
+parser_t GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);
-std::string GetStatusName(job_status_rep job_status);
-xmlNodePtr GetXmlElementAttr(xmlNodePtr root, std::string attr, std::string value);
+std::string GetStatusName(job_status_t job_status);
+ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value);
 ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node);
 ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name);
 
@@ -132,8 +138,13 @@ std::string SanitizeFileName(const std::string &file_name);
 
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
 ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::string &name);
+ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...);
 
 std::string TrimWhitespace(const std::string &target_string);
+
+// Time stuff
+time_t ParseTimet(std::string format, std::string input);
+std::string GetISOString(time_t time);
 
 } // namespace parsers
 } // namespace core
