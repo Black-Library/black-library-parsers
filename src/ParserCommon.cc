@@ -501,7 +501,7 @@ std::string TrimWhitespace(const std::string& target_string)
     return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
 }
 
-time_t parseTimet(std::string input, std::string format)
+time_t ParseTimet(std::string input, std::string format)
 {
     struct tm tm_l {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0

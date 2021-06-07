@@ -143,7 +143,8 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...);
 std::string TrimWhitespace(const std::string &target_string);
 
 // Time stuff
-time_t parseTimet(std::string format, std::string input);
+time_t ParseTimet(std::string format, std::string input);
+std::string GetISOString(time_t time);
 
 } // namespace parsers
 } // namespace core

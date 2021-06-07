@@ -70,7 +70,7 @@ protected:
     std::string source_url_;
     std::string author_;
 
-    std::string root_url_;
+    std::string target_url_;
     std::string uuid_;
     std::string local_des_;
     std::mutex mutex_;

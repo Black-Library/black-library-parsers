@@ -56,11 +56,11 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     parser_result.metadata.uuid = parser_job.uuid;
     parser_result.metadata.media_path = local_des_;
 
-    root_url_ = AppendTargetUrl(parser_job.url);
+    target_url_ = AppendTargetUrl(parser_job.url);
 
-    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << root_url_ << std::endl;
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << target_url_ << std::endl;
 
-    const auto curl_result = CurlRequest(root_url_);
+    const auto curl_result = CurlRequest(target_url_);
 
     xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);

@@ -43,7 +43,7 @@ void ParserAO3::FindChapterNodes(xmlNodePtr root_node)
 {
     ParserIndexEntry entry;
 
-    entry.data_url = root_url_;
+    entry.data_url = target_url_;
     entry.chapter_name = title_;
 
     ParserTimeResult time_result = getPublishedTime(root_node);
@@ -63,7 +63,7 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     if (title_result.found)
     {
         ParserXmlContentResult t_result = GetXmlNodeContent(title_result.seek_node);
-        if(t_result.found)
+        if (t_result.found)
         {
             title_ = t_result.result;
         }
@@ -74,7 +74,7 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     if (author_result.found)
     {
         ParserXmlContentResult a_result = GetXmlNodeContent(author_result.seek_node);
-        if(a_result.found)
+        if (a_result.found)
         {
             author_ = a_result.result;
         }
@@ -171,7 +171,7 @@ ParserTimeResult ParserAO3::getPublishedTime(xmlNodePtr root_node)
         return result;
     }
 
-    result.time = parseTimet("%F", p_result.result);
+    result.time = ParseTimet("%F", p_result.result);
     result.found = true;
     return result;
 }
