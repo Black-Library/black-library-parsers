@@ -121,11 +121,21 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
 
-    size_t index = parser_job.start_chapter - 1;
+    size_t index = parser_job.start_number - 1;
+    size_t end_index;
+
+    if (parser_job.end_number <= 0)
+    {
+        end_index = parser_job.end_number - 1;
+    }
+    else
+    {
+        end_index = index_entries_.size() - 1;
+    }
 
     if (index > index_entries_.size())
     {
-        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested starting index greater than detected entries" << std::endl;
+        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested start index greater than detected entries" << std::endl;
         return parser_result;
     }
 
@@ -147,8 +157,8 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
         if (seconds_counter == 0)
         {
-            // TODO: let the fake reader finish waiting before exiting
-            if (index + 1 > index_entries_.size())
+            // let the fake reader finish waiting before exiting
+            if (index > end_index)
             {
                 done_ = true;
                 std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;

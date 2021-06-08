@@ -240,7 +240,8 @@ int ParserWorker::AddJob(ParserJob parser_job)
     }
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) <<
-     " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << " starting chapter: " << parser_job.start_chapter << std::endl;
+        " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << 
+        " start number: " << parser_job.start_number << " end number: " << parser_job.end_number << std::endl;
 
     if (job_status_callback_)
         job_status_callback_(parser_job.uuid, job_status_t::JOB_WORKER_QUEUED);

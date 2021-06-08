@@ -37,7 +37,7 @@ public:
     bool IsReady();
 
     int AddJob(const std::string &uuid, const std::string &url);
-    int AddJob(const std::string &uuid, const std::string &url, const size_t &start_chapter);
+    int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number);
     bool GetDone();
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);

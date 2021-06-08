@@ -41,7 +41,7 @@ inline std::shared_ptr<Parser> ParserCast(T const &p)
 struct options
 {
     ParserCommon::parser_t source;
-    size_t starting_chapter = 1;
+    size_t start_number = 1;
     uint8_t length;
 };
 
@@ -73,11 +73,11 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
             case 'c':
                 if (atoi(optarg) < 0)
                 {
-                    std::cout << "starting chapter out of range" << std::endl;
+                    std::cout << "start number out of range" << std::endl;
                     Usage(argv[0]);
                     exit(1);
                 }
-                opts->starting_chapter = atoi(optarg);
+                opts->start_number = atoi(optarg);
                 break;
             case 'h':
                 Usage(argv[0]);
@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
     ParserJob parser_job;
     parser_job.url = iter->second;
     parser_job.uuid = "some-uuid";
-    parser_job.start_chapter = opts.starting_chapter;
+    parser_job.start_number = opts.start_number;
 
     parser->RegisterProgressNumberCallback(
         [](const std::string &uuid, size_t progress_num, bool error)

@@ -168,19 +168,29 @@ bool ParserManager::IsReady()
 
 int ParserManager::AddJob(const std::string &uuid, const std::string &url)
 {
-    AddJob(uuid, url, 1);
+    AddJob(uuid, url, 1, 0);
 
     return 0;
 }
 
-int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_chapter)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number)
+{
+    AddJob(uuid, url, 1, 0);
+
+    return 0;
+}
+
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number)
 {
     ParserJob job;
-    job.start_chapter = start_chapter;
+    
     job.uuid = uuid;
     job.url = url;
+    job.start_number = start_number;
+    job.end_number = end_number;
 
-    std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << " - starting chapter: " << job.start_chapter << std::endl;
+    std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << 
+        " - start number: " << job.start_number << " - end number: " << job.end_number << std::endl;
 
     if (current_jobs_.key_exists(job.uuid))
     {
