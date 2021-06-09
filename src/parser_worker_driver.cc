@@ -166,9 +166,9 @@ int main(int argc, char* argv[])
         }
     );
     parser_worker->RegisterJobStatusCallback(
-        [](const std::string &uuid, ParserCommon::job_status_t job_status)
+        [](const ParserCommon::ParserJob &parser_job, ParserCommon::job_status_t job_status)
         {
-            std::cout << "JobStatusCallback uuid: " << uuid << " - " << ParserCommon::GetStatusName(job_status) << std::endl;
+            std::cout << "JobStatusCallback: " << parser_job << " - " << ParserCommon::GetStatusName(job_status) << std::endl;
         }
     );
     parser_worker->RegisterManagerNotifyCallback(

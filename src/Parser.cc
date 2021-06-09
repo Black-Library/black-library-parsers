@@ -58,7 +58,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     target_url_ = AppendTargetUrl(parser_job.url);
 
-    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << target_url_ << std::endl;
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << std::endl;
 
     const auto curl_result = CurlRequest(target_url_);
 
@@ -124,7 +124,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     size_t index = parser_job.start_number - 1;
     size_t end_index;
 
-    if (parser_job.end_number <= 0)
+    if (parser_job.start_number < parser_job.end_number)
     {
         end_index = parser_job.end_number - 1;
     }
@@ -133,7 +133,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
         end_index = index_entries_.size() - 1;
     }
 
-    if (index > index_entries_.size())
+    if (index > index_entries_.size() || index_entries_.empty())
     {
         std::cout << "Error: " <<  GetParserName(parser_type_) << " requested start index greater than detected entries" << std::endl;
         return parser_result;
@@ -157,6 +157,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
         if (seconds_counter == 0)
         {
+            std::cout << "index: " << index << " - end index: " << end_index << std::endl;
             // let the fake reader finish waiting before exiting
             if (index > end_index)
             {

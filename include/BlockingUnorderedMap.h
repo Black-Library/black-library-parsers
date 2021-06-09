@@ -11,12 +11,12 @@
 #include <mutex>
 #include <unordered_map>
 
-template <typename Key, typename Value>
+template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class BlockingUnorderedMap
 {
 private:
     std::mutex mutex_;
-    std::unordered_map<Key, Value> map_;
+    std::unordered_map<Key, Value, Hash> map_;
 public:
     decltype(auto) begin()
     {

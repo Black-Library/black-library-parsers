@@ -30,7 +30,7 @@ protected:
     void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
-    ParserTimeResult getPublishedTime(xmlNodePtr root_node);
+    ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 
 private:
     

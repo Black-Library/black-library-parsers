@@ -46,7 +46,7 @@ void ParserAO3::FindChapterNodes(xmlNodePtr root_node)
     entry.data_url = target_url_;
     entry.chapter_name = title_;
 
-    ParserTimeResult time_result = getPublishedTime(root_node);
+    ParserTimeResult time_result = GetPublishedTime(root_node);
     if (time_result.found)
     {
         entry.time_published = time_result.time;
@@ -120,7 +120,7 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &entry)
         }
     }
 
-    std::string chapter_file_name = GetChapterFileName(entry.index_num + 1, title_);
+    std::string chapter_file_name = GetChapterFileName(entry, title_);
     FILE* chapter_file;
     std::string file_name = local_des_ + chapter_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
@@ -141,7 +141,7 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &entry)
     return output;
 }
 
-ParserTimeResult ParserAO3::getPublishedTime(xmlNodePtr root_node)
+ParserTimeResult ParserAO3::GetPublishedTime(xmlNodePtr root_node)
 {
     ParserTimeResult result;
 

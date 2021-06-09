@@ -54,7 +54,7 @@ struct ParserIndexEntry {
     std::string data_url;
     std::string chapter_name;
     time_t time_published;
-    uint16_t index_num;
+    size_t index_num;
 };
 
 struct ParserJob {
@@ -63,6 +63,35 @@ struct ParserJob {
     size_t start_number = 1;
     size_t end_number = 0;
 };
+
+struct ParserJobHash
+{
+    std::size_t operator() (const ParserJob &parser_job) const
+    {
+        std::size_t h1 = std::hash<std::string>()(parser_job.uuid);
+        std::size_t h2 = std::hash<std::string>()(parser_job.url);
+        std::size_t h3 = std::hash<size_t>()(parser_job.start_number);
+        std::size_t h4 = std::hash<size_t>()(parser_job.end_number);
+
+        return h1 ^ h2 ^ h3 ^ h4;
+    }
+};
+
+inline bool operator == (const ParserJob &left, const ParserJob &right)
+{
+    return left.uuid == right.uuid && left.url == right.url && 
+        left.start_number == right.start_number && left.end_number == right.end_number;
+}
+
+inline std::ostream& operator << (std::ostream &o, const ParserJob &parser_job)
+{
+    o << "uuid: " << parser_job.uuid << " ";
+    o << "url: " << parser_job.url << " ";
+    o << "start_number: " << parser_job.start_number << " ";
+    o << "end_number: " << parser_job.end_number;
+
+    return o;
+}
 
 struct ParserResultMetadata {
     std::string uuid;
@@ -75,11 +104,13 @@ struct ParserResultMetadata {
     std::string series;
     uint16_t series_length = 1;
     std::string media_path;
-    std::string update_date;
 };
 
 struct ParserJobResult {
     ParserResultMetadata metadata;
+
+    size_t start_number = 0;
+    size_t end_number = 0;
 
     std::string debug_string;
     bool has_error = true;
@@ -114,7 +145,7 @@ struct ParserTimeResult {
 
 // TODO check using vs typedef
 using database_status_callback = std::function<void(ParserJobResult result)>;
-using job_status_callback = std::function<void(const std::string &uuid, job_status_t job_status)>;
+using job_status_callback = std::function<void(const ParserJob &parser_job, job_status_t job_status)>;
 using manager_notify_callback = std::function<void(ParserJobResult result)>;
 using progress_number_callback = std::function<void(const std::string &uuid, size_t progress_num, bool error)>;
 
@@ -123,7 +154,7 @@ bool ContainsString(const std::string &haystack, const std::string &needle);
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 
-std::string GetChapterFileName(size_t index, const std::string &chapter_name);
+std::string GetChapterFileName(const ParserIndexEntry &entry, const std::string &chapter_name);
 std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);

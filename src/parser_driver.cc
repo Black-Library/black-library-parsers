@@ -42,6 +42,7 @@ struct options
 {
     ParserCommon::parser_t source;
     size_t start_number = 1;
+    size_t end_number = 0;
     uint8_t length;
 };
 
@@ -53,9 +54,10 @@ static void Usage(const char *prog)
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
-    static const char *const optstr = "c:hl:s:";
+    static const char *const optstr = "c:e:hl:s:";
     static const struct option long_opts[] = {
         { "chapter_start", required_argument, 0, 'c' },
+        { "chapter_end", required_argument, 0, 'e' },
         { "help", no_argument, 0, 'h' },
         { "length", required_argument, 0, 'l' },
         { "source_target", required_argument, 0, 's' },
@@ -78,6 +80,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                     exit(1);
                 }
                 opts->start_number = atoi(optarg);
+                break;
+            case 'e':
+                if (atoi(optarg) < 0)
+                {
+                    std::cout << "end number out of range" << std::endl;
+                    Usage(argv[0]);
+                    exit(1);
+                }
+                opts->end_number = atoi(optarg);
                 break;
             case 'h':
                 Usage(argv[0]);
@@ -188,6 +199,7 @@ int main(int argc, char* argv[])
     parser_job.url = iter->second;
     parser_job.uuid = "some-uuid";
     parser_job.start_number = opts.start_number;
+    parser_job.end_number = opts.end_number;
 
     parser->RegisterProgressNumberCallback(
         [](const std::string &uuid, size_t progress_num, bool error)

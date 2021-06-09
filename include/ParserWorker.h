@@ -33,7 +33,7 @@ public:
     int RunOnce();
     int Stop();
 
-    int AddJob(ParserJob parser_job);
+    int AddJob(const ParserJob &parser_job);
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterJobStatusCallback(const job_status_callback &callback);

@@ -253,7 +253,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
         return output;
     }
 
-    std::string chapter_file_name = GetChapterFileName(entry.index_num + 1, chapter_name);
+    std::string chapter_file_name = GetChapterFileName(entry, chapter_name);
 
     FILE* chapter_file;
     std::string file_name = local_des_ + chapter_file_name;

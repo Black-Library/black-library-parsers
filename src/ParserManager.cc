@@ -62,9 +62,9 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
             }
         );
         worker.second->RegisterJobStatusCallback(
-            [this](const std::string &uuid, job_status_t job_status)
+            [this](const ParserJob &parser_job, job_status_t job_status)
             {
-                if (!current_jobs_.find_and_replace(uuid, job_status))
+                if (!current_jobs_.find_and_replace(parser_job, job_status))
                     std::cout << "Error: could not replace job status" << std::endl;
             }
         );
@@ -137,7 +137,7 @@ int ParserManager::RunOnce()
         }
 
         std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
-        current_jobs_.erase(job_result.metadata.uuid);
+        current_jobs_.erase({job_result.metadata.uuid, job_result.metadata.url, job_result.start_number, job_result.end_number});
 
         if (job_result.has_error)
             std::cout << "\tParserManager: Error in job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
@@ -175,35 +175,33 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url)
 
 int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number)
 {
-    AddJob(uuid, url, 1, 0);
+    AddJob(uuid, url, start_number, 0);
 
     return 0;
 }
 
 int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number)
 {
-    ParserJob job;
+    ParserJob parser_job;
     
-    job.uuid = uuid;
-    job.url = url;
-    job.start_number = start_number;
-    job.end_number = end_number;
+    parser_job.uuid = uuid;
+    parser_job.url = url;
+    parser_job.start_number = start_number;
+    parser_job.end_number = end_number;
 
-    std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << 
-        " - start number: " << job.start_number << " - end number: " << job.end_number << std::endl;
+    std::cout << "ParserManager adding job: " << parser_job << std::endl;
 
-    // TODO: error entry job add would get put here
-    if (current_jobs_.count(job.uuid))
+    if (current_jobs_.count(parser_job))
     {
-        std::cout << "ParserManager already working on " << job.uuid << std::endl;
+        std::cout << "ParserManager already working on job: " << parser_job << std::endl;
         return 0;
     }
     else
     {
-        current_jobs_.emplace(job.uuid, job_status_t::JOB_MANAGER_QUEUED);
+        current_jobs_.emplace(parser_job, job_status_t::JOB_MANAGER_QUEUED);
     }
 
-    job_queue_.push(job);
+    job_queue_.push(parser_job);
 
     return 0;
 }

@@ -151,7 +151,7 @@ int ParserWorker::RunOnce()
                 return job_result;
             }
 
-            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid <<  std::endl;
+            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job <<  std::endl;
 
             std::thread t([this, parser, &parser_job, &parser_error](){
 
@@ -165,13 +165,13 @@ int ParserWorker::RunOnce()
                     std::this_thread::sleep_until(deadline);
                 }
 
-                std::cout << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid << " done" << std::endl;
+                std::cout << GetParserName(parser->GetParserType()) << ": " << parser_job << " done" << std::endl;
 
                 parser->Stop();
             });
 
             if (job_status_callback_)
-                job_status_callback_(parser_job.uuid, job_status_t::JOB_WORKING);
+                job_status_callback_(parser_job, job_status_t::JOB_WORKING);
 
             if (progress_number_callback_)
                 parser->RegisterProgressNumberCallback(progress_number_callback_);
@@ -182,19 +182,22 @@ int ParserWorker::RunOnce()
             {
                 parser_error = true;
                 if (job_status_callback_)
-                    job_status_callback_(parser_job.uuid, job_status_t::JOB_ERROR);
+                    job_status_callback_(parser_job, job_status_t::JOB_ERROR);
             }
             else
             {
                 if (job_status_callback_)
-                    job_status_callback_(parser_job.uuid, job_status_t::JOB_FINISHED);
+                    job_status_callback_(parser_job, job_status_t::JOB_FINISHED);
             }
 
             t.join();
 
-            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job.uuid <<  std::endl;
-            job_result.debug_string = ss.str();
+            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job <<  std::endl;
+
             job_result.metadata = parser_result.metadata;
+            job_result.start_number = parser_job.start_number;
+            job_result.end_number = parser_job.end_number;
+            job_result.debug_string = ss.str();
 
             if (!parser_result.has_error)
                 job_result.has_error = false;
@@ -225,7 +228,7 @@ int ParserWorker::Stop()
     return 0;
 }
 
-int ParserWorker::AddJob(ParserJob parser_job)
+int ParserWorker::AddJob(const ParserJob &parser_job)
 {
     if (parser_job.uuid.empty())
     {
@@ -240,11 +243,10 @@ int ParserWorker::AddJob(ParserJob parser_job)
     }
 
     std::cout << "ParserWorker " << GetParserName(parser_type_) <<
-        " adding parser_job with uuid: " << parser_job.uuid << " with url: " << parser_job.url << 
-        " start number: " << parser_job.start_number << " end number: " << parser_job.end_number << std::endl;
+        " adding parser_job: " << parser_job << std::endl;
 
     if (job_status_callback_)
-        job_status_callback_(parser_job.uuid, job_status_t::JOB_WORKER_QUEUED);
+        job_status_callback_(parser_job, job_status_t::JOB_WORKER_QUEUED);
 
     job_queue_.push(parser_job);
 
