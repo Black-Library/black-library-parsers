@@ -61,13 +61,10 @@ public:
         return map_.find(key);
     }
 
-    bool key_exists(Key key)
+    bool count(Key key)
     {
         const std::lock_guard<std::mutex> lock(mutex_);
-        if (map_.find(key) == map_.end())
-            return false;
-
-        return true;
+        return map_.count(key);
     }
 
     size_t size()

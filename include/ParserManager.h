@@ -50,6 +50,7 @@ private:
     std::unordered_map<parser_t, std::shared_ptr<ParserWorker>> worker_map_;
     std::shared_ptr<ParserFactory> parser_factory_;
     BlockingUnorderedMap<std::string, job_status_t> current_jobs_;
+    BlockingVector<ParserJob> current_errors_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
     progress_number_callback progress_number_callback_;

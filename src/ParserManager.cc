@@ -192,7 +192,8 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     std::cout << "ParserManager adding job: " << job.uuid <<  " with url: " << job.url << 
         " - start number: " << job.start_number << " - end number: " << job.end_number << std::endl;
 
-    if (current_jobs_.key_exists(job.uuid))
+    // TODO: error entry job add would get put here
+    if (current_jobs_.count(job.uuid))
     {
         std::cout << "ParserManager already working on " << job.uuid << std::endl;
         return 0;
