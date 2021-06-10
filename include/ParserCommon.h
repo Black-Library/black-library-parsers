@@ -53,7 +53,7 @@ struct ParserChapterInfo {
 struct ParserIndexEntry {
     std::string data_url;
     std::string chapter_name;
-    time_t time_published;
+    time_t time_published = 0;
     size_t index_num;
 };
 
@@ -104,6 +104,7 @@ struct ParserResultMetadata {
     std::string series;
     uint16_t series_length = 1;
     std::string media_path;
+    time_t update_date = 0;
 };
 
 struct ParserJobResult {
@@ -173,10 +174,6 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
 ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...);
 
 std::string TrimWhitespace(const std::string &target_string);
-
-// Time stuff
-time_t ParseTimet(std::string format, std::string input);
-std::string GetISOString(time_t time);
 
 } // namespace parsers
 } // namespace core

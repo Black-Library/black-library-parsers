@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <TimeOperations.h>
+
 #include <ParserAO3.h>
 
 namespace black_library {
@@ -47,10 +49,12 @@ void ParserAO3::FindChapterNodes(xmlNodePtr root_node)
     entry.chapter_name = title_;
 
     ParserTimeResult time_result = GetPublishedTime(root_node);
+
     if (time_result.found)
     {
         entry.time_published = time_result.time;
     }
+
     entry.index_num = 0;
 
     index_entries_.emplace_back(entry);
@@ -105,12 +109,24 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &entry)
     }
 
     ParserXmlNodeSeek workskin_result = SeekToNodeByPattern(next, 3, pattern_seek_t::XML_ATTRIBUTE, "id", "workskin");
+
+    if (!workskin_result.found)
+    {
+        std::cout << "Error: workskin seek" << std::endl;
+        xmlFreeDoc(chapter_doc_tree);
+        return output;
+    }
+
     xmlNodePtr workskin = workskin_result.seek_node;
     xmlDocSetRootElement(chapter_doc_tree, workskin);
 
     ParserXmlNodeSeek words_result = SeekToNodeByPattern(root_node, 5,
         pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class", "words");
-    if (words_result.found)
+    if (!words_result.found)
+    {
+        std::cout << "Error: " << GetParserName(parser_type_) << " could not get length" << std::endl;
+    }
+    else
     {
         ParserXmlContentResult w_result = GetXmlNodeContent(words_result.seek_node);
         if (w_result.found && strcmp(w_result.result.c_str(), ""))
@@ -138,6 +154,7 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &entry)
     fclose(chapter_file);
 
     output.has_error = false;
+
     return output;
 }
 
@@ -171,8 +188,9 @@ ParserTimeResult ParserAO3::GetPublishedTime(xmlNodePtr root_node)
         return result;
     }
 
-    result.time = ParseTimet("%F", p_result.result);
+    result.time = black_library::core::common::ParseTimet("%F", p_result.result);
     result.found = true;
+
     return result;
 }
 } // namespace AO3

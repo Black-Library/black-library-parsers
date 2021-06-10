@@ -208,6 +208,15 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
         std::this_thread::sleep_until(deadline);
     }
 
+    parser_result.metadata.last_url = index_entries_[sizeof(index_entries_) - 1].data_url;
+
+    // find newest update date
+    for (const auto & entry : index_entries_)
+    {
+        if (entry.time_published > parser_result.metadata.update_date)
+            parser_result.metadata.update_date = entry.time_published;
+    }
+
     parser_result.has_error = false;
 
     return parser_result;

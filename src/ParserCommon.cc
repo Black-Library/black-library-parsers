@@ -501,22 +501,6 @@ std::string TrimWhitespace(const std::string& target_string)
     return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
 }
 
-time_t ParseTimet(std::string input, std::string format)
-{
-    struct tm tm_l {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-    strptime(input.c_str(), format.c_str(), &tm_l);
-    return mktime(&tm_l);
-}
-
-std::string getISOString(time_t time)
-{
-    std::stringstream str;
-    str << std::put_time(std::gmtime(&time), "%FT%TZ") << std::ends;
-    return str.str();
-}
-
 } // namespace parsers
 } // namespace core
 } // namespace black_library

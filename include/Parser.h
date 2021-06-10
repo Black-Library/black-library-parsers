@@ -6,6 +6,7 @@
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
 
 #include <string.h>
+#include <time.h>
 
 #include <atomic>
 #include <fstream>
