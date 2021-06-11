@@ -96,10 +96,10 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
 }
 
 // limited to 9999 chapters right now (no CH10000), index starts at 1 for chapters
-std::string GetChapterFileName(const ParserIndexEntry &entry, const std::string &chapter_name)
+std::string GetChapterFileName(const ParserIndexEntry &index_entry, const std::string &chapter_name)
 {
     char buffer [CHAPTER_FILENAME_BUFFER_SIZE];
-    int res = snprintf(buffer, CHAPTER_FILENAME_BUFFER_SIZE, "CH%04lu_%s.html", entry.index_num + 1, chapter_name.c_str());
+    int res = snprintf(buffer, CHAPTER_FILENAME_BUFFER_SIZE, "CH%04lu_%s.html", index_entry.index_num + 1, chapter_name.c_str());
     if (res < 0)
         return "";
 

@@ -24,12 +24,12 @@ public:
     ~ParserRR();
 
 protected:
-    std::string GetRRChapterName(const std::string &data_url);
+    std::string GetRRChapterName(const ParserIndexEntry &index_entry);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
+    ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
     ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
 
 };

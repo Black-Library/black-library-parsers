@@ -29,7 +29,7 @@ protected:
     std::string AppendTargetUrl(const std::string &job_url);
     void FindChapterNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &entry);
+    virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 
 private:

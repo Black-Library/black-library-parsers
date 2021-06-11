@@ -7,6 +7,8 @@
 #include <sstream>
 #include <thread>
 
+#include <TimeOperations.h>
+
 #include <ParserRR.h>
 
 namespace black_library {
@@ -32,11 +34,11 @@ ParserRR::~ParserRR()
     done_ = true;
 }
 
-std::string ParserRR::GetRRChapterName(const std::string &data_url)
+std::string ParserRR::GetRRChapterName(const ParserIndexEntry &index_entry)
 {
-    auto pos = data_url.find_last_of("/");
+    auto pos = index_entry.data_url.find_last_of("/");
 
-    return data_url.substr(pos + 1);
+    return index_entry.data_url.substr(pos + 1);
 }
 
 ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
@@ -86,6 +88,22 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
     }
 
     index_entry.chapter_name = chapter_name_result.result;
+
+    auto time_seek = SeekToNodeByNameRecursive(root_node, "time");
+
+    if (!time_seek.found)
+    {
+        return index_entry;
+    }
+
+    auto time_attr_seek = GetXmlAttributeContentByName(time_seek.seek_node, "title");
+
+    if (!time_attr_seek.found)
+    {
+        return index_entry;
+    }
+
+    index_entry.time_published = black_library::core::common::ParseTimet(time_attr_seek.result, "%A, %B %d, %Y %I:%M %p");
 
     return index_entry;
 }
@@ -165,11 +183,11 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
+ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
 {
     ParserChapterInfo output;
-    std::string chapter_url = "https://www." + source_url_ + entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << entry.chapter_name << std::endl;
+    std::string chapter_url = "https://www." + source_url_ + index_entry.data_url;
+    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << index_entry.chapter_name << std::endl;
 
     std::string chapter_result = CurlRequest(chapter_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
@@ -204,7 +222,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
 
     output.length = length;
 
-    std::string chapter_name = GetRRChapterName(entry.data_url);
+    std::string chapter_name = GetRRChapterName(index_entry);
 
     chapter_name = SanitizeFileName(chapter_name);
 
@@ -215,7 +233,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &entry)
         return output;
     }
 
-    std::string chapter_file_name = GetChapterFileName(entry, chapter_name);
+    std::string chapter_file_name = GetChapterFileName(index_entry, chapter_name);
 
     FILE* chapter_file;
     std::string file_name = local_des_ + chapter_file_name;

@@ -121,10 +121,19 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
 
-    size_t index = parser_job.start_number - 1;
+    size_t index;
     size_t end_index;
 
-    if (parser_job.start_number < parser_job.end_number)
+    if (parser_job.start_number > index_entries_.size())
+    {
+        index = 0;
+    }
+    else
+    {
+        index = parser_job.start_number - 1;
+    }
+
+    if (parser_job.start_number <= parser_job.end_number && index_entries_.size() >= parser_job.end_number)
     {
         end_index = parser_job.end_number - 1;
     }
@@ -157,7 +166,6 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
         if (seconds_counter == 0)
         {
-            std::cout << "index: " << index << " - end index: " << end_index << std::endl;
             // let the fake reader finish waiting before exiting
             if (index > end_index)
             {
@@ -208,13 +216,13 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
         std::this_thread::sleep_until(deadline);
     }
 
-    parser_result.metadata.last_url = index_entries_[sizeof(index_entries_) - 1].data_url;
+    parser_result.metadata.last_url = index_entries_[index_entries_.size() - 1].data_url;
 
     // find newest update date
-    for (const auto & entry : index_entries_)
+    for (const auto & index_entry : index_entries_)
     {
-        if (entry.time_published > parser_result.metadata.update_date)
-            parser_result.metadata.update_date = entry.time_published;
+        if (index_entry.time_published > parser_result.metadata.update_date)
+            parser_result.metadata.update_date = index_entry.time_published;
     }
 
     parser_result.has_error = false;
@@ -317,8 +325,8 @@ std::string Parser::AppendTargetUrl(const std::string &job_url)
 ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
 {
     (void) root_node;
-    ParserIndexEntry entry;
-    return entry;
+    ParserIndexEntry index_entry;
+    return index_entry;
 }
 
 void Parser::FindChapterNodes(xmlNodePtr root_node)
@@ -331,9 +339,9 @@ void Parser::FindMetaData(xmlNodePtr root_node)
     (void) root_node;
 }
 
-ParserChapterInfo Parser::ParseChapter(const ParserIndexEntry &entry)
+ParserChapterInfo Parser::ParseChapter(const ParserIndexEntry &index_entry)
 {
-    (void) entry;
+    (void) index_entry;
     ParserChapterInfo info;
     return info;
 }

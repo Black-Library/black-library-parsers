@@ -155,7 +155,7 @@ bool ContainsString(const std::string &haystack, const std::string &needle);
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 
-std::string GetChapterFileName(const ParserIndexEntry &entry, const std::string &chapter_name);
+std::string GetChapterFileName(const ParserIndexEntry &index_entry, const std::string &chapter_name);
 std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);

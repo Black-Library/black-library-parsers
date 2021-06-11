@@ -208,7 +208,9 @@ int main(int argc, char* argv[])
         }
     );
 
-    parser->Parse(parser_job);
+    auto parser_result = parser->Parse(parser_job);
+
+    std::cout << "parser_result update_date: " << parser_result.metadata.update_date << std::endl;
 
     curl_global_cleanup();
 

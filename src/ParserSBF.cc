@@ -33,10 +33,10 @@ ParserSBF::~ParserSBF()
     done_ = true;
 }
 
-std::string ParserSBF::GetSBFChapterName(const std::string &chapter_name)
+std::string ParserSBF::GetSBFChapterName(const ParserIndexEntry &index_entry)
 {
     std::locale loc;
-    std::string rr_chapter_name = chapter_name;
+    std::string rr_chapter_name = index_entry.chapter_name;
 
     std::transform(rr_chapter_name.begin(), rr_chapter_name.end(), rr_chapter_name.begin(),
     [&loc](char ch)
@@ -67,6 +67,8 @@ ParserIndexEntry ParserSBF::ExtractIndexEntry(xmlNodePtr root_node)
 
     auto likes_result = GetXmlAttributeContentByName(root_node, "data-likes");
     auto author_result = GetXmlAttributeContentByName(root_node, "data-content-author");
+
+    // for SBF this gets the most recent for ALL threadmarks
     auto date_result = GetXmlAttributeContentByName(root_node, "data-content-date");
 
     if (likes_result.found)
@@ -201,11 +203,11 @@ void ParserSBF::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
+ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &index_entry)
 {
     ParserChapterInfo output;
-    std::string chapter_url = "https://" + source_url_ + entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << entry.chapter_name << std::endl;
+    std::string chapter_url = "https://" + source_url_ + index_entry.data_url;
+    std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << index_entry.chapter_name << std::endl;
 
     std::string chapter_result = CurlRequest(chapter_url);
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
@@ -216,7 +218,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
         return output;
     }
 
-    std::string target_id = GetTargetId(entry.data_url);
+    std::string target_id = GetTargetId(index_entry.data_url);
 
     xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
     xmlNodePtr current_node = root_node->children;
@@ -242,7 +244,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
 
     output.length = length;
 
-    std::string chapter_name = GetSBFChapterName(entry.chapter_name);
+    std::string chapter_name = GetSBFChapterName(index_entry);
 
     chapter_name = SanitizeFileName(chapter_name);
 
@@ -253,7 +255,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &entry)
         return output;
     }
 
-    std::string chapter_file_name = GetChapterFileName(entry, chapter_name);
+    std::string chapter_file_name = GetChapterFileName(index_entry, chapter_name);
 
     FILE* chapter_file;
     std::string file_name = local_des_ + chapter_file_name;

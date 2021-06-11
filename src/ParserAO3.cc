@@ -43,21 +43,21 @@ std::string ParserAO3::AppendTargetUrl(const std::string &job_url)
 
 void ParserAO3::FindChapterNodes(xmlNodePtr root_node)
 {
-    ParserIndexEntry entry;
+    ParserIndexEntry index_entry;
 
-    entry.data_url = target_url_;
-    entry.chapter_name = title_;
+    index_entry.data_url = target_url_;
+    index_entry.chapter_name = title_;
 
     ParserTimeResult time_result = GetPublishedTime(root_node);
 
     if (time_result.found)
     {
-        entry.time_published = time_result.time;
+        index_entry.time_published = time_result.time;
     }
 
-    entry.index_num = 0;
+    index_entry.index_num = 0;
 
-    index_entries_.emplace_back(entry);
+    index_entries_.emplace_back(index_entry);
 }
 
 void ParserAO3::FindMetaData(xmlNodePtr root_node)
@@ -85,10 +85,10 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &entry)
+ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
 {
     ParserChapterInfo output;
-    std::string url_adult = entry.data_url;
+    std::string url_adult = index_entry.data_url;
     std::string chapter_result = CurlRequest(url_adult);
 
     xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
@@ -136,7 +136,7 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &entry)
         }
     }
 
-    std::string chapter_file_name = GetChapterFileName(entry, title_);
+    std::string chapter_file_name = GetChapterFileName(index_entry, title_);
     FILE* chapter_file;
     std::string file_name = local_des_ + chapter_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
