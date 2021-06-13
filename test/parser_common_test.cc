@@ -1,7 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <ParserCommon.h>
 #include <SourceInformation.h>
+#include <StringOperations.h>
+
+#include <ParserCommon.h>
 
 namespace black_library {
 
@@ -10,6 +12,8 @@ namespace core {
 namespace parsers {
 
 static constexpr const char RR_DUMMY_URL[] = "https://www.royalroad.com/fiction/00000/some-fiction";
+
+namespace BlackLibraryCommon = black_library::core::common;
 
 bool ContainsUsingFind(const std::string &haystack, const std::string &needle)
 {
@@ -21,35 +25,35 @@ bool ContainsUsingFind(const std::string &haystack, const std::string &needle)
 
 TEST_CASE( "ContainsString generic tests (pass)", "[single-file]" )
 {
-    REQUIRE( ContainsString("haystack", "aystac") == true );
+    REQUIRE( BlackLibraryCommon::ContainsString("haystack", "aystac") == true );
     REQUIRE( ContainsUsingFind("haystack", "aystac") == true );
-    REQUIRE( ContainsString("haystack", "notneedle") == false );
+    REQUIRE( BlackLibraryCommon::ContainsString("haystack", "notneedle") == false );
     REQUIRE( ContainsUsingFind("haystack", "notneedle") == false );
-    REQUIRE( ContainsString("haystack", "") == true );
+    REQUIRE( BlackLibraryCommon::ContainsString("haystack", "") == true );
     REQUIRE( ContainsUsingFind("haystack", "") == true );
-    REQUIRE( ContainsString("", "aystac") == false );
+    REQUIRE( BlackLibraryCommon::ContainsString("", "aystac") == false );
     REQUIRE( ContainsUsingFind("", "aystac") == false );
 }
 
 TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" )
 {
-    REQUIRE( ContainsString( RR_DUMMY_URL, black_library::core::common::RR::source_url) == true );
-    REQUIRE( ContainsString( RR_DUMMY_URL, black_library::core::common::SBF::source_url) == false );
-    REQUIRE( ContainsString( black_library::core::common::RR::source_url, RR_DUMMY_URL) == false );
+    REQUIRE( BlackLibraryCommon::ContainsString( RR_DUMMY_URL, BlackLibraryCommon::RR::source_url) == true );
+    REQUIRE( BlackLibraryCommon::ContainsString( RR_DUMMY_URL, BlackLibraryCommon::SBF::source_url) == false );
+    REQUIRE( BlackLibraryCommon::ContainsString( BlackLibraryCommon::RR::source_url, RR_DUMMY_URL) == false );
 }
 
 TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
 {
-    REQUIRE( TrimWhitespace(" \t\r\n\0") == "" );
-    REQUIRE( TrimWhitespace(" \t\r\n\0\0\n\r\t ") == "" );
-    REQUIRE( TrimWhitespace(" a\t\rb\nc") == "a\t\rb\nc" );
-    REQUIRE( TrimWhitespace("a\t\rb\nc ") == "a\t\rb\nc" );
-    REQUIRE( TrimWhitespace("\t\t\ta\r") == "a" );
-    REQUIRE( TrimWhitespace(" a ") == "a" );
-    REQUIRE( TrimWhitespace("\ta\t") == "a" );
-    REQUIRE( TrimWhitespace("\ra\r") == "a" );
-    REQUIRE( TrimWhitespace("\na\n") == "a" );
-    REQUIRE( TrimWhitespace("") == "" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace(" \t\r\n\0") == "" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace(" \t\r\n\0\0\n\r\t ") == "" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace(" a\t\rb\nc") == "a\t\rb\nc" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace("a\t\rb\nc ") == "a\t\rb\nc" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace("\t\t\ta\r") == "a" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace(" a ") == "a" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace("\ta\t") == "a" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace("\ra\r") == "a" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace("\na\n") == "a" );
+    REQUIRE( BlackLibraryCommon::TrimWhitespace("") == "" );
 }
 
 } // namespace parsers

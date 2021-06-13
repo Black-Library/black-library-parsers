@@ -7,6 +7,7 @@
 #include <sstream>
 #include <thread>
 
+#include <FileOperations.h>
 #include <TimeOperations.h>
 
 #include <ParserRR.h>
@@ -19,13 +20,15 @@ namespace parsers {
 
 namespace RR {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 ParserRR::ParserRR() :
     Parser(parser_t::RR_PARSER)
 {
     title_ = "RR_Parser_title";
     nickname_ = "";
-    source_name_ = black_library::core::common::RR::source_name;
-    source_url_ = black_library::core::common::RR::source_url;
+    source_name_ = BlackLibraryCommon::RR::source_name;
+    source_url_ = BlackLibraryCommon::RR::source_url;
     author_ = "unknown-author";
 }
 
@@ -103,7 +106,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
         return index_entry;
     }
 
-    index_entry.time_published = black_library::core::common::ParseTimet(time_attr_seek.result, "%A, %B %d, %Y %I:%M %p");
+    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%A, %B %d, %Y %I:%M %p");
 
     return index_entry;
 }
@@ -224,7 +227,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
 
     std::string chapter_name = GetRRChapterName(index_entry);
 
-    chapter_name = SanitizeFileName(chapter_name);
+    chapter_name = BlackLibraryCommon::SanitizeFileName(chapter_name);
 
     if (chapter_name.empty())
     {

@@ -17,6 +17,8 @@ namespace core {
 
 namespace parsers {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const std::string &storage_dir, parser_t parser_type, size_t num_parsers) :
     pool_(num_parsers),
     job_queue_(),
@@ -130,21 +132,21 @@ int ParserWorker::RunOnce()
 
             parser->SetLocalFilePath(local_file_path);
 
-            if (!black_library::core::common::CheckFilePermission(storage_dir_))
+            if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
             {
                 ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access storage directory: " << storage_dir_ << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;
             }
 
-            if (!black_library::core::common::MakeDirectories(local_file_path))
+            if (!BlackLibraryCommon::MakeDirectories(local_file_path))
             {
                 ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could make local file path directory: " << local_file_path << std::endl;
                 job_result.debug_string = ss.str();
                 return job_result;
             }
 
-            if (!black_library::core::common::CheckFilePermission(local_file_path))
+            if (!BlackLibraryCommon::CheckFilePermission(local_file_path))
             {
                 ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access uuid directory: " << local_file_path << std::endl;
                 job_result.debug_string = ss.str();

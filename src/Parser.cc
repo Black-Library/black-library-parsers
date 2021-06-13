@@ -15,6 +15,8 @@ namespace core {
 
 namespace parsers {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 Parser::Parser(parser_t parser_type)
 {
     parser_type_ = parser_type;
@@ -32,7 +34,7 @@ Parser::Parser(parser_t parser_type)
 
     generator_ = std::mt19937_64(seed);
     distribution_ = std::uniform_int_distribution<int>(0, 2);
-    source_name_ = black_library::core::common::ERROR::source_name;
+    source_name_ = BlackLibraryCommon::ERROR::source_name;
     done_ = false;
 }
 
