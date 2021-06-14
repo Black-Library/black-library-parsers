@@ -16,13 +16,15 @@ namespace parsers {
 
 namespace AO3 {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 ParserAO3::ParserAO3() :
     Parser(parser_t::AO3_PARSER)
 {
     title_ = "AO3_Parser_title";
     nickname_ = "";
-    source_name_ = black_library::core::common::AO3::source_name;
-    source_url_ = black_library::core::common::AO3::source_url;
+    source_name_ = BlackLibraryCommon::AO3::source_name;
+    source_url_ = BlackLibraryCommon::AO3::source_url;
     author_ = "unknown-author";
 }
 
@@ -188,7 +190,7 @@ ParserTimeResult ParserAO3::GetPublishedTime(xmlNodePtr root_node)
         return result;
     }
 
-    result.time = black_library::core::common::ParseTimet("%F", p_result.result);
+    result.time = BlackLibraryCommon::ParseTimet("%F", p_result.result);
     result.found = true;
 
     return result;

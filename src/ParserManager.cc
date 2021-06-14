@@ -17,6 +17,8 @@ namespace core {
 
 namespace parsers {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 ParserManager::ParserManager(const std::string &storage_dir, const std::string &config) :
     worker_map_(),
     parser_factory_(std::make_shared<ParserFactory>()),
@@ -40,7 +42,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
     if (storage_dir_.back() == '/')
         storage_dir_.pop_back();
 
-    if (!black_library::core::common::CheckFilePermission(storage_dir_))
+    if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
     {
         std::cout << "Error: parser manager could not access storage directory" << std::endl;
         return;

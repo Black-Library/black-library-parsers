@@ -8,6 +8,8 @@
 #include <sstream>
 #include <thread>
 
+#include <FileOperations.h>
+
 #include <ParserSBF.h>
 
 namespace black_library {
@@ -18,13 +20,15 @@ namespace parsers {
 
 namespace SBF {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 ParserSBF::ParserSBF() :
     Parser(parser_t::SBF_PARSER)
 {
     title_ = "SBF_Parser_title";
     nickname_ = "";
-    source_name_ = black_library::core::common::SBF::source_name;
-    source_url_ = black_library::core::common::SBF::source_url;
+    source_name_ = BlackLibraryCommon::SBF::source_name;
+    source_url_ = BlackLibraryCommon::SBF::source_url;
     author_ = "unknown-author";
 }
 
@@ -255,7 +259,7 @@ ParserChapterInfo ParserSBF::ParseChapter(const ParserIndexEntry &index_entry)
 
     std::string chapter_name = GetSBFChapterName(index_entry);
 
-    chapter_name = SanitizeFileName(chapter_name);
+    chapter_name = BlackLibraryCommon::SanitizeFileName(chapter_name);
 
     if (chapter_name.empty())
     {

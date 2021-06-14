@@ -9,8 +9,9 @@
 
 #include <ParserManager.h>
 
-black_library::core::parsers::ParserManager *parser_manager;
+namespace BlackLibraryParsers = black_library::core::parsers;
 
+BlackLibraryParsers::ParserManager *parser_manager;
 
 struct options
 {
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    black_library::core::parsers::ParserManager manager(opts.path, "");
+    BlackLibraryParsers::ParserManager manager(opts.path, "");
 
     parser_manager = &manager;
 
@@ -102,7 +103,7 @@ int main(int argc, char* argv[])
         }
     );
     parser_manager->RegisterDatabaseStatusCallback(
-        [](black_library::core::parsers::ParserJobResult result)
+        [](BlackLibraryParsers::ParserJobResult result)
         {
             std::cout << "DatabaseStatusCallback: " << result.metadata.uuid << std::endl;
         }

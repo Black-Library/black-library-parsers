@@ -11,6 +11,8 @@ namespace parsers {
 
 static constexpr const char RR_DUMMY_URL[] = "https://www.royalroad.com/fiction/00000/some-fiction";
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 TEST_CASE( "Generic parser tests (pass)", "[single-file]" )
 {
     Parser parser;
@@ -22,7 +24,7 @@ TEST_CASE( "RR parser tests (pass)", "[single-file]" )
     RR::ParserRR parser;
     parser.SetLocalFilePath("foo");
     REQUIRE(parser.GetParserType() == parser_t::RR_PARSER);
-    REQUIRE(parser.GetSourceUrl() == black_library::core::common::RR::source_url);
+    REQUIRE(parser.GetSourceUrl() == BlackLibraryCommon::RR::source_url);
 }
 
 } // namespace parsers

@@ -9,9 +9,9 @@
 
 #include <ParserCommon.h>
 
-#include "ParserAO3.h"
-#include "ParserFFN.h"
-#include "ParserRR.h"
+#include <ParserAO3.h>
+#include <ParserFFN.h>
+#include <ParserRR.h>
 #include "ParserSBF.h"
 
 namespace black_library {

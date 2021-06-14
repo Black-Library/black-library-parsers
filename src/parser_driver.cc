@@ -23,14 +23,14 @@ static constexpr const char RR_LONG_URL[] = "https://www.royalroad.com/fiction/2
 static constexpr const char SBF_SHORT_URL[] = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
 static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/threads/intrepid-worm-au.337516/";
 
-namespace ParserCommon = black_library::core::parsers;
+namespace BlackLibraryParsers = black_library::core::parsers;
 
-using ParserJob = black_library::core::parsers::ParserJob;
+using ParserJob = BlackLibraryParsers::ParserJob;
 
-using Parser = black_library::core::parsers::Parser;
-using ParserAO3 = black_library::core::parsers::AO3::ParserAO3;
-using ParserRR = black_library::core::parsers::RR::ParserRR;
-using ParserSBF = black_library::core::parsers::SBF::ParserSBF;
+using Parser = BlackLibraryParsers::Parser;
+using ParserAO3 = BlackLibraryParsers::AO3::ParserAO3;
+using ParserRR = BlackLibraryParsers::RR::ParserRR;
+using ParserSBF = BlackLibraryParsers::SBF::ParserSBF;
 
 template <typename T>
 inline std::shared_ptr<Parser> ParserCast(T const &p)
@@ -40,7 +40,7 @@ inline std::shared_ptr<Parser> ParserCast(T const &p)
 
 struct options
 {
-    ParserCommon::parser_t source;
+    BlackLibraryParsers::parser_t source;
     size_t start_number = 1;
     size_t end_number = 0;
     uint8_t length;
@@ -106,15 +106,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
             case 's':
                 if (std::string(optarg) == "ao3")
                 {
-                    opts->source = ParserCommon::parser_t::AO3_PARSER;
+                    opts->source = BlackLibraryParsers::parser_t::AO3_PARSER;
                 }
                 else if (std::string(optarg) == "rr")
                 {
-                    opts->source = ParserCommon::parser_t::RR_PARSER;
+                    opts->source = BlackLibraryParsers::parser_t::RR_PARSER;
                 }
                 else if (std::string(optarg) == "sbf")
                 {
-                    opts->source = ParserCommon::parser_t::SBF_PARSER;
+                    opts->source = BlackLibraryParsers::parser_t::SBF_PARSER;
                 }
                 else
                 {
@@ -155,24 +155,24 @@ int main(int argc, char* argv[])
     }
 
     std::unordered_map<std::string, std::string> url_map;
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::RR_PARSER) + "0", std::string(RR_0_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::RR_PARSER) + "1", std::string(RR_SHORT_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::RR_PARSER) + "2", std::string(RR_LONG_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
-    url_map.emplace(ParserCommon::GetParserName(ParserCommon::parser_t::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "0", std::string(RR_0_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "1", std::string(RR_SHORT_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "2", std::string(RR_LONG_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
 
     std::shared_ptr<Parser> parser;
 
-    if (opts.source == ParserCommon::parser_t::AO3_PARSER)
+    if (opts.source == BlackLibraryParsers::parser_t::AO3_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserAO3>());
     }
-    else if (opts.source == ParserCommon::parser_t::RR_PARSER)
+    else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserRR>());
     }
-    else if (opts.source == ParserCommon::parser_t::SBF_PARSER)
+    else if (opts.source == BlackLibraryParsers::parser_t::SBF_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserSBF>());
     }
@@ -183,12 +183,12 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    auto iter = url_map.find(ParserCommon::GetParserName(parser->GetParserType()) + std::to_string(opts.length));
+    auto iter = url_map.find(BlackLibraryParsers::GetParserName(parser->GetParserType()) + std::to_string(opts.length));
 
     if (iter == url_map.end())
     {
         std::cout << "could not match url" << std::endl;
-        std::cout << ParserCommon::GetParserName(parser->GetParserType()) << std::endl;
+        std::cout << BlackLibraryParsers::GetParserName(parser->GetParserType()) << std::endl;
         Usage(argv[0]);
         exit(1);
     }

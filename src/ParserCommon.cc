@@ -9,8 +9,10 @@
 #include <cstdarg>
 #include <sstream>
 
-#include <ParserCommon.h>
 #include <SourceInformation.h>
+#include <StringOperations.h>
+
+#include <ParserCommon.h>
 
 namespace black_library {
 
@@ -20,17 +22,7 @@ namespace parsers {
 
 #define CHAPTER_FILENAME_BUFFER_SIZE 128
 
-// C++ wrapper around strstr()
-bool ContainsString(const std::string &haystack, const std::string &needle)
-{
-    // C-style compare is fastest
-    if (strstr(haystack.c_str(), needle.c_str()) == NULL)
-    {
-        return false;
-    }
-
-    return true;
-}
+namespace BlackLibraryCommon = black_library::core::common;
 
 // based on http://www.xmlsoft.org/examples/tree1.c
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node)
@@ -78,7 +70,7 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
             if (content != NULL)
             {
                 std::string unclean = std::string((char *)content);
-                content_string = TrimWhitespace(unclean);
+                content_string = BlackLibraryCommon::TrimWhitespace(unclean);
             }
             xmlFree(content);
             string_size = content_string.size();
@@ -140,19 +132,19 @@ parser_t GetParserTypeByUrl(const std::string &url)
 {
     parser_t rep = parser_t::ERROR_PARSER;
 
-    if (ContainsString(url, black_library::core::common::AO3::source_url))
+    if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::AO3::source_url))
     {
         rep = parser_t::AO3_PARSER;
     }
-    else if (ContainsString(url, black_library::core::common::FFN::source_url))
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::FFN::source_url))
     {
         rep = parser_t::FFN_PARSER;
     }
-    else if (ContainsString(url, black_library::core::common::SBF::source_url))
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::SBF::source_url))
     {
         rep = parser_t::SBF_PARSER;
     }
-    else if (ContainsString(url, black_library::core::common::RR::source_url))
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::RR::source_url))
     {
         rep = parser_t::RR_PARSER;
     }
@@ -249,7 +241,7 @@ ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node)
     }
 
     std::string unclean = std::string((char *)content);
-    content_result.result = TrimWhitespace(unclean);
+    content_result.result = BlackLibraryCommon::TrimWhitespace(unclean);
 
     xmlFree(content);
 
@@ -331,26 +323,6 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
     xmlFree(attribute);
 
     return found;
-}
-
-std::string SanitizeFileName(const std::string &file_name)
-{
-    std::string sanatized_file_name = file_name;
-    std::string unallowed = " /\\*?<>:;=[]!@|";
-
-    if (sanatized_file_name.front() == '-')
-    {
-        sanatized_file_name.erase(sanatized_file_name.begin());
-    }
-
-    std::transform(sanatized_file_name.begin(), sanatized_file_name.end(), sanatized_file_name.begin(),
-    [&unallowed](char ch)
-    {
-        return (std::find(unallowed.begin(), unallowed.end(), ch) != unallowed.end()) ? '-' : ch;
-    });
-
-
-    return sanatized_file_name;
 }
 
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name)
