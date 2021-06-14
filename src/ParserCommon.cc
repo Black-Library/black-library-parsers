@@ -402,91 +402,13 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
     return seek;
 }
 
-ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...)
+bool SeekToNodeByPatternHelper(xmlNodePtr root_node)
 {
-    ParserXmlNodeSeek result;
-
-    // SeekToNodeByPattern(node, 7, XML_NAME, "div", XML_ATTRIBUTE, "id", "main", XML_CONTENT, "stuff");
-    va_list valist;
-    va_start(valist, num);
-
-    auto checkNode = [valist, root_node, num]()
+    if(root_node->properties)
     {
-        int i;
-        for (i = 0; i < num - 1; i += 2)
-        {
-            switch (va_arg(valist, pattern_seek_t))
-            {
-                case pattern_seek_t::XML_NAME:
-                {
-
-                    if (xmlStrcmp(root_node->name, va_arg(valist, const xmlChar *)))
-                    {
-                        return false;
-                    }
-                    break;
-                }
-                case pattern_seek_t::XML_ATTRIBUTE:
-                {
-                    if (i + 2 >= num)
-                    {
-                        std::cout << "INVALID ARGUMENTS" << std::endl;
-                        break;
-                    }
-                    xmlAttr* prop = root_node->properties;
-                    while (prop)
-                    {
-                        if (xmlStrcmp(prop->name, va_arg(valist, const xmlChar *)) ||
-                            (xmlStrcmp(prop->children->content, va_arg(valist, const xmlChar *))))
-                        {
-                            if (!prop->next)
-                            {
-                                return false;
-                            }
-                        }
-
-                        prop = prop->next;
-                    }
-                    ++i;
-                    break;
-                }
-                case pattern_seek_t::XML_CONTENT:
-                {
-                    ParserXmlContentResult content_result = GetXmlNodeContent(root_node);
-                    if(xmlStrcmp((const xmlChar *) content_result.result.c_str(), va_arg(valist, const xmlChar *)))
-                    {
-                        return false;
-                    }
-                    break;
-                }
-            }
-        }
-
-        return true;
-    };
-
-    if (checkNode())
-    {
-        result.seek_node = root_node;
-        result.found = true;
-        return result;
+       return true;
     }
-
-    xmlNode* current_node = root_node->children;
-
-    while (current_node)
-    {
-        ParserXmlNodeSeek node_result = SeekToNodeByPattern(current_node, num, valist);
-
-        if (node_result.found)
-        {
-            return node_result;
-        }
-
-        current_node = current_node->next;
-    }
-    va_end(valist);
-    return result;
+    return true;
 }
 
 std::string TrimWhitespace(const std::string& target_string)
@@ -499,6 +421,39 @@ std::string TrimWhitespace(const std::string& target_string)
     }
 
     return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
+}
+
+std::string getXmlNodePrint(xmlNodePtr root_node)
+{
+    std::stringstream ss;
+    getXmlNodePrintHelper(root_node, ss, 0);
+    ss << "END PRINT" << std::endl;
+    return ss.str();
+}
+
+void getXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent)
+{
+    xmlNode *cur_node = NULL;
+    for (cur_node = root_node; cur_node; cur_node =
+        cur_node->next) {
+        if (cur_node->type == XML_ELEMENT_NODE) {
+            /*int i;
+            for(i = 0; i < indent; ++i) {
+                ss << " ";
+            }*/
+            ss << cur_node->name << std::endl;
+        }
+        getXmlNodePrintHelper(cur_node->children, ss, ++indent);
+    }
+}
+
+std::ostream& operator<<(std::ostream& out, const pattern_seek_t value){
+    static std::unordered_map<pattern_seek_t, std::string> strings;
+    strings.emplace(pattern_seek_t::XML_NAME, "XML_NAME");
+    strings.emplace(pattern_seek_t::XML_ATTRIBUTE, "XML_ATTRIBUTE");
+    strings.emplace(pattern_seek_t::XML_CONTENT, "XML_CONTENT");
+
+    return out << strings[value];
 }
 
 } // namespace parsers

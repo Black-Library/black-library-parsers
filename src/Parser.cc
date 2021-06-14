@@ -75,20 +75,9 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
-    ParserXmlNodeSeek head_seek = SeekToNodeByName(current_node, "head");
-
-    if (!head_seek.found)
-    {
-        std::cout << "Could not find head, exiting" << std::endl;
-        xmlFreeDoc(doc_tree);
-        return parser_result;
-    }
-
-    current_node = head_seek.seek_node;
-
     std::cout << GetParserName(parser_type_) << ": Find metadata" << std::endl;
 
-    FindMetaData(current_node->children);
+    FindMetaData(current_node);
 
     // reset current node ptr to root node children
     current_node = root_node->children;
@@ -192,7 +181,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
-            
+
                 if (remaining_attempts == 0 && progress_number_callback_)
                     progress_number_callback_(uuid_, index + 1, true);
             }
