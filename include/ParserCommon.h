@@ -180,36 +180,25 @@ void getXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int inde
 template<typename ... Args>
 ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, Args... args)
 {
-    //std::cout << "START" << std::endl;
-    //std::cout << getXmlNodePrint(root_node) << std::endl;
     ParserXmlNodeSeek result;
     if(!root_node) {
         return result;
     }
 
-    // SeekToNodeByPattern(node, 7, XML_NAME, "div", XML_ATTRIBUTE, "id", "main", XML_CONTENT, "stuff");
-
     bool found = SeekToNodeByPatternHelper(root_node, args...);
-
-    //std::cout << "Result" << found << std::endl;
-
     if (found)
     {
         result.seek_node = root_node;
         result.found = true;
-        //std::cout << "FOUND" << std::endl;
         return result;
     }
 
-    //std::cout << "START RECURSIVE" << std::endl;
 
     xmlNode* current_node = root_node->children;
 
     while (current_node)
     {
-        //std::cout << "Child Start" << std::endl;
         ParserXmlNodeSeek node_result = SeekToNodeByPattern(current_node, args...);
-        //std::cout << "Child End" << node_result.found << std::endl;
 
         if (node_result.found)
         {
@@ -221,9 +210,7 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, Args... args)
 
     if (root_node->next)
     {
-        //std::cout << "Next Start" << std::endl;
         ParserXmlNodeSeek node_result = SeekToNodeByPattern(root_node->next, args...);
-        //std::cout << "Next End" << node_result.found << std::endl;
 
         if (node_result.found)
         {
@@ -231,7 +218,6 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, Args... args)
         }
     }
 
-    //std::cout << "END" << std::endl;
     return result;
 }
 
@@ -241,12 +227,10 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, std::string match);
 template<typename ... Args>
 bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std::string match, Args... args)
 {
-    //std::cout << "START HELPER 2" << std::endl;
     switch(pattern)
     {
         case pattern_seek_t::XML_NAME:
         {
-            //std::cout << "CHECK NAME " << match << std::endl;
             if (xmlStrcmp(root_node->name, (const xmlChar *) match.c_str()))
             {
                 return false;
@@ -255,7 +239,6 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std
         }
         case pattern_seek_t::XML_CONTENT:
         {
-            //std::cout << "CHECK CONTENT" << match << std::endl;
             ParserXmlContentResult content_result = GetXmlNodeContent(root_node);
             if(xmlStrcmp((const xmlChar *) content_result.result.c_str(), (const xmlChar *) match.c_str()))
             {
@@ -265,13 +248,10 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std
         }
         case pattern_seek_t::XML_ATTRIBUTE:
         {
-            //std::cout << "CHECK ATTR" << search << std::endl;
-            //std::cout << "CHECK VALUE" << match << std::endl;
             // Split the string
             std::string attribute = match;
             std::string attr = attribute.substr(0, attribute.find('='));
             std::string value = attribute.substr(attribute.find('=') + 1);
-            //std::cout << attr << ":" << value << std::endl;
 
             bool found = false;
             xmlAttr* prop = root_node->properties;
