@@ -16,7 +16,7 @@ BlackLibraryParsers::ParserManager *parser_manager;
 struct options
 {
     std::string path = "";
-    bool intialize_db = false;
+    bool initialize_db = false;
 };
 
 static void Usage(const char *prog)
