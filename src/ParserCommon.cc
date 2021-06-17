@@ -395,15 +395,15 @@ std::string TrimWhitespace(const std::string& target_string)
     return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
 }
 
-std::string getXmlNodePrint(xmlNodePtr root_node)
+std::string GetXmlNodePrint(xmlNodePtr root_node)
 {
     std::stringstream ss;
-    getXmlNodePrintHelper(root_node, ss, 0);
+    GetXmlNodePrintHelper(root_node, ss, 0);
     ss << "END PRINT" << std::endl;
     return ss.str();
 }
 
-void getXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent)
+void GetXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent)
 {
     xmlNode *cur_node = NULL;
     for (cur_node = root_node; cur_node; cur_node =
@@ -415,7 +415,7 @@ void getXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int inde
             }*/
             ss << cur_node->name << std::endl;
         }
-        getXmlNodePrintHelper(cur_node->children, ss, ++indent);
+        GetXmlNodePrintHelper(cur_node->children, ss, ++indent);
     }
 }
 

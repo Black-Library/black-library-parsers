@@ -174,8 +174,8 @@ ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name
 ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::string &name);
 
 std::string TrimWhitespace(const std::string &target_string);
-std::string getXmlNodePrint(xmlNodePtr root_node);
-void getXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent);
+std::string GetXmlNodePrint(xmlNodePtr root_node);
+void GetXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent);
 
 template<typename ... Args>
 ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, Args... args)

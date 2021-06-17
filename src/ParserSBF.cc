@@ -181,7 +181,7 @@ void ParserSBF::FindMetaData(xmlNodePtr root_node)
 
     if (!head_seek.found)
     {
-        std::cout << "Could not find head, exiting" << std::endl;
+        std::cout << "Warning, could not get metadata" << std::endl;
         return;
     }
     root_node = head_seek.seek_node;
