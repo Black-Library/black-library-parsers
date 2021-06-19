@@ -152,6 +152,12 @@ int main(int argc, char* argv[])
         job_1.url = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
         job_2.url = "https://forums.spacebattles.com/threads/commander-pa-multicross-si.309838/";
     }
+    else if (opts.source == BlackLibraryParsers::parser_t::SVF_PARSER)
+    {
+        job_0.url = "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/";
+        job_1.url = "https://forums.sufficientvelocity.com/threads/zero-summing-foz-skyrim.19118/";
+        job_2.url = "https://forums.sufficientvelocity.com/threads/in-nuclear-fire.67755/";
+    }
     else
     {
         std::cout << "could not match parser source" << std::endl;

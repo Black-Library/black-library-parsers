@@ -53,6 +53,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
     AddWorker(parser_t::AO3_PARSER, 3);
     AddWorker(parser_t::RR_PARSER, 3);
     AddWorker(parser_t::SBF_PARSER, 3);
+    AddWorker(parser_t::SVF_PARSER, 3);
 
     for (auto & worker : worker_map_)
     {

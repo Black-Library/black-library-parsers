@@ -111,11 +111,14 @@ std::string GetParserName(parser_t rep)
     case parser_t::FFN_PARSER:
         return "FFN_PARSER";
         break;
+    case parser_t::RR_PARSER:
+        return "RR_PARSER";
+        break;
     case parser_t::SBF_PARSER:
         return "SBF_PARSER";
         break;
-    case parser_t::RR_PARSER:
-        return "RR_PARSER";
+    case parser_t::SVF_PARSER:
+        return "SVF_PARSER";
         break;
     case parser_t::_NUM_PARSERS_TYPE:
         return "_NUM_PARSERS_TYPE";
