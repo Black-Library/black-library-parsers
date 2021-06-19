@@ -380,30 +380,6 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node)
     return true;
 }
 
-std::string GetXmlNodePrint(xmlNodePtr root_node)
-{
-    std::stringstream ss;
-    GetXmlNodePrintHelper(root_node, ss, 0);
-    ss << "END PRINT" << std::endl;
-    return ss.str();
-}
-
-void GetXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent)
-{
-    xmlNode *cur_node = NULL;
-    for (cur_node = root_node; cur_node; cur_node =
-        cur_node->next) {
-        if (cur_node->type == XML_ELEMENT_NODE) {
-            /*int i;
-            for(i = 0; i < indent; ++i) {
-                ss << " ";
-            }*/
-            ss << cur_node->name << std::endl;
-        }
-        GetXmlNodePrintHelper(cur_node->children, ss, ++indent);
-    }
-}
-
 std::ostream& operator<<(std::ostream& out, const pattern_seek_t value){
     static std::unordered_map<pattern_seek_t, std::string> strings;
     strings.emplace(pattern_seek_t::XML_NAME, "XML_NAME");
