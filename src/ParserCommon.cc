@@ -377,91 +377,19 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
     return seek;
 }
 
-ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, int num, ...)
+bool SeekToNodeByPatternHelper(xmlNodePtr root_node)
 {
-    ParserXmlNodeSeek result;
+    (void) root_node;
+    return true;
+}
 
-    // SeekToNodeByPattern(node, 7, XML_NAME, "div", XML_ATTRIBUTE, "id", "main", XML_CONTENT, "stuff");
-    va_list valist;
-    va_start(valist, num);
+std::ostream& operator<<(std::ostream& out, const pattern_seek_t value){
+    static std::unordered_map<pattern_seek_t, std::string> strings;
+    strings.emplace(pattern_seek_t::XML_NAME, "XML_NAME");
+    strings.emplace(pattern_seek_t::XML_ATTRIBUTE, "XML_ATTRIBUTE");
+    strings.emplace(pattern_seek_t::XML_CONTENT, "XML_CONTENT");
 
-    auto checkNode = [valist, root_node, num]()
-    {
-        int i;
-        for (i = 0; i < num - 1; i += 2)
-        {
-            switch (va_arg(valist, pattern_seek_t))
-            {
-                case pattern_seek_t::XML_NAME:
-                {
-
-                    if (xmlStrcmp(root_node->name, va_arg(valist, const xmlChar *)))
-                    {
-                        return false;
-                    }
-                    break;
-                }
-                case pattern_seek_t::XML_ATTRIBUTE:
-                {
-                    if (i + 2 >= num)
-                    {
-                        std::cout << "INVALID ARGUMENTS" << std::endl;
-                        break;
-                    }
-                    xmlAttr* prop = root_node->properties;
-                    while (prop)
-                    {
-                        if (xmlStrcmp(prop->name, va_arg(valist, const xmlChar *)) ||
-                            (xmlStrcmp(prop->children->content, va_arg(valist, const xmlChar *))))
-                        {
-                            if (!prop->next)
-                            {
-                                return false;
-                            }
-                        }
-
-                        prop = prop->next;
-                    }
-                    ++i;
-                    break;
-                }
-                case pattern_seek_t::XML_CONTENT:
-                {
-                    ParserXmlContentResult content_result = GetXmlNodeContent(root_node);
-                    if(xmlStrcmp((const xmlChar *) content_result.result.c_str(), va_arg(valist, const xmlChar *)))
-                    {
-                        return false;
-                    }
-                    break;
-                }
-            }
-        }
-
-        return true;
-    };
-
-    if (checkNode())
-    {
-        result.seek_node = root_node;
-        result.found = true;
-        return result;
-    }
-
-    xmlNode* current_node = root_node->children;
-
-    while (current_node)
-    {
-        ParserXmlNodeSeek node_result = SeekToNodeByPattern(current_node, num, valist);
-
-        if (node_result.found)
-        {
-            return node_result;
-        }
-
-        current_node = current_node->next;
-    }
-    va_end(valist);
-    return result;
+    return out << strings[value];
 }
 
 } // namespace parsers

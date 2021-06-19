@@ -148,6 +148,15 @@ void ParserRR::FindChapterNodes(xmlNodePtr root_node)
 
 void ParserRR::FindMetaData(xmlNodePtr root_node)
 {
+    ParserXmlNodeSeek head_seek = SeekToNodeByName(root_node, "head");
+
+    if (!head_seek.found)
+    {
+        std::cout << "Warning, could not get metadata" << std::endl;
+        return;
+    }
+    root_node = head_seek.seek_node;
+
     xmlNodePtr current_node = NULL;
 
     for (current_node = root_node; current_node; current_node = current_node->next)
