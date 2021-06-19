@@ -177,7 +177,8 @@ template<typename ... Args>
 ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, Args... args)
 {
     ParserXmlNodeSeek result;
-    if(!root_node) {
+    if (!root_node)
+    {
         return result;
     }
 
@@ -223,7 +224,7 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, std::string match);
 template<typename ... Args>
 bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std::string match, Args... args)
 {
-    switch(pattern)
+    switch (pattern)
     {
         case pattern_seek_t::XML_NAME:
         {
@@ -236,7 +237,7 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std
         case pattern_seek_t::XML_CONTENT:
         {
             ParserXmlContentResult content_result = GetXmlNodeContent(root_node);
-            if(xmlStrcmp((const xmlChar *) content_result.result.c_str(), (const xmlChar *) match.c_str()))
+            if (xmlStrcmp((const xmlChar *) content_result.result.c_str(), (const xmlChar *) match.c_str()))
             {
                 return false;
             }
@@ -262,7 +263,8 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std
 
                 prop = prop->next;
             }
-            if(!found) {
+            if (!found)
+            {
                 return false;
             }
             break;
