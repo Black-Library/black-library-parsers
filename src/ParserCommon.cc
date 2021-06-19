@@ -376,10 +376,7 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
 
 bool SeekToNodeByPatternHelper(xmlNodePtr root_node)
 {
-    if(root_node->properties)
-    {
-       return true;
-    }
+    (void) root_node;
     return true;
 }
 
