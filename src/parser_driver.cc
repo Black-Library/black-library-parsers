@@ -15,6 +15,7 @@
 #include <ParserAO3.h>
 #include <ParserRR.h>
 #include <ParserSBF.h>
+#include <ParserSVF.h>
 
 static constexpr const char AO3_SHORT_URL[] = "https://archiveofourown.org/works/505809";
 static constexpr const char RR_0_URL[] = "https://www.royalroad.com/fiction/15614/daedalus";
@@ -22,6 +23,7 @@ static constexpr const char RR_SHORT_URL[] = "https://www.royalroad.com/fiction/
 static constexpr const char RR_LONG_URL[] = "https://www.royalroad.com/fiction/21220/mother-of-learning";
 static constexpr const char SBF_SHORT_URL[] = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
 static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/threads/intrepid-worm-au.337516/";
+static constexpr const char SVF_LONG_URL[] = "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/";
 
 namespace BlackLibraryParsers = black_library::core::parsers;
 
@@ -31,6 +33,7 @@ using Parser = BlackLibraryParsers::Parser;
 using ParserAO3 = BlackLibraryParsers::AO3::ParserAO3;
 using ParserRR = BlackLibraryParsers::RR::ParserRR;
 using ParserSBF = BlackLibraryParsers::SBF::ParserSBF;
+using ParserSVF = BlackLibraryParsers::SVF::ParserSVF;
 
 template <typename T>
 inline std::shared_ptr<Parser> ParserCast(T const &p)
@@ -116,6 +119,10 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 {
                     opts->source = BlackLibraryParsers::parser_t::SBF_PARSER;
                 }
+                else if (std::string(optarg) == "svf")
+                {
+                    opts->source = BlackLibraryParsers::parser_t::SVF_PARSER;
+                }
                 else
                 {
                     std::cout << "Could not match source" << std::endl;
@@ -161,6 +168,7 @@ int main(int argc, char* argv[])
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "2", std::string(RR_LONG_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SVF_PARSER) + "2", std::string(SVF_LONG_URL));
 
     std::shared_ptr<Parser> parser;
 
@@ -175,6 +183,10 @@ int main(int argc, char* argv[])
     else if (opts.source == BlackLibraryParsers::parser_t::SBF_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserSBF>());
+    }
+    else if (opts.source == BlackLibraryParsers::parser_t::SVF_PARSER)
+    {
+        parser = ParserCast(std::make_shared<ParserSVF>());
     }
     else
     {

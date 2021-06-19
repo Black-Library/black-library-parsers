@@ -33,8 +33,9 @@ enum class parser_t {
     ERROR_PARSER,
     AO3_PARSER,
     FFN_PARSER,
-    SBF_PARSER,
     RR_PARSER,
+    SBF_PARSER,
+    SVF_PARSER,
 
     _NUM_PARSERS_TYPE
 };

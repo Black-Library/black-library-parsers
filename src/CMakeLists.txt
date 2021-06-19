@@ -16,6 +16,7 @@ add_library(blacklibraryparsers
     # ParserFFN.cc
     ParserRR.cc
     ParserSBF.cc
+    ParserSVF.cc
     )
 
 target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
