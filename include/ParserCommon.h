@@ -173,7 +173,6 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
 ParserXmlNodeSeek SeekToNodeByName(xmlNodePtr root_node, const std::string &name);
 ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::string &name);
 
-std::string TrimWhitespace(const std::string &target_string);
 std::string GetXmlNodePrint(xmlNodePtr root_node);
 void GetXmlNodePrintHelper(xmlNodePtr root_node, std::stringstream& ss, int indent);
 

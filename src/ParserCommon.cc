@@ -383,18 +383,6 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node)
     return true;
 }
 
-std::string TrimWhitespace(const std::string& target_string)
-{
-    auto leading_pos = target_string.find_first_not_of(" \t\r\n\0");
-    auto trailing_pos = target_string.find_last_not_of(" \t\r\n\0");
-    if (leading_pos == std::string::npos && trailing_pos == std::string::npos)
-    {
-        return "";
-    }
-
-    return target_string.substr(leading_pos, trailing_pos - leading_pos + 1);
-}
-
 std::string GetXmlNodePrint(xmlNodePtr root_node)
 {
     std::stringstream ss;
