@@ -34,6 +34,7 @@ Parser::Parser(parser_t parser_type)
 
     generator_ = std::mt19937_64(seed);
     distribution_ = std::uniform_int_distribution<int>(0, 2);
+    nickname_ = "";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     done_ = false;
 }

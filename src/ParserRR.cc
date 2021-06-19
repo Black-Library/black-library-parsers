@@ -26,7 +26,6 @@ ParserRR::ParserRR() :
     Parser(parser_t::RR_PARSER)
 {
     title_ = "RR_Parser_title";
-    nickname_ = "";
     source_name_ = BlackLibraryCommon::RR::source_name;
     source_url_ = BlackLibraryCommon::RR::source_url;
     author_ = "unknown-author";

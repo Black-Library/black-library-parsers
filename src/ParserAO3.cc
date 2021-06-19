@@ -22,7 +22,6 @@ ParserAO3::ParserAO3() :
     Parser(parser_t::AO3_PARSER)
 {
     title_ = "AO3_Parser_title";
-    nickname_ = "";
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
     author_ = "unknown-author";

@@ -26,7 +26,6 @@ ParserSBF::ParserSBF() :
     Parser(parser_t::SBF_PARSER)
 {
     title_ = "SBF_Parser_title";
-    nickname_ = "";
     source_name_ = BlackLibraryCommon::SBF::source_name;
     source_url_ = BlackLibraryCommon::SBF::source_url;
     author_ = "unknown-author";
@@ -40,15 +39,15 @@ ParserSBF::~ParserSBF()
 std::string ParserSBF::GetSBFChapterName(const ParserIndexEntry &index_entry)
 {
     std::locale loc;
-    std::string rr_chapter_name = index_entry.chapter_name;
+    std::string sbf_chapter_name = index_entry.chapter_name;
 
-    std::transform(rr_chapter_name.begin(), rr_chapter_name.end(), rr_chapter_name.begin(),
+    std::transform(sbf_chapter_name.begin(), sbf_chapter_name.end(), sbf_chapter_name.begin(),
     [&loc](char ch)
     {
         return ch == ' ' ? '-' : std::tolower(ch, loc);
     });
 
-    return rr_chapter_name;
+    return sbf_chapter_name;
 }
 
 std::string ParserSBF::GetTargetId(const std::string &data_url)
