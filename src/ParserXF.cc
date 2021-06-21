@@ -176,9 +176,17 @@ void ParserXF::FindChapterNodes(xmlNodePtr root_node)
 
 void ParserXF::FindMetaData(xmlNodePtr root_node)
 {
+    ParserXmlNodeSeek head_seek = SeekToNodeByName(root_node, "head");
+
+    if (!head_seek.found)
+    {
+        std::cout << "Warning: Could not get metadata from: " << uuid_ << std::endl;
+        return;
+    }
+
     xmlNodePtr current_node = NULL;
 
-    for (current_node = root_node; current_node; current_node = current_node->next)
+    for (current_node = head_seek.seek_node->children; current_node; current_node = current_node->next)
     {
         if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
         {

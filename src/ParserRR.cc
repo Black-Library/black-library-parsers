@@ -152,14 +152,15 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
 
     if (!head_seek.found)
     {
-        std::cout << "Warning, could not get metadata" << std::endl;
+        std::cout << "Warning: Could not get metadata from: " << uuid_ << std::endl;
         return;
     }
-    root_node = head_seek.seek_node;
+
+    std::cout << GenerateXmlDocTreeString(head_seek.seek_node->children) << std::endl;
 
     xmlNodePtr current_node = NULL;
 
-    for (current_node = root_node; current_node; current_node = current_node->next)
+    for (current_node = head_seek.seek_node->children; current_node; current_node = current_node->next)
     {
         if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
         {
