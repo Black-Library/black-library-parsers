@@ -63,8 +63,8 @@ void ParserAO3::FindChapterNodes(xmlNodePtr root_node)
 
 void ParserAO3::FindMetaData(xmlNodePtr root_node)
 {
-    ParserXmlNodeSeek title_result = SeekToNodeByPattern(root_node, 5, pattern_seek_t::XML_NAME, "h2",
-        pattern_seek_t::XML_ATTRIBUTE, "class", "title heading");
+    ParserXmlNodeSeek title_result = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "h2",
+        pattern_seek_t::XML_ATTRIBUTE, "class=title heading");
     if (title_result.found)
     {
         ParserXmlContentResult t_result = GetXmlNodeContent(title_result.seek_node);
@@ -74,8 +74,8 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
         }
     }
 
-    ParserXmlNodeSeek author_result = SeekToNodeByPattern(root_node, 5, pattern_seek_t::XML_NAME, "a",
-        pattern_seek_t::XML_ATTRIBUTE, "rel", "author");
+    ParserXmlNodeSeek author_result = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "a",
+        pattern_seek_t::XML_ATTRIBUTE, "rel=author");
     if (author_result.found)
     {
         ParserXmlContentResult a_result = GetXmlNodeContent(author_result.seek_node);
@@ -109,7 +109,7 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
         next = next->next;
     }
 
-    ParserXmlNodeSeek workskin_result = SeekToNodeByPattern(next, 3, pattern_seek_t::XML_ATTRIBUTE, "id", "workskin");
+    ParserXmlNodeSeek workskin_result = SeekToNodeByPattern(next, pattern_seek_t::XML_ATTRIBUTE, "id=workskin");
 
     if (!workskin_result.found)
     {
@@ -121,8 +121,8 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
     xmlNodePtr workskin = workskin_result.seek_node;
     xmlDocSetRootElement(chapter_doc_tree, workskin);
 
-    ParserXmlNodeSeek words_result = SeekToNodeByPattern(root_node, 5,
-        pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class", "words");
+    ParserXmlNodeSeek words_result = SeekToNodeByPattern(root_node,
+        pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class=words");
     if (!words_result.found)
     {
         std::cout << "Error: " << GetParserName(parser_type_) << " could not get length" << std::endl;
@@ -133,7 +133,7 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
         if (w_result.found && strcmp(w_result.result.c_str(), ""))
         {
             std::cout << w_result.result << std::endl;
-            output.length = (size_t) std::stoi(w_result.result);
+            output.length = (size_t) std::stoi(w_result.result) / 1000;
         }
     }
 
@@ -169,15 +169,15 @@ ParserTimeResult ParserAO3::GetPublishedTime(xmlNodePtr root_node)
         return result;
     }
 
-    ParserXmlNodeSeek stats_result = SeekToNodeByPattern(meta_result.seek_node, 5,
-        pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class", "stats");
+    ParserXmlNodeSeek stats_result = SeekToNodeByPattern(meta_result.seek_node,
+        pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class=stats");
     if (!stats_result.found)
     {
         return result;
     }
 
-    ParserXmlNodeSeek published_result = SeekToNodeByPattern(stats_result.seek_node, 5,
-        pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class", "published");
+    ParserXmlNodeSeek published_result = SeekToNodeByPattern(stats_result.seek_node,
+        pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class=published");
     if (!published_result.found)
     {
         return result;

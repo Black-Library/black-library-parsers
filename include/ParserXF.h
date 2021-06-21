@@ -1,5 +1,7 @@
 /**
  * ParserXF.h
+ *
+ * XenForo forum parser
  */
 
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_XF_PARSER_XF_H__
