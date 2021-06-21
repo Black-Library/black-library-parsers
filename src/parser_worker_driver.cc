@@ -115,14 +115,14 @@ int main(int argc, char* argv[])
 
     auto factory = std::make_shared<BlackLibraryParsers::ParserFactory>();
 
-    dummy_worker dummy_worker_0(factory, "/mnt/store", BlackLibraryParsers::parser_t::ERROR_PARSER, 3);
+    dummy_worker dummy_worker_0(factory, "/mnt/black-library/store", BlackLibraryParsers::parser_t::ERROR_PARSER, 3);
 
     if (opts.source == BlackLibraryParsers::parser_t::ERROR_PARSER)
     {
         std::cout << "could not match parser source" << std::endl;
     }
 
-    dummy_worker dummy_worker_1(factory, "/mnt/store", opts.source, 2);
+    dummy_worker dummy_worker_1(factory, "/mnt/black-library/store", opts.source, 2);
 
     parser_worker = &dummy_worker_1;
 
