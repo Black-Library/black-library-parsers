@@ -1,16 +1,16 @@
 /**
- * ParserRR.cc
+ * ParserXF.cc
  */
 
 #include <chrono>
 #include <iostream>
+#include <locale>
 #include <sstream>
 #include <thread>
 
 #include <FileOperations.h>
-#include <TimeOperations.h>
 
-#include <ParserRR.h>
+#include <ParserXF.h>
 
 namespace black_library {
 
@@ -18,58 +18,99 @@ namespace core {
 
 namespace parsers {
 
-namespace RR {
+namespace XF {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserRR::ParserRR() :
-    Parser(parser_t::RR_PARSER)
+ParserXF::ParserXF(parser_t parser_type) :
+    Parser(parser_type)
 {
-    title_ = "RR_parser_title";
-    source_name_ = BlackLibraryCommon::RR::source_name;
-    source_url_ = BlackLibraryCommon::RR::source_url;
+    title_ = "XF_parser_title";
+    source_name_ = BlackLibraryCommon::ERROR::source_name;
+    source_url_ = BlackLibraryCommon::ERROR::source_url;
     author_ = "unknown-author";
 }
 
-ParserRR::~ParserRR()
+ParserXF::~ParserXF()
 {
     done_ = true;
 }
 
-std::string ParserRR::GetRRChapterName(const ParserIndexEntry &index_entry)
+std::string ParserXF::GetXFChapterName(const ParserIndexEntry &index_entry)
 {
-    auto pos = index_entry.data_url.find_last_of("/");
+    std::locale loc;
+    std::string sbf_chapter_name = index_entry.chapter_name;
 
-    return index_entry.data_url.substr(pos + 1);
+    std::transform(sbf_chapter_name.begin(), sbf_chapter_name.end(), sbf_chapter_name.begin(),
+    [&loc](char ch)
+    {
+        return ch == ' ' ? '-' : std::tolower(ch, loc);
+    });
+
+    return sbf_chapter_name;
 }
 
-ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
+std::string ParserXF::GetTargetId(const std::string &data_url)
+{
+    auto pos = data_url.find_last_of("-");
+
+    return data_url.substr(pos + 1);
+}
+
+std::string ParserXF::AppendTargetUrl(const std::string &job_url)
+{
+    return job_url + "threadmarks";
+}
+
+// TODO: Extract index entry may fail, use std::optional to check
+ParserIndexEntry ParserXF::ExtractIndexEntry(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
     ParserIndexEntry index_entry;
 
-    auto td_seek = SeekToNodeByName(root_node->children, "td");
+    auto likes_result = GetXmlAttributeContentByName(root_node, "data-likes");
+    auto author_result = GetXmlAttributeContentByName(root_node, "data-content-author");
 
-    if (!td_seek.found)
+    // for XF this gets the most recent for ALL threadmarks
+    auto date_result = GetXmlAttributeContentByName(root_node, "data-content-date");
+
+    if (likes_result.found)
+        // TODO: track/store the likes/popularity
+        // std::cout << likes_result.result << std::endl;
+
+    if (author_result.found)
+        author_ = author_result.result;
+
+    if (date_result.found)
+        index_entry.time_published = std::stol(date_result.result);
+
+    for (current_node = root_node->children; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
+        {
+            if (NodeHasAttributeContent(current_node, "structItem-cell structItem-cell--main"))
+            {
+                break;
+            }
+        }
+    }
+
+    if (current_node == NULL)
     {
         return index_entry;
     }
 
-    current_node = td_seek.seek_node;
+    auto url_seek = SeekToNodeByNameRecursive(current_node->children, "a");
 
-    auto a_seek = SeekToNodeByName(current_node->children, "a");
-
-    if (!a_seek.found)
+    if (!url_seek.found)
     {
         return index_entry;
     }
 
-    current_node = a_seek.seek_node;
-
-    if (!NodeHasAttribute(current_node, "href"))
-    {
-        return index_entry;
-    }
+    current_node = url_seek.seek_node;
 
     auto url_result = GetXmlAttributeContentByName(current_node, "href");
 
@@ -91,34 +132,21 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     index_entry.chapter_name = chapter_name_result.result;
 
-    auto time_seek = SeekToNodeByNameRecursive(root_node, "time");
-
-    if (!time_seek.found)
-    {
-        return index_entry;
-    }
-
-    auto time_attr_seek = GetXmlAttributeContentByName(time_seek.seek_node, "title");
-
-    if (!time_attr_seek.found)
-    {
-        return index_entry;
-    }
-
-    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%A, %B %d, %Y %I:%M %p");
-
     return index_entry;
 }
 
-void ParserRR::FindChapterNodes(xmlNodePtr root_node)
+void ParserXF::FindChapterNodes(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
     for (current_node = root_node; current_node; current_node = current_node->next)
     {
-        if (current_node->type == XML_ELEMENT_NODE)
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
         {
-            if (!xmlStrcmp(current_node->name, (const xmlChar *)"tbody"))
+            if (NodeHasAttributeContent(current_node, "structItemContainer"))
             {
                 xmlNodePtr index_node = NULL;
                 uint16_t index_num = 0;
@@ -146,7 +174,7 @@ void ParserRR::FindChapterNodes(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-void ParserRR::FindMetaData(xmlNodePtr root_node)
+void ParserXF::FindMetaData(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
@@ -159,16 +187,7 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
             if (!property_result.found)
                 continue;
 
-            if (property_result.result == "books:author")
-            {
-                auto author_result = GetXmlAttributeContentByName(current_node, "content");
-
-                if (!author_result.found)
-                    continue;
-
-                author_ = author_result.result;
-            }
-            else if (property_result.result == "og:url")
+            if (property_result.result == "og:url")
             {
                 auto title_result = GetXmlAttributeContentByName(current_node, "content");
 
@@ -176,8 +195,10 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
                     continue;
 
                 std::string unprocessed_title = title_result.result;
-                size_t found = unprocessed_title.find_last_of("/\\");
-                title_ = unprocessed_title.substr(found + 1, unprocessed_title.size());
+                size_t found_0 = unprocessed_title.find_last_of(".");
+                std::string removed_threadmarks = unprocessed_title.substr(0, found_0);
+                size_t found_1 = removed_threadmarks.find_last_of("/\\");
+                title_ = removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
             }
         }
     }
@@ -185,10 +206,10 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
+ParserChapterInfo ParserXF::ParseChapter(const ParserIndexEntry &index_entry)
 {
     ParserChapterInfo output;
-    std::string chapter_url = "https://www." + source_url_ + index_entry.data_url;
+    std::string chapter_url = "https://" + source_url_ + index_entry.data_url;
     std::cout << GetParserName(parser_type_) << " ParseChapter: " << chapter_url << " - " << index_entry.chapter_name << std::endl;
 
     std::string chapter_result = CurlRequest(chapter_url);
@@ -200,12 +221,14 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
         return output;
     }
 
+    std::string target_id = GetTargetId(index_entry.data_url);
+
     xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
     xmlNodePtr current_node = root_node->children;
     xmlNodePtr length_node = NULL;
     size_t length = 0;
 
-    ParserXmlNodeSeek chapter_seek = SeekToChapterContent(current_node);
+    ParserXmlNodeSeek chapter_seek = SeekToChapterContent(current_node, target_id);
     if (!chapter_seek.found)
     {
         std::cout << "Error: Failed seek" << std::endl;
@@ -224,7 +247,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
 
     output.length = length;
 
-    std::string chapter_name = GetRRChapterName(index_entry);
+    std::string chapter_name = GetXFChapterName(index_entry);
 
     chapter_name = BlackLibraryCommon::SanitizeFileName(chapter_name);
 
@@ -250,6 +273,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
     }
 
     xmlElemDump(chapter_file, chapter_doc_tree, current_node);
+    // TODO: figure out how to handle seg faults/other errors in threadpool/thread
     fclose(chapter_file);
 
     xmlFreeDoc(chapter_doc_tree);
@@ -259,7 +283,7 @@ ParserChapterInfo ParserRR::ParseChapter(const ParserIndexEntry &index_entry)
     return output;
 }
 
-ParserXmlNodeSeek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
+ParserXmlNodeSeek ParserXF::SeekToChapterContent(xmlNodePtr root_node, const std::string &target_id)
 {
     ParserXmlNodeSeek chapter_seek;
     xmlNodePtr current_node = NULL;
@@ -270,14 +294,26 @@ ParserXmlNodeSeek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
         if (current_node->type != XML_ELEMENT_NODE)
             continue;
 
-        if (NodeHasAttributeContent(current_node, "chapter-inner chapter-content"))
+        if (NodeHasAttribute(current_node, "data-lb-id"))
         {
-            chapter_seek.seek_node = current_node;
-            found = true;
-            break;
+            auto post_id = GetXmlAttributeContentByName(current_node, "data-lb-id");
+            if (!post_id.found)
+                continue;
+
+            // find by post_id
+            if (!post_id.result.compare("post-" + target_id))
+            {
+                auto inner_seek = SeekToNodeByNameRecursive(current_node->children, "div");
+                if (!inner_seek.found)
+                    continue;
+
+                chapter_seek.seek_node = inner_seek.seek_node;
+                found = true;
+                break;
+            }
         }
 
-        ParserXmlNodeSeek children_seek = SeekToChapterContent(current_node->children);
+        ParserXmlNodeSeek children_seek = SeekToChapterContent(current_node->children, target_id);
 
         if (children_seek.seek_node != NULL)
             chapter_seek.seek_node = children_seek.seek_node;
@@ -290,7 +326,7 @@ ParserXmlNodeSeek ParserRR::SeekToChapterContent(xmlNodePtr root_node)
     return chapter_seek;
 }
 
-} // namespace RR
+} // namespace XF
 } // namespace parsers
 } // namespace core
 } // namespace black_library

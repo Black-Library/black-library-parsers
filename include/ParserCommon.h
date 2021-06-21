@@ -36,6 +36,7 @@ enum class parser_t {
     RR_PARSER,
     SBF_PARSER,
     SVF_PARSER,
+    XF_PARSER,
 
     _NUM_PARSERS_TYPE
 };

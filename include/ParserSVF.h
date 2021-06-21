@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Parser.h"
+#include "ParserXF.h"
 
 namespace black_library {
 
@@ -17,22 +18,10 @@ namespace parsers {
 
 namespace SVF {
 
-class ParserSVF : public Parser
+class ParserSVF : public XF::ParserXF
 {
 public:
     explicit ParserSVF();
-    ~ParserSVF();
-
-protected:
-    std::string GetSVFChapterName(const ParserIndexEntry &index_entry);
-    std::string GetTargetId(const std::string &data_url);
-
-    std::string AppendTargetUrl(const std::string &job_url);
-    ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindChapterNodes(xmlNodePtr root_node);
-    void FindMetaData(xmlNodePtr root_node);
-    ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
-    ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node, const std::string &target_id);
 
 };
 

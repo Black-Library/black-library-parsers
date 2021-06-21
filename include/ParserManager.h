@@ -16,7 +16,7 @@
 
 #include "Parser.h"
 #include "ParserFactory.h"
-#include <ParserWorker.h>
+#include "ParserWorker.h"
 
 namespace black_library {
 

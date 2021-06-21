@@ -21,7 +21,7 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserAO3::ParserAO3() :
     Parser(parser_t::AO3_PARSER)
 {
-    title_ = "AO3_Parser_title";
+    title_ = "AO3_parser_title";
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
     author_ = "unknown-author";
