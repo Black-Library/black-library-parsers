@@ -344,9 +344,9 @@ size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
     std::string* str = (std::string*) data;
     char* sptr = (char*) ptr;
 
-    for(size_t x = 0; x < size * nmemb; x++)
+    for (size_t x = 0; x < size * nmemb; ++x)
     {
-      (*str) += sptr[x];
+        (*str) += sptr[x];
     }
 
     return size * nmemb;

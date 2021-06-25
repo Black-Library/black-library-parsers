@@ -156,8 +156,6 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
         return;
     }
 
-    std::cout << GenerateXmlDocTreeString(head_seek.seek_node->children) << std::endl;
-
     xmlNodePtr current_node = NULL;
 
     for (current_node = head_seek.seek_node->children; current_node; current_node = current_node->next)
