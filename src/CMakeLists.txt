@@ -18,6 +18,9 @@ add_library(blacklibraryparsers
     ParserSBF.cc
     ParserSVF.cc
     ParserXF.cc
+
+    ReaderTimeGenerator.cc
+    ShortTimeGenerator.cc
     )
 
 target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)

@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <Parser.h>
+#include <ShortTimeGenerator.h>
 
 namespace black_library {
 
@@ -19,29 +20,14 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 Parser::Parser(parser_t parser_type)
 {
-    parser_type_ = parser_type;
-
-    std::random_device rd;
-    std::mt19937_64::result_type seed = rd() ^ (
-            (std::mt19937_64::result_type)
-            std::chrono::duration_cast<std::chrono::seconds>(
-                std::chrono::system_clock::now().time_since_epoch()
-                ).count() +
-            (std::mt19937_64::result_type)
-            std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::high_resolution_clock::now().time_since_epoch()
-                ).count() );
-
-    generator_ = std::mt19937_64(seed);
-    distribution_ = std::uniform_int_distribution<int>(0, 2);
+    time_generator_ = std::make_shared<ShortTimeGenerator>();
     nickname_ = "";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
+    parser_type_ = parser_type;
     done_ = false;
 }
 
 Parser::Parser(const Parser &parser) :
-    generator_(parser.generator_),
-    distribution_(parser.distribution_),
     parser_type_(parser.parser_type_),
     done_(bool(parser.done_))
 {
@@ -58,6 +44,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     parser_result.metadata.url = parser_job.url;
     parser_result.metadata.uuid = parser_job.uuid;
     parser_result.metadata.media_path = local_des_;
+    parser_result.is_error_job = parser_job.is_error_job;
 
     target_url_ = AppendTargetUrl(parser_job.url);
 
@@ -177,7 +164,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
             ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
             --remaining_attempts;
 
-            wait_time = GenerateWaitTime(chapter_parse_info.length);
+            wait_time = time_generator_->GenerateWaitTime(chapter_parse_info.length);
             wait_time_total += wait_time;
 
             if (chapter_parse_info.has_error)
@@ -282,23 +269,6 @@ std::string Parser::GetSourceName()
 std::string Parser::GetSourceUrl()
 {
     return source_url_;
-}
-
-size_t Parser::GenerateWaitTime(size_t length)
-{
-    size_t wait_time = 0;
-
-    size_t loops = length;
-
-    if (length <= 20)
-        loops = 40;
-
-    for (size_t i = 0; i < loops; ++i)
-    {
-        wait_time += 3 + distribution_(generator_);
-    }
-
-    return wait_time;
 }
 
 int Parser::RegisterProgressNumberCallback(const progress_number_callback &callback)

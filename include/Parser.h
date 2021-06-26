@@ -6,12 +6,11 @@
 #define __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
 
 #include <string.h>
-#include <time.h>
 
 #include <atomic>
 #include <fstream>
+#include <memory>
 #include <mutex>
-#include <random>
 #include <string>
 
 #include <curl/curl.h>
@@ -21,6 +20,7 @@
 #include <SourceInformation.h>
 
 #include "ParserCommon.h"
+#include "ParserTimeGenerator.h"
 
 namespace black_library {
 
@@ -48,8 +48,6 @@ public:
     std::string GetSourceName();
     std::string GetSourceUrl();
 
-    size_t GenerateWaitTime(size_t length);
-
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 protected:
@@ -59,10 +57,8 @@ protected:
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
 
-    std::mt19937_64 generator_;
-    std::uniform_int_distribution<int> distribution_;
     std::vector<ParserIndexEntry> index_entries_;
-
+    std::shared_ptr<ParserTimeGenerator> time_generator_;
     progress_number_callback progress_number_callback_;
 
     std::string title_;
