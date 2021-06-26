@@ -50,10 +50,10 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
 
     std::cout << "Using storage dir: " << storage_dir_ << std::endl;
 
-    AddWorker(parser_t::AO3_PARSER, 3);
-    AddWorker(parser_t::RR_PARSER, 3);
-    AddWorker(parser_t::SBF_PARSER, 3);
-    AddWorker(parser_t::SVF_PARSER, 3);
+    AddWorker(parser_t::AO3_PARSER, 1);
+    AddWorker(parser_t::RR_PARSER, 1);
+    AddWorker(parser_t::SBF_PARSER, 1);
+    AddWorker(parser_t::SVF_PARSER, 1);
 
     for (auto & worker : worker_map_)
     {
@@ -67,7 +67,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
         worker.second->RegisterJobStatusCallback(
             [this](const ParserJob &parser_job, job_status_t job_status)
             {
-                if (!current_jobs_.find_and_replace(parser_job, job_status))
+                if (!current_jobs_.find_and_replace(std::make_pair(parser_job.uuid, parser_job.is_error_job), job_status))
                     std::cout << "Error: could not replace job status" << std::endl;
             }
         );
@@ -140,7 +140,7 @@ int ParserManager::RunOnce()
         }
 
         std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
-        current_jobs_.erase({job_result.metadata.uuid, job_result.metadata.url, job_result.start_number, job_result.end_number});
+        current_jobs_.erase(std::make_pair(job_result.metadata.uuid, job_result.is_error_job));
 
         if (job_result.has_error)
             std::cout << "\tParserManager: Error in job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
@@ -171,19 +171,26 @@ bool ParserManager::IsReady()
 
 int ParserManager::AddJob(const std::string &uuid, const std::string &url)
 {
-    AddJob(uuid, url, 1, 0);
+    AddJob(uuid, url, 1, 0, false);
 
     return 0;
 }
 
 int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number)
 {
-    AddJob(uuid, url, start_number, 0);
+    AddJob(uuid, url, start_number, 0, false);
 
     return 0;
 }
 
 int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number)
+{
+    AddJob(uuid, url, start_number, end_number, false);
+
+    return 0;
+}
+
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number, const error_job_rep &is_error_job)
 {
     ParserJob parser_job;
     
@@ -191,17 +198,18 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     parser_job.url = url;
     parser_job.start_number = start_number;
     parser_job.end_number = end_number;
+    parser_job.is_error_job = is_error_job;
 
     std::cout << "ParserManager adding job: " << parser_job << std::endl;
 
-    if (current_jobs_.count(parser_job))
+    if (current_jobs_.count(std::make_pair(parser_job.uuid, parser_job.is_error_job)))
     {
         std::cout << "ParserManager already working on job: " << parser_job << std::endl;
         return 0;
     }
     else
     {
-        current_jobs_.emplace(parser_job, job_status_t::JOB_MANAGER_QUEUED);
+        current_jobs_.emplace(std::make_pair(parser_job.uuid, parser_job.is_error_job), job_status_t::JOB_MANAGER_QUEUED);
     }
 
     job_queue_.push(parser_job);

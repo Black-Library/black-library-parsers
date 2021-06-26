@@ -62,11 +62,14 @@ struct ParserIndexEntry {
     size_t index_num;
 };
 
+typedef bool error_job_rep;
+
 struct ParserJob {
     std::string uuid;
     std::string url;
     size_t start_number = 1;
     size_t end_number = 0;
+    error_job_rep is_error_job = false;
 };
 
 struct ParserJobHash
@@ -77,8 +80,20 @@ struct ParserJobHash
         std::size_t h2 = std::hash<std::string>()(parser_job.url);
         std::size_t h3 = std::hash<size_t>()(parser_job.start_number);
         std::size_t h4 = std::hash<size_t>()(parser_job.end_number);
+        std::size_t h5 = std::hash<error_job_rep>()(parser_job.is_error_job);
 
-        return h1 ^ h2 ^ h3 ^ h4;
+        return h1 ^ h2 ^ h3 ^ h4 ^ h5;
+    }
+};
+
+struct CurrentJobPairHash
+{
+    std::size_t operator() (const std::pair<const std::string, error_job_rep> &pair) const
+    {
+        std::size_t h1 = std::hash<std::string>()(pair.first);
+        std::size_t h2 = std::hash<error_job_rep>()(pair.second);
+
+        return h1 ^ h2;
     }
 };
 
@@ -93,7 +108,8 @@ inline std::ostream& operator << (std::ostream &o, const ParserJob &parser_job)
     o << "uuid: " << parser_job.uuid << " ";
     o << "url: " << parser_job.url << " ";
     o << "start_number: " << parser_job.start_number << " ";
-    o << "end_number: " << parser_job.end_number;
+    o << "end_number: " << parser_job.end_number << " ";
+    o << "is_error_job: " << parser_job.is_error_job;
 
     return o;
 }
@@ -119,6 +135,7 @@ struct ParserJobResult {
     size_t end_number = 0;
 
     std::string debug_string;
+    error_job_rep is_error_job = false;
     bool has_error = true;
 };
 
@@ -126,6 +143,7 @@ struct ParserResult {
     ParserResultMetadata metadata;
 
     std::string debug_string;
+    error_job_rep is_error_job = false;
     bool has_error = true;
 };
 

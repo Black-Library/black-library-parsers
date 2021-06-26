@@ -57,6 +57,7 @@ int ParserWorker::Run()
 int ParserWorker::RunOnce()
 {
     const std::lock_guard<std::mutex> lock(mutex_);
+
     // clear pool_erases
     while (!pool_erases_.empty())
     {
@@ -67,6 +68,7 @@ int ParserWorker::RunOnce()
     for (size_t i = 0; i < pool_results_.size(); ++i)
     {
         auto & result = pool_results_[i];
+
         // check if future is ready
         if (!result.valid())
             continue;

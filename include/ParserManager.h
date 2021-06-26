@@ -39,6 +39,7 @@ public:
     int AddJob(const std::string &uuid, const std::string &url);
     int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number);
     int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number);
+    int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number,  const error_job_rep &is_error_job);
     bool GetDone();
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
@@ -50,7 +51,7 @@ private:
 
     std::unordered_map<parser_t, std::shared_ptr<ParserWorker>> worker_map_;
     std::shared_ptr<ParserFactory> parser_factory_;
-    BlockingUnorderedMap<ParserJob, job_status_t, ParserJobHash> current_jobs_;
+    BlockingUnorderedMap<std::pair<std::string, error_job_rep>, job_status_t, CurrentJobPairHash> current_jobs_;
     BlockingQueue<ParserJob> job_queue_;
     BlockingQueue<ParserJobResult> result_queue_;
     progress_number_callback progress_number_callback_;

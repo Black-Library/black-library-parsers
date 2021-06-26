@@ -86,6 +86,8 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
 
 void SigHandler(int sig)
 {
+    std::cout << "parser_worker_driver stop" << std::endl;
+
     if (sig == SIGTERM || sig == SIGINT)
         parser_worker->Stop();
 }
