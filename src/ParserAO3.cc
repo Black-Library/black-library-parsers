@@ -32,7 +32,7 @@ ParserAO3::~ParserAO3()
     done_ = true;
 }
 
-int ParserAO3::ParseChapter()
+int ParserAO3::ParseIndexEntry()
 {
     return 0;
 }
@@ -42,12 +42,12 @@ std::string ParserAO3::AppendTargetUrl(const std::string &job_url)
     return job_url + "?view_full_work=true&view_adult=true";
 }
 
-void ParserAO3::FindChapterNodes(xmlNodePtr root_node)
+void ParserAO3::FindSectionNodes(xmlNodePtr root_node)
 {
     ParserIndexEntry index_entry;
 
     index_entry.data_url = target_url_;
-    index_entry.chapter_name = title_;
+    index_entry.name = title_;
 
     ParserTimeResult time_result = GetPublishedTime(root_node);
 
@@ -86,22 +86,22 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo ParserAO3::ParseIndexEntry(const ParserIndexEntry &index_entry)
 {
-    ParserChapterInfo output;
+    ParserIndexEntryInfo output;
     std::string url_adult = index_entry.data_url;
-    std::string chapter_result = CurlRequest(url_adult);
+    std::string index_entry_curl_result = CurlRequest(url_adult);
 
-    xmlDocPtr chapter_doc_tree = htmlReadDoc((xmlChar*) chapter_result.c_str(), NULL, NULL,
+    xmlDocPtr index_entry_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    if (!chapter_doc_tree)
+    if (!index_entry_doc_tree)
     {
         std::cout << "Unable to Parse" << std::endl;
         output.has_error = true;
         return output;
     }
 
-    xmlNodePtr root_node = xmlDocGetRootElement(chapter_doc_tree);
+    xmlNodePtr root_node = xmlDocGetRootElement(index_entry_doc_tree);
     xmlNodePtr next = root_node->children;
 
     while (memcmp(next->name, "body", 4))
@@ -114,12 +114,12 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
     if (!workskin_result.found)
     {
         std::cout << "Error: workskin seek" << std::endl;
-        xmlFreeDoc(chapter_doc_tree);
+        xmlFreeDoc(index_entry_doc_tree);
         return output;
     }
 
     xmlNodePtr workskin = workskin_result.seek_node;
-    xmlDocSetRootElement(chapter_doc_tree, workskin);
+    xmlDocSetRootElement(index_entry_doc_tree, workskin);
 
     ParserXmlNodeSeek words_result = SeekToNodeByPattern(root_node,
         pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class=words");
@@ -137,22 +137,22 @@ ParserChapterInfo ParserAO3::ParseChapter(const ParserIndexEntry &index_entry)
         }
     }
 
-    std::string chapter_file_name = GetChapterFileName(index_entry, title_);
-    FILE* chapter_file;
-    std::string file_name = local_des_ + chapter_file_name;
+    std::string index_entry_file_name = GetIndexEntryFileName(index_entry, title_);
+    FILE* index_entry_file;
+    std::string file_name = local_des_ + index_entry_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
-    chapter_file = fopen(file_name.c_str(), "w+");
+    index_entry_file = fopen(file_name.c_str(), "w+");
 
-    if (chapter_file == NULL)
+    if (index_entry_file == NULL)
     {
         std::cout << "Error: could not open file with name: " << file_name << std::endl;
-        xmlFreeDoc(chapter_doc_tree);
+        xmlFreeDoc(index_entry_doc_tree);
         return output;
     }
 
-    xmlElemDump(chapter_file, chapter_doc_tree, workskin_result.seek_node);
+    xmlElemDump(index_entry_file, index_entry_doc_tree, workskin_result.seek_node);
     // TODO: figure out how to handle seg faults/other errors in threadpool/thread
-    fclose(chapter_file);
+    fclose(index_entry_file);
 
     output.has_error = false;
 

@@ -76,16 +76,16 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     if (!body_seek.found)
     {
-        std::cout << "Could not find chapter index, exiting" << std::endl;
+        std::cout << "Could not find index entries, exiting" << std::endl;
         xmlFreeDoc(doc_tree);
         return parser_result;
     }
 
     current_node = body_seek.seek_node;
 
-    std::cout << GetParserName(parser_type_) << ": Find chapter nodes" << std::endl;
+    std::cout << GetParserName(parser_type_) << ": Find index entry nodes" << std::endl;
 
-    FindChapterNodes(current_node->children);
+    FindSectionNodes(current_node->children);
 
     std::cout << "\tTitle: " << title_ << std::endl;
     std::cout << "\tAuthor: " << author_ << std::endl;
@@ -155,21 +155,21 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
             if (remaining_attempts <= 0)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << std::endl;
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index << std::endl;
                 remaining_attempts = 5;
                 ++index;
                 continue;
             }
 
-            ParserChapterInfo chapter_parse_info = ParseChapter(index_entries_[index]);
+            ParserIndexEntryInfo index_entry_parse_info = ParseIndexEntry(index_entries_[index]);
             --remaining_attempts;
 
-            wait_time = time_generator_->GenerateWaitTime(chapter_parse_info.length);
+            wait_time = time_generator_->GenerateWaitTime(index_entry_parse_info.length);
             wait_time_total += wait_time;
 
-            if (chapter_parse_info.has_error)
+            if (index_entry_parse_info.has_error)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse chapter entry index: " << index << " - remaining attempts: " << remaining_attempts
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (remaining_attempts == 0 && progress_number_callback_)
@@ -177,7 +177,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " chapter length is " << chapter_parse_info.length
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " index entry length is " << index_entry_parse_info.length
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (progress_number_callback_)
@@ -291,7 +291,7 @@ ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
     return index_entry;
 }
 
-void Parser::FindChapterNodes(xmlNodePtr root_node)
+void Parser::FindSectionNodes(xmlNodePtr root_node)
 {
     (void) root_node;
 }
@@ -301,10 +301,10 @@ void Parser::FindMetaData(xmlNodePtr root_node)
     (void) root_node;
 }
 
-ParserChapterInfo Parser::ParseChapter(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo Parser::ParseIndexEntry(const ParserIndexEntry &index_entry)
 {
     (void) index_entry;
-    ParserChapterInfo info;
+    ParserIndexEntryInfo info;
     return info;
 }
 

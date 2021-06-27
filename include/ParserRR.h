@@ -5,8 +5,6 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_RR_PARSER_RR_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_RR_PARSER_RR_H__
 
-#include <vector>
-
 #include "Parser.h"
 
 namespace black_library {
@@ -24,13 +22,13 @@ public:
     ~ParserRR();
 
 protected:
-    std::string GetRRChapterName(const ParserIndexEntry &index_entry);
+    std::string GetRRIndexEntryTitle(const ParserIndexEntry &index_entry);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindChapterNodes(xmlNodePtr root_node);
+    void FindSectionNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
-    ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node);
+    ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);
 
 };
 

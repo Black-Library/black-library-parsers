@@ -25,11 +25,11 @@ public:
     void Stop();
 
 protected:
-    int ParseChapter();
+    int ParseIndexEntry();
     std::string AppendTargetUrl(const std::string &job_url);
-    void FindChapterNodes(xmlNodePtr root_node);
+    void FindSectionNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
+    virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 
 private:

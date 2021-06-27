@@ -16,6 +16,7 @@
 #include <ParserRR.h>
 #include <ParserSBF.h>
 #include <ParserSVF.h>
+#include <ParserYT.h>
 
 static constexpr const char AO3_SHORT_URL[] = "https://archiveofourown.org/works/505809";
 static constexpr const char RR_0_URL[] = "https://www.royalroad.com/fiction/15614/daedalus";
@@ -24,6 +25,8 @@ static constexpr const char RR_LONG_URL[] = "https://www.royalroad.com/fiction/2
 static constexpr const char SBF_SHORT_URL[] = "https://forums.spacebattles.com/threads/new-operational-parameters.815612/";
 static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/threads/intrepid-worm-au.337516/";
 static constexpr const char SVF_LONG_URL[] = "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/";
+static constexpr const char YT_SHORT_URL[] = "https://www.youtube.com/watch?v=GRHat19F2Kg";
+static constexpr const char YT_LONG_URL[] = "https://www.youtube.com/playlist?list=PLDb22nlVXGgdg_NR_-GtTrMnbMVmtSSXa";
 
 namespace BlackLibraryParsers = black_library::core::parsers;
 
@@ -34,6 +37,7 @@ using ParserAO3 = BlackLibraryParsers::AO3::ParserAO3;
 using ParserRR = BlackLibraryParsers::RR::ParserRR;
 using ParserSBF = BlackLibraryParsers::SBF::ParserSBF;
 using ParserSVF = BlackLibraryParsers::SVF::ParserSVF;
+using ParserYT = BlackLibraryParsers::YT::ParserYT;
 
 template <typename T>
 inline std::shared_ptr<Parser> ParserCast(T const &p)
@@ -52,18 +56,18 @@ struct options
 static void Usage(const char *prog)
 {
     const char *p = strchr(prog, '/');
-    printf("usage: %s --(s)ource_target source --(l)ength 0-2 --[c]hapter_start [-h]\n", p ? (p + 1) : prog);
+    printf("usage: %s --source_(t)arget source --(l)ength 0-2 --section_[s]tart (start number) --section_[e]nd (end number) [-h]\n", p ? (p + 1) : prog);
 }
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
     static const char *const optstr = "c:e:hl:s:";
     static const struct option long_opts[] = {
-        { "chapter_start", required_argument, 0, 'c' },
-        { "chapter_end", required_argument, 0, 'e' },
+        { "section_end", required_argument, 0, 'e' },
         { "help", no_argument, 0, 'h' },
         { "length", required_argument, 0, 'l' },
-        { "source_target", required_argument, 0, 's' },
+        { "section_start", required_argument, 0, 's' },
+        { "source_target", required_argument, 0, 't' },
         { 0, 0, 0, 0 }
     };
 
@@ -75,15 +79,6 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
     {
         switch (opt)
         {
-            case 'c':
-                if (atoi(optarg) < 0)
-                {
-                    std::cout << "start number out of range" << std::endl;
-                    Usage(argv[0]);
-                    exit(1);
-                }
-                opts->start_number = atoi(optarg);
-                break;
             case 'e':
                 if (atoi(optarg) < 0)
                 {
@@ -107,6 +102,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 opts->length = atoi(optarg);
                 break;
             case 's':
+                if (atoi(optarg) < 0)
+                {
+                    std::cout << "start number out of range" << std::endl;
+                    Usage(argv[0]);
+                    exit(1);
+                }
+                opts->start_number = atoi(optarg);
+                break;
+            case 't':
                 if (std::string(optarg) == "ao3")
                 {
                     opts->source = BlackLibraryParsers::parser_t::AO3_PARSER;
@@ -122,6 +126,10 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 else if (std::string(optarg) == "svf")
                 {
                     opts->source = BlackLibraryParsers::parser_t::SVF_PARSER;
+                }
+                else if (std::string(optarg) == "yt")
+                {
+                    opts->source = BlackLibraryParsers::parser_t::YT_PARSER;
                 }
                 else
                 {
@@ -169,6 +177,8 @@ int main(int argc, char* argv[])
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SBF_PARSER) + "1", std::string(SBF_SHORT_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SBF_PARSER) + "2", std::string(SBF_LONG_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SVF_PARSER) + "2", std::string(SVF_LONG_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::YT_PARSER) + "1", std::string(YT_SHORT_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::YT_PARSER) + "2", std::string(YT_LONG_URL));
 
     std::shared_ptr<Parser> parser;
 
@@ -187,6 +197,10 @@ int main(int argc, char* argv[])
     else if (opts.source == BlackLibraryParsers::parser_t::SVF_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserSVF>());
+    }
+    else if (opts.source == BlackLibraryParsers::parser_t::YT_PARSER)
+    {
+        parser = ParserCast(std::make_shared<ParserYT>());
     }
     else
     {

@@ -5,8 +5,6 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_SVF_PARSER_SVF_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_SVF_PARSER_SVF_H__
 
-#include <vector>
-
 #include "Parser.h"
 #include "ParserXF.h"
 

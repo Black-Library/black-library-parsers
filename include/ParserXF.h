@@ -26,15 +26,15 @@ public:
     ~ParserXF();
 
 protected:
-    std::string GetXFChapterName(const ParserIndexEntry &index_entry);
+    std::string GetXFIndexEntryTitle(const ParserIndexEntry &index_entry);
     std::string GetTargetId(const std::string &data_url);
 
     std::string AppendTargetUrl(const std::string &job_url);
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindChapterNodes(xmlNodePtr root_node);
+    void FindSectionNodes(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
-    ParserXmlNodeSeek SeekToChapterContent(xmlNodePtr root_node, const std::string &target_id);
+    ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node, const std::string &target_id);
 
 };
 

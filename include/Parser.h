@@ -53,9 +53,9 @@ public:
 protected:
     virtual std::string AppendTargetUrl(const std::string &job_url);
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    virtual void FindChapterNodes(xmlNodePtr root_node);
+    virtual void FindSectionNodes(xmlNodePtr root_node);
     virtual void FindMetaData(xmlNodePtr root_node);
-    virtual ParserChapterInfo ParseChapter(const ParserIndexEntry &index_entry);
+    virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
 
     std::vector<ParserIndexEntry> index_entries_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;

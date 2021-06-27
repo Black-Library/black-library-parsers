@@ -66,7 +66,7 @@ std::string ParserFFN::ParseAuthor()
     return "";
 }
 
-int ParserFFN::ParseChapter()
+int ParserFFN::ParseIndexEntry()
 {
     return 0;
 }

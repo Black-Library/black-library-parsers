@@ -26,7 +26,7 @@ public:
 protected:
     std::string ParseTitle();
     std::string ParseAuthor();
-    int ParseChapter();
+    int ParseIndexEntry();
 
 private:
 };

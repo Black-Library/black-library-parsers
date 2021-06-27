@@ -38,6 +38,7 @@ enum class parser_t {
     SBF_PARSER,
     SVF_PARSER,
     XF_PARSER,
+    YT_PARSER,
 
     _NUM_PARSERS_TYPE
 };
@@ -50,14 +51,14 @@ enum class pattern_seek_t {
 
 std::ostream& operator<<(std::ostream& out, const pattern_seek_t value);
 
-struct ParserChapterInfo {
+struct ParserIndexEntryInfo {
     size_t length = 0;
     bool has_error = true;
 };
 
 struct ParserIndexEntry {
     std::string data_url;
-    std::string chapter_name;
+    std::string name;
     time_t time_published = 0;
     size_t index_num;
 };
@@ -178,7 +179,7 @@ bool ContainsString(const std::string &haystack, const std::string &needle);
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 
-std::string GetChapterFileName(const ParserIndexEntry &index_entry, const std::string &chapter_name);
+std::string GetIndexEntryFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name);
 std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
 std::string GetSpaceString(size_t num_tabs);
