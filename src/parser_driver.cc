@@ -61,7 +61,7 @@ static void Usage(const char *prog)
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
-    static const char *const optstr = "c:e:hl:s:";
+    static const char *const optstr = "e:hl:s:t:";
     static const struct option long_opts[] = {
         { "section_end", required_argument, 0, 'e' },
         { "help", no_argument, 0, 'h' },

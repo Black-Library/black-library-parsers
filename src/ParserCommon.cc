@@ -123,6 +123,9 @@ std::string GetParserName(parser_t rep)
     case parser_t::XF_PARSER:
         return "XF_PARSER";
         break;
+    case parser_t::YT_PARSER:
+        return "YT_PARSER";
+        break;
     case parser_t::_NUM_PARSERS_TYPE:
         return "_NUM_PARSERS_TYPE";
         break;
@@ -153,6 +156,10 @@ parser_t GetParserTypeByUrl(const std::string &url)
     else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::RR::source_url))
     {
         rep = parser_t::RR_PARSER;
+    }
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::YT::source_url))
+    {
+        rep = parser_t::YT_PARSER;
     }
 
     return rep;

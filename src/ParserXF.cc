@@ -36,32 +36,6 @@ ParserXF::~ParserXF()
     done_ = true;
 }
 
-std::string ParserXF::GetXFIndexEntryTitle(const ParserIndexEntry &index_entry)
-{
-    std::locale loc;
-    std::string xf_index_entry_name = index_entry.name;
-
-    std::transform(xf_index_entry_name.begin(), xf_index_entry_name.end(), xf_index_entry_name.begin(),
-    [&loc](char ch)
-    {
-        return ch == ' ' ? '-' : std::tolower(ch, loc);
-    });
-
-    return xf_index_entry_name;
-}
-
-std::string ParserXF::GetTargetId(const std::string &data_url)
-{
-    auto pos = data_url.find_last_of("-");
-
-    return data_url.substr(pos + 1);
-}
-
-std::string ParserXF::AppendTargetUrl(const std::string &job_url)
-{
-    return job_url + "threadmarks";
-}
-
 // TODO: Extract index entry may fail, use std::optional to check
 ParserIndexEntry ParserXF::ExtractIndexEntry(xmlNodePtr root_node)
 {
@@ -289,6 +263,32 @@ ParserIndexEntryInfo ParserXF::ParseIndexEntry(const ParserIndexEntry &index_ent
     output.has_error = false;
 
     return output;
+}
+
+std::string ParserXF::PreprocessTargetUrl(const std::string &job_url)
+{
+    return job_url + "threadmarks";
+}
+
+std::string ParserXF::GetTargetId(const std::string &data_url)
+{
+    auto pos = data_url.find_last_of("-");
+
+    return data_url.substr(pos + 1);
+}
+
+std::string ParserXF::GetXFIndexEntryTitle(const ParserIndexEntry &index_entry)
+{
+    std::locale loc;
+    std::string xf_index_entry_name = index_entry.name;
+
+    std::transform(xf_index_entry_name.begin(), xf_index_entry_name.end(), xf_index_entry_name.begin(),
+    [&loc](char ch)
+    {
+        return ch == ' ' ? '-' : std::tolower(ch, loc);
+    });
+
+    return xf_index_entry_name;
 }
 
 ParserXmlNodeSeek ParserXF::SeekToIndexEntryContent(xmlNodePtr root_node, const std::string &target_id)

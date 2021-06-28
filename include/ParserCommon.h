@@ -174,8 +174,6 @@ using job_status_callback = std::function<void(const ParserJob &parser_job, job_
 using manager_notify_callback = std::function<void(ParserJobResult result)>;
 using progress_number_callback = std::function<void(const std::string &uuid, size_t progress_num, bool error)>;
 
-bool ContainsString(const std::string &haystack, const std::string &needle);
-
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 

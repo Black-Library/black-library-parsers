@@ -46,7 +46,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     parser_result.metadata.media_path = local_des_;
     parser_result.is_error_job = parser_job.is_error_job;
 
-    target_url_ = AppendTargetUrl(parser_job.url);
+    target_url_ = PreprocessTargetUrl(parser_job.url);
 
     std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << std::endl;
 
@@ -278,12 +278,6 @@ int Parser::RegisterProgressNumberCallback(const progress_number_callback &callb
     return 0;
 }
 
-
-std::string Parser::AppendTargetUrl(const std::string &job_url)
-{
-    return job_url;
-}
-
 ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
 {
     (void) root_node;
@@ -306,6 +300,11 @@ ParserIndexEntryInfo Parser::ParseIndexEntry(const ParserIndexEntry &index_entry
     (void) index_entry;
     ParserIndexEntryInfo info;
     return info;
+}
+
+std::string Parser::PreprocessTargetUrl(const std::string &job_url)
+{
+    return job_url;
 }
 
 // Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c

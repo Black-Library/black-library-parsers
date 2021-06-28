@@ -24,14 +24,14 @@ public:
     ~ParserXF();
 
 protected:
-    std::string GetXFIndexEntryTitle(const ParserIndexEntry &index_entry);
-    std::string GetTargetId(const std::string &data_url);
-
-    std::string AppendTargetUrl(const std::string &job_url);
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    std::string PreprocessTargetUrl(const std::string &job_url);
+
+    std::string GetTargetId(const std::string &data_url);
+    std::string GetXFIndexEntryTitle(const ParserIndexEntry &index_entry);
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node, const std::string &target_id);
 
 };

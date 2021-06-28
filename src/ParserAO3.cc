@@ -37,11 +37,6 @@ int ParserAO3::ParseIndexEntry()
     return 0;
 }
 
-std::string ParserAO3::AppendTargetUrl(const std::string &job_url)
-{
-    return job_url + "?view_full_work=true&view_adult=true";
-}
-
 void ParserAO3::FindIndexEntries(xmlNodePtr root_node)
 {
     ParserIndexEntry index_entry;
@@ -157,6 +152,11 @@ ParserIndexEntryInfo ParserAO3::ParseIndexEntry(const ParserIndexEntry &index_en
     output.has_error = false;
 
     return output;
+}
+
+std::string ParserAO3::PreprocessTargetUrl(const std::string &job_url)
+{
+    return job_url + "?view_full_work=true&view_adult=true";
 }
 
 ParserTimeResult ParserAO3::GetPublishedTime(xmlNodePtr root_node)

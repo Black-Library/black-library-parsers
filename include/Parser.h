@@ -51,11 +51,11 @@ public:
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 protected:
-    virtual std::string AppendTargetUrl(const std::string &job_url);
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     virtual void FindIndexEntries(xmlNodePtr root_node);
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    virtual std::string PreprocessTargetUrl(const std::string &job_url);
 
     std::vector<ParserIndexEntry> index_entries_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;
