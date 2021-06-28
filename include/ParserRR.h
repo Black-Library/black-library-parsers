@@ -25,7 +25,7 @@ protected:
     std::string GetRRIndexEntryTitle(const ParserIndexEntry &index_entry);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindSectionNodes(xmlNodePtr root_node);
+    void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);

@@ -42,7 +42,7 @@ std::string ParserAO3::AppendTargetUrl(const std::string &job_url)
     return job_url + "?view_full_work=true&view_adult=true";
 }
 
-void ParserAO3::FindSectionNodes(xmlNodePtr root_node)
+void ParserAO3::FindIndexEntries(xmlNodePtr root_node)
 {
     ParserIndexEntry index_entry;
 
@@ -137,9 +137,9 @@ ParserIndexEntryInfo ParserAO3::ParseIndexEntry(const ParserIndexEntry &index_en
         }
     }
 
-    std::string index_entry_file_name = GetIndexEntryFileName(index_entry, title_);
+    std::string section_file_name = GetSectionFileName(index_entry, title_);
     FILE* index_entry_file;
-    std::string file_name = local_des_ + index_entry_file_name;
+    std::string file_name = local_des_ + section_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     index_entry_file = fopen(file_name.c_str(), "w+");
 

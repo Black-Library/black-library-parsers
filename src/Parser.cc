@@ -85,7 +85,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     std::cout << GetParserName(parser_type_) << ": Find index entry nodes" << std::endl;
 
-    FindSectionNodes(current_node->children);
+    FindIndexEntries(current_node->children);
 
     std::cout << "\tTitle: " << title_ << std::endl;
     std::cout << "\tAuthor: " << author_ << std::endl;
@@ -291,7 +291,7 @@ ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
     return index_entry;
 }
 
-void Parser::FindSectionNodes(xmlNodePtr root_node)
+void Parser::FindIndexEntries(xmlNodePtr root_node)
 {
     (void) root_node;
 }

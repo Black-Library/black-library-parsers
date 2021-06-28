@@ -7,8 +7,6 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_XF_PARSER_XF_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_XF_PARSER_XF_H__
 
-#include <vector>
-
 #include "Parser.h"
 
 namespace black_library {
@@ -31,7 +29,7 @@ protected:
 
     std::string AppendTargetUrl(const std::string &job_url);
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindSectionNodes(xmlNodePtr root_node);
+    void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node, const std::string &target_id);

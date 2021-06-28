@@ -2,14 +2,6 @@
  * ParserSVF.cc
  */
 
-#include <chrono>
-#include <iostream>
-#include <locale>
-#include <sstream>
-#include <thread>
-
-#include <FileOperations.h>
-
 #include <ParserSVF.h>
 
 namespace black_library {

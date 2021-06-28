@@ -2,10 +2,7 @@
  * ParserRR.cc
  */
 
-#include <chrono>
 #include <iostream>
-#include <sstream>
-#include <thread>
 
 #include <FileOperations.h>
 #include <TimeOperations.h>
@@ -110,7 +107,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
     return index_entry;
 }
 
-void ParserRR::FindSectionNodes(xmlNodePtr root_node)
+void ParserRR::FindIndexEntries(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
@@ -140,7 +137,7 @@ void ParserRR::FindSectionNodes(xmlNodePtr root_node)
             }
         }
 
-        FindSectionNodes(current_node->children);
+        FindIndexEntries(current_node->children);
     }
 
     xmlFree(current_node);
@@ -243,10 +240,10 @@ ParserIndexEntryInfo ParserRR::ParseIndexEntry(const ParserIndexEntry &index_ent
         return output;
     }
 
-    std::string index_entry_file_name = GetIndexEntryFileName(index_entry, index_entry_title);
+    std::string section_file_name = GetSectionFileName(index_entry, index_entry_title);
 
     FILE* index_entry_file;
-    std::string file_name = local_des_ + index_entry_file_name;
+    std::string file_name = local_des_ + section_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     index_entry_file = fopen(file_name.c_str(), "w+");
 
@@ -258,6 +255,7 @@ ParserIndexEntryInfo ParserRR::ParseIndexEntry(const ParserIndexEntry &index_ent
     }
 
     xmlElemDump(index_entry_file, index_entry_doc_tree, current_node);
+
     fclose(index_entry_file);
 
     xmlFreeDoc(index_entry_doc_tree);

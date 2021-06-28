@@ -53,7 +53,7 @@ public:
 protected:
     virtual std::string AppendTargetUrl(const std::string &job_url);
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    virtual void FindSectionNodes(xmlNodePtr root_node);
+    virtual void FindIndexEntries(xmlNodePtr root_node);
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
 

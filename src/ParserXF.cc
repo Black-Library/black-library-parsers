@@ -135,7 +135,7 @@ ParserIndexEntry ParserXF::ExtractIndexEntry(xmlNodePtr root_node)
     return index_entry;
 }
 
-void ParserXF::FindSectionNodes(xmlNodePtr root_node)
+void ParserXF::FindIndexEntries(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
@@ -168,7 +168,7 @@ void ParserXF::FindSectionNodes(xmlNodePtr root_node)
             }
         }
 
-        FindSectionNodes(current_node->children);
+        FindIndexEntries(current_node->children);
     }
 
     xmlFree(current_node);
@@ -266,10 +266,10 @@ ParserIndexEntryInfo ParserXF::ParseIndexEntry(const ParserIndexEntry &index_ent
         return output;
     }
 
-    std::string index_entry_file_name = GetIndexEntryFileName(index_entry, index_entry_name);
+    std::string section_file_name = GetSectionFileName(index_entry, index_entry_name);
 
     FILE* index_entry_file;
-    std::string file_name = local_des_ + index_entry_file_name;
+    std::string file_name = local_des_ + section_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     index_entry_file = fopen(file_name.c_str(), "w+");
 
@@ -281,7 +281,7 @@ ParserIndexEntryInfo ParserXF::ParseIndexEntry(const ParserIndexEntry &index_ent
     }
 
     xmlElemDump(index_entry_file, index_entry_doc_tree, current_node);
-    // TODO: figure out how to handle seg faults/other errors in threadpool/thread
+
     fclose(index_entry_file);
 
     xmlFreeDoc(index_entry_doc_tree);

@@ -1,5 +1,5 @@
 /**
- * ParseYTR.h
+ * ParserYTR.h
  */
 
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
@@ -15,20 +15,20 @@ namespace parsers {
 
 namespace YT {
 
-class ParseYT : public Parser
+class ParserYT : public Parser
 {
 public:
-    explicit ParseYT();
-    ~ParseYT();
+    explicit ParserYT();
+    ~ParserYT();
 
 protected:
-    std::string GetYTIndexName(const ParserIndexEntry &index_entry);
+    std::string GetYTIndexEntryTitle(const ParserIndexEntry &index_entry);
 
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    void FindIndexNodes(xmlNodePtr root_node);
+    void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserIndexEntryInfo ParseIndex(const ParserIndexEntry &index_entry);
-    ParserXmlNodeSeek SeekToIndexContent(xmlNodePtr root_node);
+    ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);
 
 };
 

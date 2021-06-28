@@ -20,7 +20,7 @@ namespace core {
 
 namespace parsers {
 
-#define CHAPTER_FILENAME_BUFFER_SIZE 128
+#define INDEX_ENTRY_FILENAME_BUFFER_SIZE 128
 
 namespace BlackLibraryCommon = black_library::core::common;
 
@@ -88,10 +88,10 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
 }
 
 // limited to 9999 sections right now (no CH10000), index starts at 1 for sections
-std::string GetIndexEntryFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name)
+std::string GetSectionFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name)
 {
-    char buffer [CHAPTER_FILENAME_BUFFER_SIZE];
-    int res = snprintf(buffer, CHAPTER_FILENAME_BUFFER_SIZE, "CH%04lu_%s.html", index_entry.index_num + 1, index_entry_name.c_str());
+    char buffer [INDEX_ENTRY_FILENAME_BUFFER_SIZE];
+    int res = snprintf(buffer, INDEX_ENTRY_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_entry.index_num + 1, index_entry_name.c_str());
     if (res < 0)
         return "";
 
