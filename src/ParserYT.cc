@@ -50,7 +50,17 @@ void ParserYT::FindIndexEntries(xmlNodePtr root_node)
 
 void ParserYT::FindMetaData(xmlNodePtr root_node)
 {
-    std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
+    ParserXmlNodeSeek title_result = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "meta",
+        pattern_seek_t::XML_ATTRIBUTE, "name=title");
+    if (title_result.found)
+    {
+        ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(title_result.seek_node, "content");
+        if (content_result.found)
+        {
+            title_ = content_result.result;
+        }
+    }
+
 }
 
 ParserIndexEntryInfo ParserYT::ParseIndexEntry(const ParserIndexEntry &index_entry)
