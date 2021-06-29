@@ -21,8 +21,13 @@ namespace BlackLibraryCommon = black_library::core::common;
 Parser::Parser(parser_t parser_type)
 {
     time_generator_ = std::make_shared<ShortTimeGenerator>();
+    title_ = "ERROR_parser_title";
     nickname_ = "";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
+    source_url_ = BlackLibraryCommon::ERROR::source_url;
+    author_ = "unknown-author";
+    index_ = 0;
+    end_index_ = 0;
     parser_type_ = parser_type;
     done_ = false;
 }
@@ -100,28 +105,9 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
 
-    size_t index;
-    size_t end_index;
+    CalculateIndexBounds(parser_job);
 
-    if (parser_job.start_number > index_entries_.size())
-    {
-        index = 0;
-    }
-    else
-    {
-        index = parser_job.start_number - 1;
-    }
-
-    if (parser_job.start_number <= parser_job.end_number && index_entries_.size() >= parser_job.end_number)
-    {
-        end_index = parser_job.end_number - 1;
-    }
-    else
-    {
-        end_index = index_entries_.size() - 1;
-    }
-
-    if (index > index_entries_.size() || index_entries_.empty())
+    if (index_ > index_entries_.size() || index_entries_.empty())
     {
         std::cout << "Error: " <<  GetParserName(parser_type_) << " requested start index greater than detected entries" << std::endl;
         return parser_result;
@@ -146,7 +132,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
         if (seconds_counter == 0)
         {
             // let the fake reader finish waiting before exiting
-            if (index > end_index)
+            if (index_ > end_index_)
             {
                 done_ = true;
                 std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
@@ -155,13 +141,13 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
             if (remaining_attempts <= 0)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index << std::endl;
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << std::endl;
                 remaining_attempts = 5;
-                ++index;
+                ++index_;
                 continue;
             }
 
-            ParserIndexEntryInfo index_entry_parse_info = ParseIndexEntry(index_entries_[index]);
+            ParserIndexEntryInfo index_entry_parse_info = ParseIndexEntry(index_entries_[index_]);
             --remaining_attempts;
 
             wait_time = time_generator_->GenerateWaitTime(index_entry_parse_info.length);
@@ -169,24 +155,24 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
             if (index_entry_parse_info.has_error)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index << " - remaining attempts: " << remaining_attempts
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (remaining_attempts == 0 && progress_number_callback_)
-                    progress_number_callback_(uuid_, index + 1, true);
+                    progress_number_callback_(uuid_, index_ + 1, true);
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index << " index entry length is " << index_entry_parse_info.length
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << index_entry_parse_info.length
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (progress_number_callback_)
-                    progress_number_callback_(uuid_, index + 1, false);
+                    progress_number_callback_(uuid_, index_ + 1, false);
 
-                parser_result.metadata.series_length = index + 1;
+                parser_result.metadata.series_length = index_ + 1;
 
                 remaining_attempts = 5;
-                ++index;
+                ++index_;
             }
         }
 
@@ -305,6 +291,27 @@ ParserIndexEntryInfo Parser::ParseIndexEntry(const ParserIndexEntry &index_entry
 std::string Parser::PreprocessTargetUrl(const std::string &job_url)
 {
     return job_url;
+}
+
+void Parser::CalculateIndexBounds(const ParserJob &parser_job)
+{
+    if (parser_job.start_number > index_entries_.size())
+    {
+        index_ = 0;
+    }
+    else
+    {
+        index_ = parser_job.start_number - 1;
+    }
+
+    if (parser_job.start_number <= parser_job.end_number && index_entries_.size() >= parser_job.end_number)
+    {
+        end_index_ = parser_job.end_number - 1;
+    }
+    else
+    {
+        end_index_ = index_entries_.size() - 1;
+    }
 }
 
 // Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c

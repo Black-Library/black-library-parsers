@@ -57,6 +57,8 @@ protected:
     virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
     virtual std::string PreprocessTargetUrl(const std::string &job_url);
 
+    void CalculateIndexBounds(const ParserJob &parser_job);
+
     std::vector<ParserIndexEntry> index_entries_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;
     progress_number_callback progress_number_callback_;
@@ -70,6 +72,10 @@ protected:
     std::string target_url_;
     std::string uuid_;
     std::string local_des_;
+
+    size_t index_;
+    size_t end_index_;
+
     std::mutex mutex_;
     parser_t parser_type_;
     std::atomic_bool done_;

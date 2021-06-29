@@ -25,7 +25,6 @@ ParserYT::ParserYT() :
     title_ = "YT_parser_title";
     source_name_ = BlackLibraryCommon::YT::source_name;
     source_url_ = BlackLibraryCommon::YT::source_url;
-    author_ = "unknown-author";
 
     is_playlist = false;
 }
@@ -50,17 +49,34 @@ void ParserYT::FindIndexEntries(xmlNodePtr root_node)
 
 void ParserYT::FindMetaData(xmlNodePtr root_node)
 {
-    ParserXmlNodeSeek title_result = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "meta",
+    std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
+
+    ParserXmlNodeSeek title_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "meta",
         pattern_seek_t::XML_ATTRIBUTE, "name=title");
-    if (title_result.found)
+    if (title_seek.found)
     {
-        ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(title_result.seek_node, "content");
+        ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(title_seek.seek_node, "content");
         if (content_result.found)
         {
             title_ = content_result.result;
         }
     }
 
+    ParserXmlNodeSeek author_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "span",
+        pattern_seek_t::XML_ATTRIBUTE, "itemprop=author");
+    if (author_seek.found)
+    {
+        ParserXmlNodeSeek name_seek = SeekToNodeByPattern(author_seek.seek_node->children, pattern_seek_t::XML_NAME, "link",
+        pattern_seek_t::XML_ATTRIBUTE, "itemprop=name");
+        if (name_seek.found)
+        {
+            ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(name_seek.seek_node, "content");
+            if (content_result.found)
+            {
+                author_ = content_result.result;
+            }
+        }
+    }
 }
 
 ParserIndexEntryInfo ParserYT::ParseIndexEntry(const ParserIndexEntry &index_entry)

@@ -20,7 +20,6 @@ ParserSBF::ParserSBF() :
     title_ = "SBF_parser_title";
     source_name_ = BlackLibraryCommon::SBF::source_name;
     source_url_ = BlackLibraryCommon::SBF::source_url;
-    author_ = "unknown-author";
 }
 
 } // namespace SBF

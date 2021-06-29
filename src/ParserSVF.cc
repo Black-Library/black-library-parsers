@@ -20,7 +20,6 @@ ParserSVF::ParserSVF() :
     title_ = "SVF_parser_title";
     source_name_ = BlackLibraryCommon::SVF::source_name;
     source_url_ = BlackLibraryCommon::SVF::source_url;
-    author_ = "unknown-author";
 }
 
 } // namespace SVF

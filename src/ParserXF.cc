@@ -28,7 +28,6 @@ ParserXF::ParserXF(parser_t parser_type) :
     title_ = "XF_parser_title";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     source_url_ = BlackLibraryCommon::ERROR::source_url;
-    author_ = "unknown-author";
 }
 
 ParserXF::~ParserXF()
