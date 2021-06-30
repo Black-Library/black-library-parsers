@@ -75,9 +75,9 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserIndexEntryInfo ParserAO3::ParseBehavior()
+ParserBehaviorInfo ParserAO3::ParseBehavior()
 {
-    ParserIndexEntryInfo output;
+    ParserBehaviorInfo output;
     auto index_entry = index_entries_[index_];
 
     std::string url_adult = index_entry.data_url;

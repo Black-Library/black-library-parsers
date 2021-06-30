@@ -178,9 +178,9 @@ void Parser::FindMetaData(xmlNodePtr root_node)
     (void) root_node;
 }
 
-ParserIndexEntryInfo Parser::ParseBehavior()
+ParserBehaviorInfo Parser::ParseBehavior()
 {
-    ParserIndexEntryInfo info;
+    ParserBehaviorInfo info;
     return info;
 }
 

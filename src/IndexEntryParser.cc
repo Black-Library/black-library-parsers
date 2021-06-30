@@ -140,13 +140,13 @@ void IndexEntryParser::ParseLoop(ParserResult &parser_result)
                 continue;
             }
 
-            ParserIndexEntryInfo index_entry_parse_info = ParseBehavior();
+            const auto parser_behavior_info = ParseBehavior();
             --remaining_attempts;
 
-            wait_time = time_generator_->GenerateWaitTime(index_entry_parse_info.length);
+            wait_time = time_generator_->GenerateWaitTime(parser_behavior_info.length);
             wait_time_total += wait_time;
 
-            if (index_entry_parse_info.has_error)
+            if (parser_behavior_info.has_error)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
@@ -156,7 +156,7 @@ void IndexEntryParser::ParseLoop(ParserResult &parser_result)
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << index_entry_parse_info.length
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << parser_behavior_info.length
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (progress_number_callback_)

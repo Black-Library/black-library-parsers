@@ -57,7 +57,7 @@ enum class pattern_seek_t {
 
 std::ostream& operator<<(std::ostream& out, const pattern_seek_t value);
 
-struct ParserIndexEntryInfo {
+struct ParserBehaviorInfo {
     size_t length = 0;
     bool has_error = true;
 };

@@ -185,9 +185,9 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserIndexEntryInfo ParserRR::ParseBehavior()
+ParserBehaviorInfo ParserRR::ParseBehavior()
 {
-    ParserIndexEntryInfo output;
+    ParserBehaviorInfo output;
     auto index_entry = index_entries_[index_];
 
     std::string index_entry_url = "https://www." + source_url_ + index_entry.data_url;

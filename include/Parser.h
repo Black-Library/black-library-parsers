@@ -53,7 +53,7 @@ public:
 
 protected:
     virtual void FindMetaData(xmlNodePtr root_node);
-    virtual ParserIndexEntryInfo ParseBehavior();
+    virtual ParserBehaviorInfo ParseBehavior();
     virtual void ParseLoop(ParserResult &parser_result);
     virtual void PostProcessMetaData();
     virtual std::string PreprocessTargetUrl(const std::string &job_url);
@@ -76,7 +76,6 @@ protected:
 
     std::mutex mutex_;
     parser_t parser_type_;
-    parser_behavior_t parser_behavior_;
     std::atomic_bool done_;
 
 private:
