@@ -75,24 +75,24 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserIndexEntryInfo ParserAO3::ParseBehavior()
+ParseSectionInfo ParserAO3::ParseSection()
 {
-    ParserIndexEntryInfo output;
-    auto index_entry = index_entries_[index_];
+    ParseSectionInfo output;
+    const auto index_entry = index_entries_[index_];
 
-    std::string url_adult = index_entry.data_url;
-    std::string index_entry_curl_result = CurlRequest(url_adult);
+    const auto url_adult = index_entry.data_url;
+    const auto index_entry_curl_result = CurlRequest(url_adult);
 
-    xmlDocPtr index_entry_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    if (!index_entry_doc_tree)
+    if (!section_doc_tree)
     {
         std::cout << "Unable to Parse" << std::endl;
         output.has_error = true;
         return output;
     }
 
-    xmlNodePtr root_node = xmlDocGetRootElement(index_entry_doc_tree);
+    xmlNodePtr root_node = xmlDocGetRootElement(section_doc_tree);
     xmlNodePtr next = root_node->children;
 
     while (memcmp(next->name, "body", 4))
@@ -105,12 +105,12 @@ ParserIndexEntryInfo ParserAO3::ParseBehavior()
     if (!workskin_result.found)
     {
         std::cout << "Error: workskin seek" << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
     xmlNodePtr workskin = workskin_result.seek_node;
-    xmlDocSetRootElement(index_entry_doc_tree, workskin);
+    xmlDocSetRootElement(section_doc_tree, workskin);
 
     ParserXmlNodeSeek words_result = SeekToNodeByPattern(root_node,
         pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class=words");
@@ -128,7 +128,7 @@ ParserIndexEntryInfo ParserAO3::ParseBehavior()
         }
     }
 
-    std::string section_file_name = GetSectionFileName(index_entry, title_);
+    std::string section_file_name = GetSectionFileName(index_entry.index_num, title_);
     FILE* index_entry_file;
     std::string file_name = local_des_ + section_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
@@ -137,11 +137,11 @@ ParserIndexEntryInfo ParserAO3::ParseBehavior()
     if (index_entry_file == NULL)
     {
         std::cout << "Error: could not open file with name: " << file_name << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    xmlElemDump(index_entry_file, index_entry_doc_tree, workskin_result.seek_node);
+    xmlElemDump(index_entry_file, section_doc_tree, workskin_result.seek_node);
     // TODO: figure out how to handle seg faults/other errors in threadpool/thread
     fclose(index_entry_file);
 

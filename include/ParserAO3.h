@@ -24,7 +24,7 @@ public:
 protected:
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    virtual ParserIndexEntryInfo ParseBehavior();
+    virtual ParseSectionInfo ParseSection();
     std::string PreprocessTargetUrl(const std::string &job_url);
 
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);

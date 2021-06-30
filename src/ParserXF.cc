@@ -23,122 +23,11 @@ namespace XF {
 namespace BlackLibraryCommon = black_library::core::common;
 
 ParserXF::ParserXF(parser_t parser_type) :
-    IndexEntryParser(parser_type)
+    LinkedListParser(parser_type)
 {
     title_ = "XF_parser_title";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     source_url_ = BlackLibraryCommon::ERROR::source_url;
-}
-
-// TODO: Extract index entry may fail, use std::optional to check
-ParserIndexEntry ParserXF::ExtractIndexEntry(xmlNodePtr root_node)
-{
-    xmlNodePtr current_node = NULL;
-    ParserIndexEntry index_entry;
-
-    auto likes_result = GetXmlAttributeContentByName(root_node, "data-likes");
-    auto author_result = GetXmlAttributeContentByName(root_node, "data-content-author");
-
-    // for XF this gets the most recent for ALL threadmarks
-    auto date_result = GetXmlAttributeContentByName(root_node, "data-content-date");
-
-    if (likes_result.found)
-        // TODO: track/store the likes/popularity
-        // std::cout << likes_result.result << std::endl;
-
-    if (author_result.found)
-        author_ = author_result.result;
-
-    if (date_result.found)
-        index_entry.time_published = std::stol(date_result.result);
-
-    for (current_node = root_node->children; current_node; current_node = current_node->next)
-    {
-        if (current_node->type != XML_ELEMENT_NODE)
-            continue;
-
-        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
-        {
-            if (NodeHasAttributeContent(current_node, "structItem-cell structItem-cell--main"))
-            {
-                break;
-            }
-        }
-    }
-
-    if (current_node == NULL)
-    {
-        return index_entry;
-    }
-
-    auto url_seek = SeekToNodeByNameRecursive(current_node->children, "a");
-
-    if (!url_seek.found)
-    {
-        return index_entry;
-    }
-
-    current_node = url_seek.seek_node;
-
-    auto url_result = GetXmlAttributeContentByName(current_node, "href");
-
-    if (!url_result.found)
-    {
-        return index_entry;
-    }
-
-    index_entry.data_url = url_result.result;
-
-    current_node = current_node->children;
-
-    auto index_entry_name_result = GetXmlNodeContent(current_node);
-
-    if (!index_entry_name_result.found)
-    {
-        return index_entry;
-    }
-
-    index_entry.name = index_entry_name_result.result;
-
-    return index_entry;
-}
-
-void ParserXF::FindIndexEntries(xmlNodePtr root_node)
-{
-    xmlNodePtr current_node = NULL;
-
-    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
-
-    if (!body_seek.found)
-    {
-        std::cout << "Could not find index entries" << std::endl;
-        return;
-    }
-
-    current_node = body_seek.seek_node->children;
-
-    ParserXmlNodeSeek item_container_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
-        pattern_seek_t::XML_ATTRIBUTE, "class=structItemContainer");
-    if (item_container_seek.found)
-    {
-        xmlNodePtr index_node = NULL;
-        uint16_t index_num = 0;
-        for (index_node = item_container_seek.seek_node->children; index_node; index_node = index_node->next)
-        {
-            if (index_node->type == XML_ELEMENT_NODE)
-            {
-                ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
-                if (index_entry.data_url.empty())
-                    continue;
-
-                index_entry.index_num = index_num;
-                index_entries_.emplace_back(index_entry);
-                ++index_num;
-            }
-        }
-
-        xmlFree(index_node);
-    }
 }
 
 void ParserXF::FindMetaData(xmlNodePtr root_node)
@@ -181,39 +70,60 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserIndexEntryInfo ParserXF::ParseBehavior()
+ParseSectionInfo ParserXF::ParseSection()
 {
-    ParserIndexEntryInfo output;
-    auto index_entry = index_entries_[index_];
+    ParseSectionInfo output;
 
-    std::string index_entry_url = "https://" + source_url_ + index_entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseBehavior: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
+    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << next_url_ << std::endl;
 
-    std::string index_entry_curl_result = CurlRequest(index_entry_url);
-    xmlDocPtr index_entry_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
+    const auto working_url = next_url_;
+    const auto working_index = index_;
+
+    const auto section_curl_result = CurlRequest(working_url);
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    if (index_entry_doc_tree == NULL)
+    if (section_doc_tree == NULL)
     {
         std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
         return output;
     }
 
-    std::string target_id = GetTargetId(index_entry.data_url);
-
-    xmlNodePtr root_node = xmlDocGetRootElement(index_entry_doc_tree);
+    xmlNodePtr root_node = xmlDocGetRootElement(section_doc_tree);
     xmlNodePtr current_node = root_node->children;
     xmlNodePtr length_node = NULL;
     size_t length = 0;
 
-    ParserXmlNodeSeek index_entry_content_seek = SeekToIndexEntryContent(current_node, target_id);
-    if (!index_entry_content_seek.found)
+    // std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
+
+    const auto target_post = GetTargetPost(current_node);
+
+    std::cout << "target_post: " << target_post << std::endl;
+
+    const auto post_target = "id=" + target_post;
+
+    const auto section_title_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "span",
+        pattern_seek_t::XML_ATTRIBUTE, post_target);
+    if (!section_title_seek.found)
     {
-        std::cout << "Error: Failed seek" << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        std::cout << "Error: Failed title seek" << std::endl;
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    current_node = index_entry_content_seek.seek_node;
+    std::cout << "Found" << std::endl;
+
+    // reset current node
+    current_node = root_node->children;
+
+    const auto section_content_seek = SeekToSectionContent(current_node, target_post);
+    if (!section_content_seek.found)
+    {
+        std::cout << "Error: Failed content seek" << std::endl;
+        xmlFreeDoc(section_doc_tree);
+        return output;
+    }
+
+    current_node = section_content_seek.seek_node;
 
     for (length_node = current_node->children; length_node; length_node = length_node->next)
     {
@@ -224,18 +134,18 @@ ParserIndexEntryInfo ParserXF::ParseBehavior()
 
     output.length = length;
 
-    std::string index_entry_name = GetXFIndexEntryTitle(index_entry);
+    std::string section_title_name = GetXFTitle(working_url);
 
-    index_entry_name = BlackLibraryCommon::SanitizeFileName(index_entry_name);
+    section_title_name = BlackLibraryCommon::SanitizeFileName(section_title_name);
 
-    if (index_entry_name.empty())
+    if (section_title_name.empty())
     {
         std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " index entry name" << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    std::string section_file_name = GetSectionFileName(index_entry, index_entry_name);
+    std::string section_file_name = GetSectionFileName(working_index, section_title_name);
 
     FILE* index_entry_file;
     std::string file_name = local_des_ + section_file_name;
@@ -245,52 +155,74 @@ ParserIndexEntryInfo ParserXF::ParseBehavior()
     if (index_entry_file == NULL)
     {
         std::cout << "Error: could not open file with name: " << file_name << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    xmlElemDump(index_entry_file, index_entry_doc_tree, current_node);
+    xmlElemDump(index_entry_file, section_doc_tree, current_node);
 
     fclose(index_entry_file);
 
-    xmlFreeDoc(index_entry_doc_tree);
+    xmlFreeDoc(section_doc_tree);
 
     output.has_error = false;
 
     return output;
 }
 
-
-
 std::string ParserXF::PreprocessTargetUrl(const std::string &job_url)
 {
     return job_url + "threadmarks";
 }
 
-std::string ParserXF::GetTargetId(const std::string &data_url)
+std::string ParserXF::GetTargetPost(xmlNodePtr root_node)
 {
-    auto pos = data_url.find_last_of("-");
+    xmlNodePtr current_node = NULL;
 
-    return data_url.substr(pos + 1);
+    const auto target_post_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "span",
+        pattern_seek_t::XML_ATTRIBUTE, "class=u-anchorTarget",
+        pattern_seek_t::XML_ATTRIBUTE, "id=post-18370764"
+        );
+    if (!target_post_seek.found)
+    {
+        std::cout << "Error: Failed target post seek" << std::endl;
+        return "";
+    }
+
+    current_node = target_post_seek.seek_node;
+
+    const auto post_id = GetXmlAttributeContentByName(current_node, "data-lb-id");
+
+    const auto post_content = GetXmlAttributeContentByName(current_node, "data-content");
+
+    if (!post_content.found)
+    {
+        std::cout << "Error: Failed content" << std::endl;
+        return "";
+    }
+
+    std::cout << post_content.result << std::endl;
+
+    return "hello";
 }
 
-std::string ParserXF::GetXFIndexEntryTitle(const ParserIndexEntry &index_entry)
+std::string ParserXF::GetXFTitle(const std::string &title)
 {
     std::locale loc;
-    std::string xf_index_entry_name = index_entry.name;
+    std::string xf_title_name = title;
 
-    std::transform(xf_index_entry_name.begin(), xf_index_entry_name.end(), xf_index_entry_name.begin(),
+    std::transform(xf_title_name.begin(), xf_title_name.end(), xf_title_name.begin(),
     [&loc](char ch)
     {
         return ch == ' ' ? '-' : std::tolower(ch, loc);
     });
 
-    return xf_index_entry_name;
+    return xf_title_name;
 }
 
-ParserXmlNodeSeek ParserXF::SeekToIndexEntryContent(xmlNodePtr root_node, const std::string &target_id)
+ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post)
 {
-    ParserXmlNodeSeek index_entry_content_seek;
+    ParserXmlNodeSeek section_content_seek;
     xmlNodePtr current_node = NULL;
     bool found = false;
 
@@ -306,29 +238,29 @@ ParserXmlNodeSeek ParserXF::SeekToIndexEntryContent(xmlNodePtr root_node, const 
                 continue;
 
             // find by post_id
-            if (!post_id.result.compare("post-" + target_id))
+            if (!post_id.result.compare(target_post))
             {
                 auto inner_seek = SeekToNodeByNameRecursive(current_node->children, "div");
                 if (!inner_seek.found)
                     continue;
 
-                index_entry_content_seek.seek_node = inner_seek.seek_node;
+                section_content_seek.seek_node = inner_seek.seek_node;
                 found = true;
                 break;
             }
         }
 
-        ParserXmlNodeSeek children_seek = SeekToIndexEntryContent(current_node->children, target_id);
+        ParserXmlNodeSeek children_seek = SeekToSectionContent(current_node->children, target_post);
 
         if (children_seek.seek_node != NULL)
-            index_entry_content_seek.seek_node = children_seek.seek_node;
+            section_content_seek.seek_node = children_seek.seek_node;
 
         found = found || children_seek.found;
     }
 
-    index_entry_content_seek.found = found;
+    section_content_seek.found = found;
 
-    return index_entry_content_seek;
+    return section_content_seek;
 }
 
 } // namespace XF

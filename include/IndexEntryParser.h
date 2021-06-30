@@ -21,17 +21,14 @@ public:
     virtual ParserResult Parse(const ParserJob &parser_job);
 
 protected:
+    virtual int CalculateIndexBounds(const ParserJob &parser_job);
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     virtual void FindIndexEntries(xmlNodePtr root_node);
     virtual void ParseLoop(ParserResult &parser_result);
     virtual void SaveLastUrl(ParserResult &parser_result);
     virtual void SaveUpdateDate(ParserResult &parser_result);
 
-    int CalculateIndexBounds(const ParserJob &parser_job);
-
     std::vector<ParserIndexEntry> index_entries_;
-    size_t index_;
-    size_t end_index_;
 };
 
 } // namespace parsers
