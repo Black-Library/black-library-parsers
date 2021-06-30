@@ -57,7 +57,7 @@ enum class pattern_seek_t {
 
 std::ostream& operator<<(std::ostream& out, const pattern_seek_t value);
 
-struct ParserBehaviorInfo {
+struct ParseSectionInfo {
     size_t length = 0;
     bool has_error = true;
 };
@@ -186,7 +186,7 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 std::string GetParserBehaviorName(parser_behavior_t behavior);
 std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
-std::string GetSectionFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name);
+std::string GetSectionFileName(const size_t &index_num, const std::string &section_name);
 std::string GetSpaceString(size_t num_tabs);
 std::string GetStatusName(job_status_t job_status);
 ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value);

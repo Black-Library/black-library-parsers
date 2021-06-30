@@ -74,9 +74,9 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserBehaviorInfo ParserYT::ParseBehavior()
+ParseSectionInfo ParserYT::ParseSection()
 {
-    ParserBehaviorInfo output;
+    ParseSectionInfo output;
     
     output.has_error = false;
 

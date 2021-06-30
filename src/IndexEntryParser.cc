@@ -19,9 +19,7 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 IndexEntryParser::IndexEntryParser(parser_t parser_type) : 
     Parser(parser_type),
-    index_entries_(),
-    index_(0),
-    end_index_(0)
+    index_entries_()
 {
     parser_behavior_ = parser_behavior_t::INDEX_ENTRY;
 }
@@ -140,13 +138,13 @@ void IndexEntryParser::ParseLoop(ParserResult &parser_result)
                 continue;
             }
 
-            const auto parser_behavior_info = ParseBehavior();
+            ParseSectionInfo parse_section_info = ParseSection();
             --remaining_attempts;
 
-            wait_time = time_generator_->GenerateWaitTime(parser_behavior_info.length);
+            wait_time = time_generator_->GenerateWaitTime(parse_section_info.length);
             wait_time_total += wait_time;
 
-            if (parser_behavior_info.has_error)
+            if (parse_section_info.has_error)
             {
                 std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
@@ -156,7 +154,7 @@ void IndexEntryParser::ParseLoop(ParserResult &parser_result)
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << parser_behavior_info.length
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << parse_section_info.length
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (progress_number_callback_)

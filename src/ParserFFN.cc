@@ -25,8 +25,8 @@ ParserFFN::~ParserFFN()
 
 void ParserFFN::Parse(const ParserJob &parser_job)
 {
-    std::string url_adult = parser_job.url + "?view_full_work=true&view_adult=true";
-    std::string result = CurlRequest(url_adult);
+    const auto url_adult = parser_job.url + "?view_full_work=true&view_adult=true";
+    const auto result = CurlRequest(url_adult);
 
     xmlDoc* doc = htmlReadDoc((xmlChar*) result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);

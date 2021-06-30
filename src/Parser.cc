@@ -25,6 +25,8 @@ Parser::Parser(parser_t parser_type) :
     source_name_(BlackLibraryCommon::ERROR::source_name),
     source_url_(BlackLibraryCommon::ERROR::source_url),
     author_("unknown-author"),
+    index_(0),
+    end_index_(0),
     parser_type_(parser_type),
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false)
@@ -85,6 +87,13 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     SaveMetaData(parser_result);
 
     xmlFreeDoc(doc_tree);
+
+    if (CalculateIndexBounds(parser_job))
+    {
+        return parser_result;
+    }
+
+    PreparseLoop();
 
     ParseLoop(parser_result);
 
@@ -173,15 +182,23 @@ int Parser::RegisterProgressNumberCallback(const progress_number_callback &callb
     return 0;
 }
 
+int Parser::CalculateIndexBounds(const ParserJob &parser_job)
+{
+    index_ = parser_job.start_number - 1;
+    end_index_ = parser_job.end_number -1;
+
+    return 0;
+}
+
 void Parser::FindMetaData(xmlNodePtr root_node)
 {
     (void) root_node;
 }
 
-ParserBehaviorInfo Parser::ParseBehavior()
+ParseSectionInfo Parser::ParseSection()
 {
-    ParserBehaviorInfo info;
-    return info;
+    ParseSectionInfo parse_section_info;
+    return parse_section_info;
 }
 
 void Parser::ParseLoop(ParserResult &parser_result)

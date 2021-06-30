@@ -26,7 +26,7 @@ protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserBehaviorInfo ParseBehavior();
+    ParseSectionInfo ParseSection();
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);
 
 };

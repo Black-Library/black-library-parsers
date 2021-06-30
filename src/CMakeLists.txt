@@ -6,6 +6,9 @@ message("LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
 include(GNUInstallDirs)
 
 add_library(blacklibraryparsers
+    IndexEntryParser.cc
+    LinkedListParser.cc
+
     Parser.cc
     ParserCommon.cc
     ParserFactory.cc
@@ -19,8 +22,6 @@ add_library(blacklibraryparsers
     ParserSVF.cc
     ParserXF.cc
     ParserYT.cc
-
-    IndexEntryParser.cc
 
     ReaderTimeGenerator.cc
     ShortTimeGenerator.cc

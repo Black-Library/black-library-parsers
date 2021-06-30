@@ -185,24 +185,24 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserBehaviorInfo ParserRR::ParseBehavior()
+ParseSectionInfo ParserRR::ParseSection()
 {
-    ParserBehaviorInfo output;
-    auto index_entry = index_entries_[index_];
+    ParseSectionInfo output;
+    const auto index_entry = index_entries_[index_];
 
-    std::string index_entry_url = "https://www." + source_url_ + index_entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseBehavior: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
+    const auto index_entry_url = "https://www." + source_url_ + index_entry.data_url;
+    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
 
-    std::string index_entry_curl_result = CurlRequest(index_entry_url);
-    xmlDocPtr index_entry_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
+    const auto curl_request_result = CurlRequest(index_entry_url);
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    if (index_entry_doc_tree == NULL)
+    if (section_doc_tree == NULL)
     {
         std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
         return output;
     }
 
-    xmlNodePtr root_node = xmlDocGetRootElement(index_entry_doc_tree);
+    xmlNodePtr root_node = xmlDocGetRootElement(section_doc_tree);
     xmlNodePtr current_node = root_node->children;
     xmlNodePtr length_node = NULL;
     size_t length = 0;
@@ -210,8 +210,8 @@ ParserBehaviorInfo ParserRR::ParseBehavior()
     ParserXmlNodeSeek index_entry_content_seek = SeekToIndexEntryContent(current_node);
     if (!index_entry_content_seek.found)
     {
-        std::cout << "Error: Failed seek" << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        std::cout << "Error: Failed content seek" << std::endl;
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
@@ -233,11 +233,11 @@ ParserBehaviorInfo ParserRR::ParseBehavior()
     if (index_entry_title.empty())
     {
         std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " index entry title name" << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    std::string section_file_name = GetSectionFileName(index_entry, index_entry_title);
+    std::string section_file_name = GetSectionFileName(index_entry.index_num, index_entry_title);
 
     FILE* index_entry_file;
     std::string file_name = local_des_ + section_file_name;
@@ -247,15 +247,15 @@ ParserBehaviorInfo ParserRR::ParseBehavior()
     if (index_entry_file == NULL)
     {
         std::cout << "Error: could not open file with name: " << file_name << std::endl;
-        xmlFreeDoc(index_entry_doc_tree);
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    xmlElemDump(index_entry_file, index_entry_doc_tree, current_node);
+    xmlElemDump(index_entry_file, section_doc_tree, current_node);
 
     fclose(index_entry_file);
 
-    xmlFreeDoc(index_entry_doc_tree);
+    xmlFreeDoc(section_doc_tree);
 
     output.has_error = false;
 

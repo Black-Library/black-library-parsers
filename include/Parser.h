@@ -52,10 +52,12 @@ public:
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 protected:
+    virtual int CalculateIndexBounds(const ParserJob &parser_job);
     virtual void FindMetaData(xmlNodePtr root_node);
-    virtual ParserBehaviorInfo ParseBehavior();
     virtual void ParseLoop(ParserResult &parser_result);
+    virtual ParseSectionInfo ParseSection();
     virtual void PostProcessMetaData();
+    virtual void PreparseLoop();
     virtual std::string PreprocessTargetUrl(const std::string &job_url);
     virtual void SaveLastUrl(ParserResult &parser_result);
     virtual void SaveMetaData(ParserResult &parser_result);
@@ -73,6 +75,9 @@ protected:
     std::string target_url_;
     std::string uuid_;
     std::string local_des_;
+
+    size_t index_;
+    size_t end_index_;
 
     std::mutex mutex_;
     parser_t parser_type_;
