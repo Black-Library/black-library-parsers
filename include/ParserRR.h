@@ -5,7 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_RR_PARSER_RR_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_RR_PARSER_RR_H__
 
-#include "Parser.h"
+#include "IndexEntryParser.h"
 
 namespace black_library {
 
@@ -15,11 +15,10 @@ namespace parsers {
 
 namespace RR {
 
-class ParserRR : public Parser
+class ParserRR : public IndexEntryParser
 {
 public:
     explicit ParserRR();
-    ~ParserRR();
 
 protected:
     std::string GetRRIndexEntryTitle(const ParserIndexEntry &index_entry);
@@ -27,7 +26,7 @@ protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    ParserIndexEntryInfo ParseBehavior();
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);
 
 };

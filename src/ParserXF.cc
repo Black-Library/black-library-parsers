@@ -23,16 +23,11 @@ namespace XF {
 namespace BlackLibraryCommon = black_library::core::common;
 
 ParserXF::ParserXF(parser_t parser_type) :
-    Parser(parser_type)
+    IndexEntryParser(parser_type)
 {
     title_ = "XF_parser_title";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     source_url_ = BlackLibraryCommon::ERROR::source_url;
-}
-
-ParserXF::~ParserXF()
-{
-    done_ = true;
 }
 
 // TODO: Extract index entry may fail, use std::optional to check
@@ -112,39 +107,38 @@ void ParserXF::FindIndexEntries(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
-    for (current_node = root_node; current_node; current_node = current_node->next)
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
+
+    if (!body_seek.found)
     {
-        if (current_node->type != XML_ELEMENT_NODE)
-            continue;
+        std::cout << "Could not find index entries" << std::endl;
+        return;
+    }
 
-        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
+    current_node = body_seek.seek_node->children;
+
+    ParserXmlNodeSeek item_container_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=structItemContainer");
+    if (item_container_seek.found)
+    {
+        xmlNodePtr index_node = NULL;
+        uint16_t index_num = 0;
+        for (index_node = item_container_seek.seek_node->children; index_node; index_node = index_node->next)
         {
-            if (NodeHasAttributeContent(current_node, "structItemContainer"))
+            if (index_node->type == XML_ELEMENT_NODE)
             {
-                xmlNodePtr index_node = NULL;
-                uint16_t index_num = 0;
-                for (index_node = current_node->children; index_node; index_node = index_node->next)
-                {
-                    if (index_node->type == XML_ELEMENT_NODE)
-                    {
-                        ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
-                        if (index_entry.data_url.empty())
-                            continue;
+                ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
+                if (index_entry.data_url.empty())
+                    continue;
 
-                        index_entry.index_num = index_num;
-                        index_entries_.emplace_back(index_entry);
-                        ++index_num;
-                    }
-                }
-
-                xmlFree(index_node);
+                index_entry.index_num = index_num;
+                index_entries_.emplace_back(index_entry);
+                ++index_num;
             }
         }
 
-        FindIndexEntries(current_node->children);
+        xmlFree(index_node);
     }
-
-    xmlFree(current_node);
 }
 
 void ParserXF::FindMetaData(xmlNodePtr root_node)
@@ -187,11 +181,13 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserIndexEntryInfo ParserXF::ParseIndexEntry(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo ParserXF::ParseBehavior()
 {
     ParserIndexEntryInfo output;
+    auto index_entry = index_entries_[index_];
+
     std::string index_entry_url = "https://" + source_url_ + index_entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseIndexEntry: " << index_entry_url << " - " << index_entry.name << std::endl;
+    std::cout << GetParserName(parser_type_) << " ParseBehavior: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
 
     std::string index_entry_curl_result = CurlRequest(index_entry_url);
     xmlDocPtr index_entry_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
@@ -263,6 +259,8 @@ ParserIndexEntryInfo ParserXF::ParseIndexEntry(const ParserIndexEntry &index_ent
 
     return output;
 }
+
+
 
 std::string ParserXF::PreprocessTargetUrl(const std::string &job_url)
 {

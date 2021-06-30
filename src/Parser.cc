@@ -5,7 +5,6 @@
 #include <chrono>
 #include <functional>
 #include <iostream>
-#include <thread>
 
 #include <Parser.h>
 #include <ShortTimeGenerator.h>
@@ -18,24 +17,30 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-Parser::Parser(parser_t parser_type)
+Parser::Parser(parser_t parser_type) : 
+    progress_number_callback_(),
+    time_generator_(std::make_shared<ShortTimeGenerator>()),
+    title_("ERROR_parser_title"),
+    nickname_(""),
+    source_name_(BlackLibraryCommon::ERROR::source_name),
+    source_url_(BlackLibraryCommon::ERROR::source_url),
+    author_("unknown-author"),
+    parser_type_(parser_type),
+    parser_behavior_(parser_behavior_t::ERROR),
+    done_(false)
 {
-    time_generator_ = std::make_shared<ShortTimeGenerator>();
-    title_ = "ERROR_parser_title";
-    nickname_ = "";
-    source_name_ = BlackLibraryCommon::ERROR::source_name;
-    source_url_ = BlackLibraryCommon::ERROR::source_url;
-    author_ = "unknown-author";
-    index_ = 0;
-    end_index_ = 0;
-    parser_type_ = parser_type;
-    done_ = false;
 }
 
 Parser::Parser(const Parser &parser) :
     parser_type_(parser.parser_type_),
+    parser_behavior_(parser.parser_behavior_),
     done_(bool(parser.done_))
 {
+}
+
+Parser::~Parser()
+{
+    done_ = true;
 }
 
 ParserResult Parser::Parse(const ParserJob &parser_job)
@@ -77,118 +82,17 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     // reset current node ptr to root node children
     current_node = root_node->children;
 
-    ParserXmlNodeSeek body_seek = SeekToNodeByName(current_node, "body");
-
-    if (!body_seek.found)
-    {
-        std::cout << "Could not find index entries, exiting" << std::endl;
-        xmlFreeDoc(doc_tree);
-        return parser_result;
-    }
-
-    current_node = body_seek.seek_node;
-
-    std::cout << GetParserName(parser_type_) << ": Find index entry nodes" << std::endl;
-
-    FindIndexEntries(current_node->children);
-
-    std::cout << "\tTitle: " << title_ << std::endl;
-    std::cout << "\tAuthor: " << author_ << std::endl;
-    std::cout << "\tNickname: " << nickname_ << std::endl;
-
-    parser_result.metadata.title = title_;
-    parser_result.metadata.author = author_;
-    parser_result.metadata.nickname = nickname_;
-    parser_result.metadata.source = GetSourceName();
+    SaveMetaData(parser_result);
 
     xmlFreeDoc(doc_tree);
 
-    std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
+    ParseLoop(parser_result);
 
-    CalculateIndexBounds(parser_job);
+    PostProcessMetaData();
 
-    if (index_ > index_entries_.size() || index_entries_.empty())
-    {
-        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested start index greater than detected entries" << std::endl;
-        return parser_result;
-    }
-
-    size_t seconds_counter = 0;
-    size_t wait_time = 0;
-    size_t wait_time_total = 0;
-    size_t remaining_attempts = 5;
-
-    // TODO: make parser take 8ish hour break
-    while (!done_)
-    {
-        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
-
-        if (done_)
-            break;
-
-        if (seconds_counter >= wait_time)
-            seconds_counter = 0;
-
-        if (seconds_counter == 0)
-        {
-            // let the fake reader finish waiting before exiting
-            if (index_ > end_index_)
-            {
-                done_ = true;
-                std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
-                continue;
-            }
-
-            if (remaining_attempts <= 0)
-            {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << std::endl;
-                remaining_attempts = 5;
-                ++index_;
-                continue;
-            }
-
-            ParserIndexEntryInfo index_entry_parse_info = ParseIndexEntry(index_entries_[index_]);
-            --remaining_attempts;
-
-            wait_time = time_generator_->GenerateWaitTime(index_entry_parse_info.length);
-            wait_time_total += wait_time;
-
-            if (index_entry_parse_info.has_error)
-            {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << " - remaining attempts: " << remaining_attempts
-                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
-
-                if (remaining_attempts == 0 && progress_number_callback_)
-                    progress_number_callback_(uuid_, index_ + 1, true);
-            }
-            else
-            {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << index_entry_parse_info.length
-                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
-
-                if (progress_number_callback_)
-                    progress_number_callback_(uuid_, index_ + 1, false);
-
-                parser_result.metadata.series_length = index_ + 1;
-
-                remaining_attempts = 5;
-                ++index_;
-            }
-        }
-
-        ++seconds_counter;
-
-        std::this_thread::sleep_until(deadline);
-    }
-
-    parser_result.metadata.last_url = index_entries_[index_entries_.size() - 1].data_url;
-
-    // find newest update date
-    for (const auto & index_entry : index_entries_)
-    {
-        if (index_entry.time_published > parser_result.metadata.update_date)
-            parser_result.metadata.update_date = index_entry.time_published;
-    }
+    // save information to parser_result
+    SaveLastUrl(parser_result);
+    SaveUpdateDate(parser_result);
 
     parser_result.has_error = false;
 
@@ -242,6 +146,11 @@ bool Parser::GetDone()
     return done_;
 }
 
+parser_behavior_t Parser::GetParserBehaviorType()
+{
+    return parser_behavior_;
+}
+
 parser_t Parser::GetParserType()
 {
     return parser_type_;
@@ -264,28 +173,26 @@ int Parser::RegisterProgressNumberCallback(const progress_number_callback &callb
     return 0;
 }
 
-ParserIndexEntry Parser::ExtractIndexEntry(xmlNodePtr root_node)
-{
-    (void) root_node;
-    ParserIndexEntry index_entry;
-    return index_entry;
-}
-
-void Parser::FindIndexEntries(xmlNodePtr root_node)
-{
-    (void) root_node;
-}
-
 void Parser::FindMetaData(xmlNodePtr root_node)
 {
     (void) root_node;
 }
 
-ParserIndexEntryInfo Parser::ParseIndexEntry(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo Parser::ParseBehavior()
 {
-    (void) index_entry;
     ParserIndexEntryInfo info;
     return info;
+}
+
+void Parser::ParseLoop(ParserResult &parser_result)
+{
+    (void) parser_result;
+    return;
+}
+
+void Parser::PostProcessMetaData()
+{
+    return;
 }
 
 std::string Parser::PreprocessTargetUrl(const std::string &job_url)
@@ -293,25 +200,28 @@ std::string Parser::PreprocessTargetUrl(const std::string &job_url)
     return job_url;
 }
 
-void Parser::CalculateIndexBounds(const ParserJob &parser_job)
+void Parser::SaveLastUrl(ParserResult &parser_result)
 {
-    if (parser_job.start_number > index_entries_.size())
-    {
-        index_ = 0;
-    }
-    else
-    {
-        index_ = parser_job.start_number - 1;
-    }
+    (void) parser_result;
+    return;
+}
 
-    if (parser_job.start_number <= parser_job.end_number && index_entries_.size() >= parser_job.end_number)
-    {
-        end_index_ = parser_job.end_number - 1;
-    }
-    else
-    {
-        end_index_ = index_entries_.size() - 1;
-    }
+void Parser::SaveMetaData(ParserResult &parser_result)
+{
+    std::cout << "\tTitle: " << title_ << std::endl;
+    std::cout << "\tAuthor: " << author_ << std::endl;
+    std::cout << "\tNickname: " << nickname_ << std::endl;
+
+    parser_result.metadata.title = title_;
+    parser_result.metadata.author = author_;
+    parser_result.metadata.nickname = nickname_;
+    parser_result.metadata.source = GetSourceName();
+}
+
+void Parser::SaveUpdateDate(ParserResult &parser_result)
+{
+    (void) parser_result;
+    return;
 }
 
 // Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c

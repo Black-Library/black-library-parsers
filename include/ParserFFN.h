@@ -19,14 +19,12 @@ class ParserFFN : public Parser
 {
 public:
     ParserFFN();
-    ~ParserFFN();
 
     ParserResult Parse(const ParserJob &parser_job);
 
 protected:
     std::string ParseTitle();
     std::string ParseAuthor();
-    int ParseIndexEntry();
 
 private:
 };

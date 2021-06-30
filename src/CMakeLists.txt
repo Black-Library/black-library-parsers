@@ -20,6 +20,8 @@ add_library(blacklibraryparsers
     ParserXF.cc
     ParserYT.cc
 
+    IndexEntryParser.cc
+
     ReaderTimeGenerator.cc
     ShortTimeGenerator.cc
     )

@@ -66,11 +66,6 @@ std::string ParserFFN::ParseAuthor()
     return "";
 }
 
-int ParserFFN::ParseIndexEntry()
-{
-    return 0;
-}
-
 } // namespace FFN
 
 } // namespace parsers

@@ -29,11 +29,6 @@ ParserYT::ParserYT() :
     is_playlist = false;
 }
 
-ParserYT::~ParserYT()
-{
-    done_ = true;
-}
-
 ParserIndexEntry ParserYT::ExtractIndexEntry(xmlNodePtr root_node)
 {
     (void) root_node;
@@ -79,10 +74,8 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserIndexEntryInfo ParserYT::ParseIndexEntry(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo ParserYT::ParseBehavior()
 {
-    (void) index_entry;
-
     ParserIndexEntryInfo output;
     
     output.has_error = false;

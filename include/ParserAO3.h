@@ -5,7 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
 
-#include "Parser.h"
+#include "IndexEntryParser.h"
 
 namespace black_library {
 
@@ -15,20 +15,16 @@ namespace parsers {
 
 namespace AO3 {
 
-class ParserAO3 : public Parser
+class ParserAO3 : public IndexEntryParser
 {
 public:
     explicit ParserAO3();
     ~ParserAO3();
 
-    ParserResult Parse(const ParserJob &parser_job);
-    void Stop();
-
 protected:
-    int ParseIndexEntry();
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    virtual ParserIndexEntryInfo ParseBehavior();
     std::string PreprocessTargetUrl(const std::string &job_url);
 
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);

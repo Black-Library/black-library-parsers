@@ -20,16 +20,11 @@ namespace RR {
 namespace BlackLibraryCommon = black_library::core::common;
 
 ParserRR::ParserRR() :
-    Parser(parser_t::RR_PARSER)
+    IndexEntryParser(parser_t::RR_PARSER)
 {
     title_ = "RR_parser_title";
     source_name_ = BlackLibraryCommon::RR::source_name;
     source_url_ = BlackLibraryCommon::RR::source_url;
-}
-
-ParserRR::~ParserRR()
-{
-    done_ = true;
 }
 
 std::string ParserRR::GetRRIndexEntryTitle(const ParserIndexEntry &index_entry)
@@ -110,36 +105,37 @@ void ParserRR::FindIndexEntries(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
-    for (current_node = root_node; current_node; current_node = current_node->next)
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
+
+    if (!body_seek.found)
     {
-        if (current_node->type == XML_ELEMENT_NODE)
+        std::cout << "Could not find index entries" << std::endl;
+        return;
+    }
+
+    current_node = body_seek.seek_node->children;
+
+    ParserXmlNodeSeek tbody_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "tbody");
+    if (tbody_seek.found)
+    {
+        xmlNodePtr index_node = NULL;
+        uint16_t index_num = 0;
+        for (index_node = tbody_seek.seek_node->children; index_node; index_node = index_node->next)
         {
-            if (!xmlStrcmp(current_node->name, (const xmlChar *)"tbody"))
+            if (!xmlStrcmp(index_node->name, (const xmlChar *) "tr"))
             {
-                xmlNodePtr index_node = NULL;
-                uint16_t index_num = 0;
-                for (index_node = current_node->children; index_node; index_node = index_node->next)
-                {
-                    if (index_node->type == XML_ELEMENT_NODE)
-                    {
-                        ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
-                        if (index_entry.data_url.empty())
-                            continue;
+                ParserIndexEntry index_entry = ExtractIndexEntry(index_node);
+                if (index_entry.data_url.empty())
+                    continue;
 
-                        index_entry.index_num = index_num;
-                        index_entries_.emplace_back(index_entry);
-                        ++index_num;
-                    }
-                }
-
-                xmlFree(index_node);
+                index_entry.index_num = index_num;
+                index_entries_.emplace_back(index_entry);
+                ++index_num;
             }
         }
 
-        FindIndexEntries(current_node->children);
+        xmlFree(index_node);
     }
-
-    xmlFree(current_node);
 }
 
 void ParserRR::FindMetaData(xmlNodePtr root_node)
@@ -189,11 +185,13 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
     xmlFree(current_node);
 }
 
-ParserIndexEntryInfo ParserRR::ParseIndexEntry(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo ParserRR::ParseBehavior()
 {
     ParserIndexEntryInfo output;
+    auto index_entry = index_entries_[index_];
+
     std::string index_entry_url = "https://www." + source_url_ + index_entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseIndexEntry: " << index_entry_url << " - " << index_entry.name << std::endl;
+    std::cout << GetParserName(parser_type_) << " ParseBehavior: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
 
     std::string index_entry_curl_result = CurlRequest(index_entry_url);
     xmlDocPtr index_entry_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,

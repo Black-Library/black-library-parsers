@@ -19,7 +19,7 @@ namespace AO3 {
 namespace BlackLibraryCommon = black_library::core::common;
 
 ParserAO3::ParserAO3() :
-    Parser(parser_t::AO3_PARSER)
+    IndexEntryParser(parser_t::AO3_PARSER)
 {
     title_ = "AO3_parser_title";
     source_name_ = BlackLibraryCommon::AO3::source_name;
@@ -29,11 +29,6 @@ ParserAO3::ParserAO3() :
 ParserAO3::~ParserAO3()
 {
     done_ = true;
-}
-
-int ParserAO3::ParseIndexEntry()
-{
-    return 0;
 }
 
 void ParserAO3::FindIndexEntries(xmlNodePtr root_node)
@@ -80,9 +75,11 @@ void ParserAO3::FindMetaData(xmlNodePtr root_node)
     }
 }
 
-ParserIndexEntryInfo ParserAO3::ParseIndexEntry(const ParserIndexEntry &index_entry)
+ParserIndexEntryInfo ParserAO3::ParseBehavior()
 {
     ParserIndexEntryInfo output;
+    auto index_entry = index_entries_[index_];
+
     std::string url_adult = index_entry.data_url;
     std::string index_entry_curl_result = CurlRequest(url_adult);
 

@@ -7,7 +7,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_XF_PARSER_XF_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_XF_PARSER_XF_H__
 
-#include "Parser.h"
+#include "IndexEntryParser.h"
 
 namespace black_library {
 
@@ -17,17 +17,16 @@ namespace parsers {
 
 namespace XF {
 
-class ParserXF : public Parser
+class ParserXF : public IndexEntryParser
 {
 public:
     explicit ParserXF(parser_t parser_type);
-    ~ParserXF();
 
 protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    ParserIndexEntryInfo ParseBehavior();
     std::string PreprocessTargetUrl(const std::string &job_url);
 
     std::string GetTargetId(const std::string &data_url);

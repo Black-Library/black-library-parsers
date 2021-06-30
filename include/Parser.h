@@ -34,9 +34,9 @@ public:
     Parser(parser_t parser_type);
     Parser() : Parser(parser_t::ERROR_PARSER){};
     Parser(const Parser &parser);
-    virtual ~Parser() = default;
+    virtual ~Parser();
 
-    ParserResult Parse(const ParserJob &parser_job);
+    virtual ParserResult Parse(const ParserJob &parser_job);
     void Stop();
 
     std::string CurlRequest(const std::string &url);
@@ -45,23 +45,24 @@ public:
 
     bool GetDone();
     parser_t GetParserType();
+    parser_behavior_t GetParserBehaviorType();
     std::string GetSourceName();
     std::string GetSourceUrl();
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 protected:
-    virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    virtual void FindIndexEntries(xmlNodePtr root_node);
     virtual void FindMetaData(xmlNodePtr root_node);
-    virtual ParserIndexEntryInfo ParseIndexEntry(const ParserIndexEntry &index_entry);
+    virtual ParserIndexEntryInfo ParseBehavior();
+    virtual void ParseLoop(ParserResult &parser_result);
+    virtual void PostProcessMetaData();
     virtual std::string PreprocessTargetUrl(const std::string &job_url);
+    virtual void SaveLastUrl(ParserResult &parser_result);
+    virtual void SaveMetaData(ParserResult &parser_result);
+    virtual void SaveUpdateDate(ParserResult &parser_result);
 
-    void CalculateIndexBounds(const ParserJob &parser_job);
-
-    std::vector<ParserIndexEntry> index_entries_;
-    std::shared_ptr<ParserTimeGenerator> time_generator_;
     progress_number_callback progress_number_callback_;
+    std::shared_ptr<ParserTimeGenerator> time_generator_;
 
     std::string title_;
     std::string nickname_;
@@ -73,11 +74,9 @@ protected:
     std::string uuid_;
     std::string local_des_;
 
-    size_t index_;
-    size_t end_index_;
-
     std::mutex mutex_;
     parser_t parser_type_;
+    parser_behavior_t parser_behavior_;
     std::atomic_bool done_;
 
 private:
