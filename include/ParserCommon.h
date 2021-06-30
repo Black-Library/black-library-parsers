@@ -43,6 +43,12 @@ enum class parser_t {
     _NUM_PARSERS_TYPE
 };
 
+enum class parser_behavior_t {
+    ERROR,
+    INDEX_ENTRY,
+    LINKED_LIST
+};
+
 enum class pattern_seek_t {
     XML_NAME,
     XML_ATTRIBUTE,
@@ -177,9 +183,10 @@ using progress_number_callback = std::function<void(const std::string &uuid, siz
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 
-std::string GetSectionFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name);
+std::string GetParserBehaviorName(parser_behavior_t behavior);
 std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
+std::string GetSectionFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name);
 std::string GetSpaceString(size_t num_tabs);
 std::string GetStatusName(job_status_t job_status);
 ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value);

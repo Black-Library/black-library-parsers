@@ -87,15 +87,23 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
     return ss.str();
 }
 
-// limited to 9999 sections right now (no CH10000), index starts at 1 for sections
-std::string GetSectionFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name)
+std::string GetParserBehaviorName(parser_behavior_t behavior)
 {
-    char buffer [INDEX_ENTRY_FILENAME_BUFFER_SIZE];
-    int res = snprintf(buffer, INDEX_ENTRY_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_entry.index_num + 1, index_entry_name.c_str());
-    if (res < 0)
-        return "";
-
-    return std::string(buffer);
+    switch (behavior)
+    {
+    case parser_behavior_t::ERROR:
+        return "ERROR_BEHAVIOR";
+        break;
+    case parser_behavior_t::INDEX_ENTRY:
+        return "INDEX_ENTRY_BEHAVIOR";
+        break;
+    case parser_behavior_t::LINKED_LIST:
+        return "LINKED_LIST_BEHAVIOR";
+        break;
+    default:
+        return "NO_BEHAVIOR";
+        break;
+    }
 }
 
 std::string GetParserName(parser_t rep)
@@ -163,6 +171,18 @@ parser_t GetParserTypeByUrl(const std::string &url)
     }
 
     return rep;
+}
+
+
+// limited to 9999 sections right now (no CH10000), index starts at 1 for sections
+std::string GetSectionFileName(const ParserIndexEntry &index_entry, const std::string &index_entry_name)
+{
+    char buffer [INDEX_ENTRY_FILENAME_BUFFER_SIZE];
+    int res = snprintf(buffer, INDEX_ENTRY_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_entry.index_num + 1, index_entry_name.c_str());
+    if (res < 0)
+        return "";
+
+    return std::string(buffer);
 }
 
 std::string GetSpaceString(size_t num_tabs)
