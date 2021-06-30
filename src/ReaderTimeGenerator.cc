@@ -29,6 +29,7 @@ ReaderTimeGenerator::ReaderTimeGenerator()
     distribution_ = std::uniform_int_distribution<int>(0, 2);
 }
 
+// TODO: make parser take 8ish hour break
 size_t ReaderTimeGenerator::GenerateWaitTime(const size_t length)
 {
     size_t wait_time = 0;
