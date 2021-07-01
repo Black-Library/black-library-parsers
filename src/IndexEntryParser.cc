@@ -80,7 +80,7 @@ ParserResult IndexEntryParser::Parse(const ParserJob &parser_job)
 
     ParseLoop(parser_result);
 
-    PostProcessMetaData();
+    PostProcessLoop();
 
     // save information to parser_result
     SaveLastUrl(parser_result);

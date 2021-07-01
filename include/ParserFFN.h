@@ -20,8 +20,6 @@ class ParserFFN : public Parser
 public:
     ParserFFN();
 
-    ParserResult Parse(const ParserJob &parser_job);
-
 protected:
     std::string ParseTitle();
     std::string ParseAuthor();
