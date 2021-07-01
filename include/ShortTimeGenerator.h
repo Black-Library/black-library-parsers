@@ -5,7 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_READER_TIME_GENERATOR_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_READER_TIME_GENERATOR_H__
 
-#include <ParserTimeGenerator.h>
+#include "ParserTimeGenerator.h"
 
 namespace black_library {
 
