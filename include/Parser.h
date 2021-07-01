@@ -56,7 +56,7 @@ protected:
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual void ParseLoop(ParserResult &parser_result);
     virtual ParseSectionInfo ParseSection();
-    virtual void PostProcessMetaData();
+    virtual void PostProcessLoop();
     virtual void PreparseLoop();
     virtual std::string PreprocessTargetUrl(const std::string &job_url);
     virtual void SaveLastUrl(ParserResult &parser_result);

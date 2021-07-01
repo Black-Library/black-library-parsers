@@ -97,7 +97,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     ParseLoop(parser_result);
 
-    PostProcessMetaData();
+    PostProcessLoop();
 
     // save information to parser_result
     SaveLastUrl(parser_result);
@@ -207,7 +207,7 @@ void Parser::ParseLoop(ParserResult &parser_result)
     return;
 }
 
-void Parser::PostProcessMetaData()
+void Parser::PostProcessLoop()
 {
     return;
 }
