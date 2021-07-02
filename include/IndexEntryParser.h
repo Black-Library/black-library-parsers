@@ -18,15 +18,15 @@ class IndexEntryParser : public Parser
 public:
     explicit IndexEntryParser(parser_t parser_type);
 
-    virtual ParserResult Parse(const ParserJob &parser_job);
-
 protected:
-    virtual int CalculateIndexBounds(const ParserJob &parser_job);
+    int CalculateIndexBounds(const ParserJob &parser_job);
+    int PreParseLoop(xmlNodePtr root_node) override;
+    bool ReachedEnd();
+    void SaveLastUrl(ParserResult &parser_result);
+    void SaveUpdateDate(ParserResult &parser_result);
+
     virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     virtual void FindIndexEntries(xmlNodePtr root_node);
-    virtual void ParseLoop(ParserResult &parser_result);
-    virtual void SaveLastUrl(ParserResult &parser_result);
-    virtual void SaveUpdateDate(ParserResult &parser_result);
 
     std::vector<ParserIndexEntry> index_entries_;
 };

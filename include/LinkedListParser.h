@@ -19,10 +19,12 @@ public:
     explicit LinkedListParser(parser_t parser_type);
 
 protected:
-    virtual void ParseLoop(ParserResult &parser_result);
-    virtual std::string PreprocessTargetUrl(const std::string &job_url);
+    virtual int PreParseLoop(xmlNodePtr root_node);
+    bool ReachedEnd();
     virtual void SaveLastUrl(ParserResult &parser_result);
     virtual void SaveUpdateDate(ParserResult &parser_result);
+
+    virtual std::string GetFirstUrl(xmlNodePtr root_node) = 0;
 
     std::string last_url_;
     std::string next_url_;

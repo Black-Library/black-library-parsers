@@ -76,7 +76,7 @@ ParseSectionInfo ParserXF::ParseSection()
 
     std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << next_url_ << std::endl;
 
-    const auto working_url = next_url_;
+    const auto working_url = "https://" + source_url_ + next_url_;
     const auto working_index = index_;
 
     const auto section_curl_result = CurlRequest(working_url);
@@ -93,35 +93,33 @@ ParseSectionInfo ParserXF::ParseSection()
     xmlNodePtr length_node = NULL;
     size_t length = 0;
 
-    // std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
-
-    const auto target_post = GetTargetPost(current_node);
-
-    std::cout << "target_post: " << target_post << std::endl;
-
-    const auto post_target = "id=" + target_post;
-
-    const auto section_title_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "span",
-        pattern_seek_t::XML_ATTRIBUTE, post_target);
-    if (!section_title_seek.found)
-    {
-        std::cout << "Error: Failed title seek" << std::endl;
-        xmlFreeDoc(section_doc_tree);
-        return output;
-    }
-
-    std::cout << "Found" << std::endl;
+    const auto target_id = GetTargetId(working_url);
 
     // reset current node
     current_node = root_node->children;
 
-    const auto section_content_seek = SeekToSectionContent(current_node, target_post);
+    const auto section_content_seek = SeekToSectionContent(current_node, target_id);
     if (!section_content_seek.found)
     {
         std::cout << "Error: Failed content seek" << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
+
+    current_node = section_content_seek.seek_node;
+
+    // get section title
+    // const auto section_title_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "span",
+    //     pattern_seek_t::XML_ATTRIBUTE, post_target);
+    // if (!section_title_seek.found)
+    // {
+    //     std::cout << "Error: Failed title seek" << std::endl;
+    //     xmlFreeDoc(section_doc_tree);
+    //     return output;
+    // }
+    // get next url
+
+    const auto section_title = "section_title";
 
     current_node = section_content_seek.seek_node;
 
@@ -134,7 +132,7 @@ ParseSectionInfo ParserXF::ParseSection()
 
     output.length = length;
 
-    std::string section_title_name = GetXFTitle(working_url);
+    auto section_title_name = GetXFTitle(section_title);
 
     section_title_name = BlackLibraryCommon::SanitizeFileName(section_title_name);
 
@@ -145,10 +143,10 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    std::string section_file_name = GetSectionFileName(working_index, section_title_name);
+    auto section_file_name = GetSectionFileName(working_index, section_title_name);
 
     FILE* index_entry_file;
-    std::string file_name = local_des_ + section_file_name;
+    const auto file_name = local_des_ + section_file_name;
     std::cout << "FILENAME: " << file_name << std::endl;
     index_entry_file = fopen(file_name.c_str(), "w+");
 
@@ -175,35 +173,84 @@ std::string ParserXF::PreprocessTargetUrl(const std::string &job_url)
     return job_url + "threadmarks";
 }
 
-std::string ParserXF::GetTargetPost(xmlNodePtr root_node)
+std::string ParserXF::GetFirstUrl(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
-    const auto target_post_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "span",
-        pattern_seek_t::XML_ATTRIBUTE, "class=u-anchorTarget",
-        pattern_seek_t::XML_ATTRIBUTE, "id=post-18370764"
-        );
-    if (!target_post_seek.found)
+    const auto body_seek = SeekToNodeByName(root_node, "body");
+
+    if (!body_seek.found)
     {
-        std::cout << "Error: Failed target post seek" << std::endl;
+        std::cout << "Could not find first url" << std::endl;
         return "";
     }
 
-    current_node = target_post_seek.seek_node;
+    current_node = body_seek.seek_node->children;
 
-    const auto post_id = GetXmlAttributeContentByName(current_node, "data-lb-id");
-
-    const auto post_content = GetXmlAttributeContentByName(current_node, "data-content");
-
-    if (!post_content.found)
+    ParserXmlNodeSeek item_container_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=structItemContainer");
+    if (item_container_seek.found)
     {
-        std::cout << "Error: Failed content" << std::endl;
+        xmlNodePtr index_node = NULL;
+        for (index_node = item_container_seek.seek_node->children; index_node; index_node = index_node->next)
+        {
+            if (index_node->type == XML_ELEMENT_NODE)
+            {
+                auto author_result = GetXmlAttributeContentByName(index_node, "data-content-author");
+
+                if (author_result.found)
+                    author_ = author_result.result;
+
+                current_node = index_node;
+
+                break;
+            }
+        }
+    }
+
+    for (current_node = current_node->children; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (!xmlStrcmp(current_node->name, (const xmlChar *)"div"))
+        {
+            if (NodeHasAttributeContent(current_node, "structItem-cell structItem-cell--main"))
+            {
+                break;
+            }
+        }
+    }
+
+    if (current_node == NULL)
+    {
         return "";
     }
 
-    std::cout << post_content.result << std::endl;
+    auto url_seek = SeekToNodeByNameRecursive(current_node->children, "a");
 
-    return "hello";
+    if (!url_seek.found)
+    {
+        return "";
+    }
+
+    current_node = url_seek.seek_node;
+
+    auto url_result = GetXmlAttributeContentByName(current_node, "href");
+
+    if (!url_result.found)
+    {
+        return "";
+    }
+
+    return url_result.result;
+}
+
+std::string ParserXF::GetTargetId(const std::string &data_url)
+{
+    auto pos = data_url.find_last_of("-");
+
+    return data_url.substr(pos + 1);
 }
 
 std::string ParserXF::GetXFTitle(const std::string &title)
@@ -220,7 +267,7 @@ std::string ParserXF::GetXFTitle(const std::string &title)
     return xf_title_name;
 }
 
-ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post)
+ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std::string &target_id)
 {
     ParserXmlNodeSeek section_content_seek;
     xmlNodePtr current_node = NULL;
@@ -238,7 +285,7 @@ ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std
                 continue;
 
             // find by post_id
-            if (!post_id.result.compare(target_post))
+            if (!post_id.result.compare("post-" + target_id))
             {
                 auto inner_seek = SeekToNodeByNameRecursive(current_node->children, "div");
                 if (!inner_seek.found)
@@ -250,7 +297,7 @@ ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std
             }
         }
 
-        ParserXmlNodeSeek children_seek = SeekToSectionContent(current_node->children, target_post);
+        ParserXmlNodeSeek children_seek = SeekToSectionContent(current_node->children, target_id);
 
         if (children_seek.seek_node != NULL)
             section_content_seek.seek_node = children_seek.seek_node;

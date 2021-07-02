@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <iostream>
+#include <thread>
 
 #include <Parser.h>
 #include <ShortTimeGenerator.h>
@@ -84,20 +85,26 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     // reset current node ptr to root node children
     current_node = root_node->children;
 
-    SaveMetaData(parser_result);
+    if (PreParseLoop(current_node))
+    {
+        return parser_result;
+    }
 
-    xmlFreeDoc(doc_tree);
+    // reset current node ptr to root node children
+    current_node = root_node->children;
+
+    SaveMetaData(parser_result);
 
     if (CalculateIndexBounds(parser_job))
     {
         return parser_result;
     }
 
-    PreparseLoop();
+    xmlFreeDoc(doc_tree);
 
     ParseLoop(parser_result);
 
-    PostProcessLoop();
+    PostParseLoop(parser_result);
 
     // save information to parser_result
     SaveLastUrl(parser_result);
@@ -203,18 +210,94 @@ ParseSectionInfo Parser::ParseSection()
 
 void Parser::ParseLoop(ParserResult &parser_result)
 {
+    size_t seconds_counter = 0;
+    size_t wait_time = 0;
+    size_t wait_time_total = 0;
+    size_t remaining_attempts = 5;
+
+    while (!done_)
+    {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+
+        if (done_)
+            break;
+
+        if (seconds_counter >= wait_time)
+            seconds_counter = 0;
+
+        if (seconds_counter == 0)
+        {
+            // let the fake reader finish waiting before exiting
+            if (ReachedEnd())
+            {
+                done_ = true;
+                std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
+                continue;
+            }
+
+            if (remaining_attempts <= 0)
+            {
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << std::endl;
+                remaining_attempts = 5;
+                ++index_;
+                continue;
+            }
+
+            ParseSectionInfo parse_section_info = ParseSection();
+            --remaining_attempts;
+
+            wait_time = time_generator_->GenerateWaitTime(parse_section_info.length);
+            wait_time_total += wait_time;
+
+            if (parse_section_info.has_error)
+            {
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << " - remaining attempts: " << remaining_attempts
+                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+
+                if (remaining_attempts == 0 && progress_number_callback_)
+                    progress_number_callback_(uuid_, index_ + 1, true);
+            }
+            else
+            {
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << parse_section_info.length
+                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+
+                if (progress_number_callback_)
+                    progress_number_callback_(uuid_, index_ + 1, false);
+
+                parser_result.metadata.series_length = index_ + 1;
+
+                remaining_attempts = 5;
+                ++index_;
+            }
+        }
+
+        ++seconds_counter;
+
+        std::this_thread::sleep_until(deadline);
+    }
+}
+
+void Parser::PostParseLoop(ParserResult &parser_result)
+{
     (void) parser_result;
     return;
 }
 
-void Parser::PostProcessLoop()
+int Parser::PreParseLoop(xmlNodePtr root_node)
 {
-    return;
+    (void) root_node;
+    return 1;
 }
 
 std::string Parser::PreprocessTargetUrl(const std::string &job_url)
 {
     return job_url;
+}
+
+bool Parser::ReachedEnd()
+{
+    return true;
 }
 
 void Parser::SaveLastUrl(ParserResult &parser_result)

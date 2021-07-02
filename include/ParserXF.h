@@ -27,7 +27,9 @@ protected:
     virtual ParseSectionInfo ParseSection();
     virtual std::string PreprocessTargetUrl(const std::string &job_url);
 
-    std::string GetTargetPost(xmlNodePtr root_node);
+    std::string GetFirstUrl(xmlNodePtr root_node) override;
+
+    std::string GetTargetId(const std::string &data_url);
     std::string GetXFTitle(const std::string &title);
     ParserXmlNodeSeek SeekToSectionContent(xmlNodePtr root_node, const std::string &target_id);
 
