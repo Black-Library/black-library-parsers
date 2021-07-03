@@ -59,7 +59,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     parser_result.metadata.media_path = local_des_;
     parser_result.is_error_job = parser_job.is_error_job;
 
-    target_url_ = PreprocessTargetUrl(parser_job.url);
+    target_url_ = PreprocessTargetUrl(parser_job);
 
     std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << std::endl;
 
@@ -85,7 +85,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     // reset current node ptr to root node children
     current_node = root_node->children;
 
-    if (PreParseLoop(current_node))
+    if (PreParseLoop(current_node, parser_job))
     {
         return parser_result;
     }
@@ -289,15 +289,16 @@ void Parser::PostParseLoop(ParserResult &parser_result)
     return;
 }
 
-int Parser::PreParseLoop(xmlNodePtr root_node)
+int Parser::PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job)
 {
     (void) root_node;
+    (void) parser_job;
     return 1;
 }
 
-std::string Parser::PreprocessTargetUrl(const std::string &job_url)
+std::string Parser::PreprocessTargetUrl(const ParserJob &parser_job)
 {
-    return job_url;
+    return parser_job.url;
 }
 
 bool Parser::ReachedEnd()

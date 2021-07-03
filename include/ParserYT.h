@@ -25,7 +25,7 @@ protected:
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParseSectionInfo ParseSection();
-    std::string PreprocessTargetUrl(const std::string &job_url);
+    std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
     std::string GetYTIndexEntryTitle(const ParserIndexEntry &index_entry);
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);

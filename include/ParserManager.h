@@ -36,10 +36,10 @@ public:
 
     bool IsReady();
 
-    int AddJob(const std::string &uuid, const std::string &url);
-    int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number);
-    int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number);
-    int AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number,  const error_job_rep &is_error_job);
+    int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url);
+    int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number);
+    int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number);
+    int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number,  const error_job_rep &is_error_job);
     bool GetDone();
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);

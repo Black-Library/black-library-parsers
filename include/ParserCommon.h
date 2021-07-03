@@ -74,6 +74,7 @@ typedef bool error_job_rep;
 struct ParserJob {
     std::string uuid;
     std::string url;
+    std::string last_url;
     size_t start_number = 1;
     size_t end_number = 0;
     error_job_rep is_error_job = false;
@@ -85,11 +86,12 @@ struct ParserJobHash
     {
         std::size_t h1 = std::hash<std::string>()(parser_job.uuid);
         std::size_t h2 = std::hash<std::string>()(parser_job.url);
-        std::size_t h3 = std::hash<size_t>()(parser_job.start_number);
-        std::size_t h4 = std::hash<size_t>()(parser_job.end_number);
-        std::size_t h5 = std::hash<error_job_rep>()(parser_job.is_error_job);
+        std::size_t h3 = std::hash<std::string>()(parser_job.last_url);
+        std::size_t h4 = std::hash<size_t>()(parser_job.start_number);
+        std::size_t h5 = std::hash<size_t>()(parser_job.end_number);
+        std::size_t h6 = std::hash<error_job_rep>()(parser_job.is_error_job);
 
-        return h1 ^ h2 ^ h3 ^ h4 ^ h5;
+        return h1 ^ h2 ^ h3 ^ h4 ^ h5 ^ h6;
     }
 };
 

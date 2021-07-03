@@ -79,6 +79,13 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto working_url = "https://" + source_url_ + next_url_;
     const auto working_index = index_;
 
+    if (working_index > target_end_index_)
+    {
+        reached_end_ = true;
+        output.has_error = false;
+        return output;
+    }
+
     const auto section_curl_result = CurlRequest(working_url);
     xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -124,6 +131,13 @@ ParseSectionInfo ParserXF::ParseSection()
 
     // get last update date
     last_update_date_ = GetUpdateDate(current_node->children);
+
+    // skip saving content if before target start index
+    if (working_index < target_start_index_)
+    {
+        output.has_error = false;
+        return output;
+    }
 
     // reset current node to threadmark header
     current_node = root_node->children;
@@ -183,9 +197,9 @@ ParseSectionInfo ParserXF::ParseSection()
     return output;
 }
 
-std::string ParserXF::PreprocessTargetUrl(const std::string &job_url)
+std::string ParserXF::PreprocessTargetUrl(const ParserJob &parser_job)
 {
-    return job_url + "threadmarks";
+    return parser_job.url + "threadmarks";
 }
 
 std::string ParserXF::GetFirstUrl(xmlNodePtr root_node)
@@ -196,7 +210,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node)
 
     if (!body_seek.found)
     {
-        std::cout << "Could not find first url" << std::endl;
+        std::cout << "Error: body seek failed" << std::endl;
         return "";
     }
 

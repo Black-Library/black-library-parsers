@@ -169,33 +169,34 @@ bool ParserManager::IsReady()
     return initialized_;
 }
 
-int ParserManager::AddJob(const std::string &uuid, const std::string &url)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const std::string &last_url)
 {
-    AddJob(uuid, url, 1, 0, false);
+    AddJob(uuid, url, last_url, 1, 0, false);
 
     return 0;
 }
 
-int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number)
 {
-    AddJob(uuid, url, start_number, 0, false);
+    AddJob(uuid, url, last_url, start_number, 0, false);
 
     return 0;
 }
 
-int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number)
 {
-    AddJob(uuid, url, start_number, end_number, false);
+    AddJob(uuid, url, last_url, start_number, end_number, false);
 
     return 0;
 }
 
-int ParserManager::AddJob(const std::string &uuid, const std::string &url, const size_t &start_number, const size_t &end_number, const error_job_rep &is_error_job)
+int ParserManager::AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number, const error_job_rep &is_error_job)
 {
     ParserJob parser_job;
     
     parser_job.uuid = uuid;
     parser_job.url = url;
+    parser_job.last_url = last_url;
     parser_job.start_number = start_number;
     parser_job.end_number = end_number;
     parser_job.is_error_job = is_error_job;

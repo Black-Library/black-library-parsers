@@ -83,9 +83,9 @@ ParseSectionInfo ParserYT::ParseSection()
     return output;
 }
 
-std::string ParserYT::PreprocessTargetUrl(const std::string &job_url)
+std::string ParserYT::PreprocessTargetUrl(const ParserJob &parser_job)
 {
-    return job_url;
+    return parser_job.url;
 }
 
 std::string ParserYT::GetYTIndexEntryTitle(const ParserIndexEntry &index_entry)

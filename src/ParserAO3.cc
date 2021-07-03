@@ -150,9 +150,9 @@ ParseSectionInfo ParserAO3::ParseSection()
     return output;
 }
 
-std::string ParserAO3::PreprocessTargetUrl(const std::string &job_url)
+std::string ParserAO3::PreprocessTargetUrl(const ParserJob &parser_job)
 {
-    return job_url + "?view_full_work=true&view_adult=true";
+    return parser_job.url + "?view_full_work=true&view_adult=true";
 }
 
 ParserTimeResult ParserAO3::GetPublishedTime(xmlNodePtr root_node)
