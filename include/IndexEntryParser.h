@@ -20,6 +20,7 @@ public:
 
 protected:
     int CalculateIndexBounds(const ParserJob &parser_job);
+    void ExpendedAttempts();
     int PreParseLoop(xmlNodePtr root_node) override;
     bool ReachedEnd();
     void SaveLastUrl(ParserResult &parser_result);

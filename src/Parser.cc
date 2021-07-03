@@ -197,6 +197,11 @@ int Parser::CalculateIndexBounds(const ParserJob &parser_job)
     return 0;
 }
 
+void Parser::ExpendedAttempts()
+{
+    done_ = true;;
+}
+
 void Parser::FindMetaData(xmlNodePtr root_node)
 {
     (void) root_node;
@@ -237,9 +242,9 @@ void Parser::ParseLoop(ParserResult &parser_result)
 
             if (remaining_attempts <= 0)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << std::endl;
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse section - index: " << index_ << std::endl;
                 remaining_attempts = 5;
-                ++index_;
+                ExpendedAttempts();
                 continue;
             }
 
@@ -251,7 +256,7 @@ void Parser::ParseLoop(ParserResult &parser_result)
 
             if (parse_section_info.has_error)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse index entry - index: " << index_ << " - remaining attempts: " << remaining_attempts
+                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse section - index: " << index_ << " - remaining attempts: " << remaining_attempts
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (remaining_attempts == 0 && progress_number_callback_)
@@ -259,7 +264,7 @@ void Parser::ParseLoop(ParserResult &parser_result)
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " index entry length is " << parse_section_info.length
+                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " section length is " << parse_section_info.length
                         << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
 
                 if (progress_number_callback_)

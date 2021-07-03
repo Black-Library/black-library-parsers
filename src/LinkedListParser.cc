@@ -17,12 +17,16 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 LinkedListParser::LinkedListParser(parser_t parser_type) : 
     Parser(parser_type),
-    last_url_(),
     next_url_(),
     last_update_date_(0),
     reached_end_(false)
 {
     parser_behavior_ = parser_behavior_t::LINKED_LIST;
+}
+
+void LinkedListParser::ExpendedAttempts()
+{
+    reached_end_ = true;
 }
 
 int LinkedListParser::PreParseLoop(xmlNodePtr root_node)
@@ -31,7 +35,7 @@ int LinkedListParser::PreParseLoop(xmlNodePtr root_node)
 
     if (next_url_.empty())
     {
-        std::cout << "Error: PreParseLoop empty next url";
+        std::cout << "Error: PreParseLoop empty first url";
         return -1;
     }
 
@@ -45,7 +49,7 @@ bool LinkedListParser::ReachedEnd()
 
 void LinkedListParser::SaveLastUrl(ParserResult &parser_result)
 {
-    parser_result.metadata.last_url = last_url_;
+    parser_result.metadata.last_url = next_url_;
 }
 
 void LinkedListParser::SaveUpdateDate(ParserResult &parser_result)

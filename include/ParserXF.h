@@ -29,9 +29,13 @@ protected:
 
     std::string GetFirstUrl(xmlNodePtr root_node) override;
 
-    std::string GetTargetId(const std::string &data_url);
+    std::string GetNextUrl(xmlNodePtr root_node);
+    std::string GetSectionTitle(xmlNodePtr root_node);
+    std::string GetTargetPost(const std::string &data_url);
+    time_t GetUpdateDate(xmlNodePtr root_node);
     std::string GetXFTitle(const std::string &title);
-    ParserXmlNodeSeek SeekToSectionContent(xmlNodePtr root_node, const std::string &target_id);
+    ParserXmlNodeSeek SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post);
+    ParserXmlNodeSeek SeekToSectionPost(xmlNodePtr root_node, const std::string &target_post);
 
 };
 

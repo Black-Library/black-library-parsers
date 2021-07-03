@@ -53,6 +53,7 @@ public:
 
 protected:
     virtual int CalculateIndexBounds(const ParserJob &parser_job);
+    virtual void ExpendedAttempts();
     virtual void FindMetaData(xmlNodePtr root_node);
     virtual void ParseLoop(ParserResult &parser_result);
     virtual ParseSectionInfo ParseSection();
