@@ -99,7 +99,7 @@ ParseSectionInfo ParserXF::ParseSection()
         pattern_seek_t::XML_ATTRIBUTE, "class=xb-content-wrapper");
     if (!content_wrapper_seek.found)
     {
-        std::cout << "Error: Failed content wrapper seek" << std::endl;
+        std::cout << "Error: failed content wrapper seek" << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -109,7 +109,7 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto section_post_seek = SeekToSectionPost(current_node, target_post);
     if (!section_post_seek.found)
     {
-        std::cout << "Error: Failed post seek" << std::endl;
+        std::cout << "Error: failed post seek" << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -131,7 +131,7 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto section_content_seek = SeekToSectionContent(current_node, target_post);
     if (!section_content_seek.found)
     {
-        std::cout << "Error: Failed content seek" << std::endl;
+        std::cout << "Error: failed section content seek" << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -153,7 +153,7 @@ ParseSectionInfo ParserXF::ParseSection()
 
     if (section_title_name.empty())
     {
-        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " section name" << std::endl;
+        std::cout << "Error: unable to generate " << GetParserName(parser_type_) << " section name" << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -307,7 +307,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
     if (!section_threadmark_header_seek.found)
     {
-        std::cout << "Error: Failed threadmark header seek" << std::endl;
+        std::cout << "Error: failed threadmark header seek" << std::endl;
         return "";
     }
 
@@ -344,9 +344,45 @@ std::string ParserXF::GetTargetPost(const std::string &data_url)
 
 time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
 {
-    (void) root_node;
-    // std::stol(date_result.result)
-    return 0;
+    xmlNodePtr current_node = NULL;
+
+    const auto message_attribution_main_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=message-attribution-main");
+    if (!message_attribution_main_seek.found)
+    {
+        std::cout << "Error: failed message attribution main seek" << std::endl;
+        return 0;
+    }
+
+    current_node = message_attribution_main_seek.seek_node->children;
+
+    const auto a_seek = SeekToNodeByName(current_node, "a");
+    if (!a_seek.found)
+    {
+        std::cout << "Error: failed 'a' seek" << std::endl;
+        return 0;
+    }
+
+    current_node = a_seek.seek_node->children;
+
+    const auto time_seek = SeekToNodeByName(current_node, "time");
+    if (!time_seek.found)
+    {
+        std::cout << "Error: failed time seek" << std::endl;
+        return 0;
+    }
+
+    current_node = time_seek.seek_node;
+
+    const auto time_result = GetXmlAttributeContentByName(current_node, "data-time");
+
+    if (!time_result.found)
+    {
+        std::cout << "Error: failed time result" << std::endl;
+        return 0;
+    }
+
+    return std::stol(time_result.result);
 }
 
 std::string ParserXF::GetXFTitle(const std::string &title)

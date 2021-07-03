@@ -292,7 +292,7 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
     while (attribute)
     {
         const xmlChar *attr_name = attribute->name;
-        if (attr_name != NULL)
+        if (attr_name)
         {
             if (!target_name.compare(std::string((char *)attr_name)))
             {
