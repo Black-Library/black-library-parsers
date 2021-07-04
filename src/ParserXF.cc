@@ -30,46 +30,6 @@ ParserXF::ParserXF(parser_t parser_type) :
     source_url_ = BlackLibraryCommon::ERROR::source_url;
 }
 
-void ParserXF::FindMetaData(xmlNodePtr root_node)
-{
-    ParserXmlNodeSeek head_seek = SeekToNodeByName(root_node, "head");
-
-    if (!head_seek.found)
-    {
-        std::cout << "Warning: Could not get metadata from: " << uuid_ << std::endl;
-        return;
-    }
-
-    xmlNodePtr current_node = NULL;
-
-    for (current_node = head_seek.seek_node->children; current_node; current_node = current_node->next)
-    {
-        if (!xmlStrcmp(current_node->name, (const xmlChar *) "meta"))
-        {
-            auto property_result = GetXmlAttributeContentByName(current_node, "property");
-
-            if (!property_result.found)
-                continue;
-
-            if (property_result.result == "og:url")
-            {
-                auto title_result = GetXmlAttributeContentByName(current_node, "content");
-
-                if (!title_result.found)
-                    continue;
-
-                std::string unprocessed_title = title_result.result;
-                size_t found_0 = unprocessed_title.find_last_of(".");
-                std::string removed_threadmarks = unprocessed_title.substr(0, found_0);
-                size_t found_1 = removed_threadmarks.find_last_of("/\\");
-                title_ = removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
-            }
-        }
-    }
-
-    xmlFree(current_node);
-}
-
 ParseSectionInfo ParserXF::ParseSection()
 {
     ParseSectionInfo output;
@@ -199,7 +159,14 @@ ParseSectionInfo ParserXF::ParseSection()
 
 std::string ParserXF::PreprocessTargetUrl(const ParserJob &parser_job)
 {
-    return parser_job.url + "threadmarks";
+    title_ = GetWorkTitleFromUrl(parser_job.url);
+
+    if (parser_job.url == parser_job.last_url)
+    {
+        return parser_job.url + "threadmarks";
+    }
+
+    return parser_job.url;
 }
 
 std::string ParserXF::GetFirstUrl(xmlNodePtr root_node)
@@ -397,6 +364,15 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     }
 
     return std::stol(time_result.result);
+}
+
+std::string ParserXF::GetWorkTitleFromUrl(const std::string &data_url)
+{
+    std::string unprocessed_title = data_url;
+    size_t found_0 = unprocessed_title.find_last_of(".");
+    std::string removed_threadmarks = unprocessed_title.substr(0, found_0);
+    size_t found_1 = removed_threadmarks.find_last_of("/\\");
+    return removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
 }
 
 std::string ParserXF::GetXFTitle(const std::string &title)
