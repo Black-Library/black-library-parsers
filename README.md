@@ -1,8 +1,8 @@
 # black-library-parser
-Black Library parser library. 
+Black Library parser library.
 
 ## Dependencies
-curl and libxml2 are required dependencies
+curl, libxml2, python3, pip, and selenium are required dependencies
 
 To make the docker container in which the application is intended to be run on, follow/run the install_docker_deps.sh file
 

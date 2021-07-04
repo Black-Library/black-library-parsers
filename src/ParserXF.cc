@@ -79,8 +79,14 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto working_url = "https://" + source_url_ + next_url_;
     const auto working_index = index_;
 
-    const auto section_curl_result = CurlRequest(working_url);
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.c_str(), NULL, NULL,
+    const auto section_curl_result = network_.get()->NetworkRequest(working_url);
+    if(section_curl_result.has_error)
+    {
+        std::cout << section_curl_result.debug_string << std::endl;
+        return output;
+    }
+
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {

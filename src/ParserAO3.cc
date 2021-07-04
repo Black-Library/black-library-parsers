@@ -24,6 +24,7 @@ ParserAO3::ParserAO3() :
     title_ = "AO3_parser_title";
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
+    network_ = std::make_shared<SeleniumAdapter>();
 }
 
 ParserAO3::~ParserAO3()
@@ -81,14 +82,18 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto index_entry = index_entries_[index_];
 
     const auto url_adult = index_entry.data_url;
-    const auto index_entry_curl_result = CurlRequest(url_adult);
+    const auto index_entry_curl_result = network_.get()->NetworkRequest(url_adult);
+    if(index_entry_curl_result.has_error)
+    {
+        std::cout << index_entry_curl_result.debug_string << std::endl;
+        return output;
+    }
 
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (!section_doc_tree)
     {
         std::cout << "Unable to Parse" << std::endl;
-        output.has_error = true;
         return output;
     }
 

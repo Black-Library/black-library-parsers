@@ -30,7 +30,7 @@ protected:
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 
 private:
-    
+
 };
 
 } // namespace AO3

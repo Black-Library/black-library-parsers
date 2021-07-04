@@ -193,8 +193,14 @@ ParseSectionInfo ParserRR::ParseSection()
     const auto index_entry_url = "https://www." + source_url_ + index_entry.data_url;
     std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
 
-    const auto curl_request_result = CurlRequest(index_entry_url);
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
+    const auto curl_request_result = network_.get()->NetworkRequest(index_entry_url);
+    if(curl_request_result.has_error)
+    {
+        std::cout << curl_request_result.debug_string << std::endl;
+        return output;
+    }
+
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {

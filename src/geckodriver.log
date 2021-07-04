@@ -1,0 +1,62 @@
+1625342301089	geckodriver	INFO	Listening on 127.0.0.1:57965
+1625342302096	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAa8Ul0"
+1625342302400	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileAa8Ul0/search.json.mozlz4", (void 0)))
+1625342303610	Marionette	INFO	Listening on port 35881
+1625342303768	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625342312254	Marionette	INFO	Stopped listening on port 35881
+1625342536421	geckodriver	INFO	Listening on 127.0.0.1:41581
+1625342536425	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileyN7L6E"
+1625342536712	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileyN7L6E/search.json.mozlz4", (void 0)))
+1625342538390	Marionette	INFO	Listening on port 42187
+1625342538462	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625342543930	Marionette	INFO	Stopped listening on port 42187
+1625342563915	geckodriver	INFO	Listening on 127.0.0.1:34055
+1625342563918	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilekwKV3J"
+1625342564212	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilekwKV3J/search.json.mozlz4", (void 0)))
+1625342565623	Marionette	INFO	Listening on port 33389
+1625342565654	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625342567662	Marionette	INFO	Stopped listening on port 33389
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1625342581177	geckodriver	INFO	Listening on 127.0.0.1:58557
+1625342581181	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilesrf3N3"
+1625342581454	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilesrf3N3/search.json.mozlz4", (void 0)))
+1625342583237	Marionette	INFO	Listening on port 44681
+1625342583271	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625342584831	Marionette	INFO	Stopped listening on port 44681
+1625343050779	geckodriver	INFO	Listening on 127.0.0.1:42693
+1625343050782	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileCgfD61"
+1625343051049	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileCgfD61/search.json.mozlz4", (void 0)))
+1625343052341	Marionette	INFO	Listening on port 43121
+1625343052411	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625343054064	Marionette	INFO	Stopped listening on port 43121
+1625354042896	geckodriver	INFO	Listening on 127.0.0.1:35105
+1625354042903	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilenExFga"
+1625354043182	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilenExFga/search.json.mozlz4", (void 0)))
+1625354045609	Marionette	INFO	Listening on port 36407
+1625354045718	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625354047376	Marionette	INFO	Stopped listening on port 36407
+1625355271268	geckodriver	INFO	Listening on 127.0.0.1:47189
+1625355271271	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile8CVfTt"
+1625355271539	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofile8CVfTt/search.json.mozlz4", (void 0)))
+1625355273270	Marionette	INFO	Listening on port 45103
+1625355273299	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1625355275632	Marionette	INFO	Stopped listening on port 45103
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+

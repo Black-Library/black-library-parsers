@@ -154,6 +154,13 @@ struct ParserResult {
     bool has_error = true;
 };
 
+struct NetworkRequestResult {
+    std::string html = "";
+
+    std::string debug_string;
+    bool has_error = true;
+};
+
 struct ParserXmlAttributeResult {
     std::string result = "";
     bool found = false;
