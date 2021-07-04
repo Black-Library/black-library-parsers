@@ -23,6 +23,7 @@ public:
     explicit ParserXF(parser_t parser_type);
 
 protected:
+    void FindMetaData(xmlNodePtr root_node);
     ParseSectionInfo ParseSection();
     std::string PreprocessTargetUrl(const ParserJob &parser_job);
 

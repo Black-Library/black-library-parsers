@@ -30,6 +30,48 @@ ParserXF::ParserXF(parser_t parser_type) :
     source_url_ = BlackLibraryCommon::ERROR::source_url;
 }
 
+void ParserXF::FindMetaData(xmlNodePtr root_node)
+{
+    xmlNodePtr current_node = NULL;
+
+    ParserXmlNodeSeek head_seek = SeekToNodeByName(root_node, "head");
+    if (!head_seek.found)
+    {
+        std::cout << "Warning: Could not get metadata from: " << uuid_ << std::endl;
+        return;
+    }
+
+    current_node = head_seek.seek_node;
+
+    const auto thread_starter_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "ul",
+        pattern_seek_t::XML_ATTRIBUTE, "class=listInline listInline--bullet");
+    if (!thread_starter_seek.found)
+    {
+        std::cout << "Error: could not find thread starter" << std::endl;
+        return;
+    }
+
+    current_node = thread_starter_seek.seek_node->children->next->children;
+
+    const auto name_seek = SeekToNodeByName(current_node, "a");
+    if (!name_seek.found)
+    {
+        std::cout << "Error: could not find author content" << std::endl;
+        return;
+    }
+
+    current_node = name_seek.seek_node;
+
+    const auto author_result = GetXmlNodeContent(current_node->children);
+    if (!author_result.found)
+    {
+        std::cout << "Error: could not get author content" << std::endl;
+        return;
+    }
+
+    author_ = author_result.result;
+}
+
 ParseSectionInfo ParserXF::ParseSection()
 {
     ParseSectionInfo output;
@@ -372,6 +414,7 @@ std::string ParserXF::GetWorkTitleFromUrl(const std::string &data_url)
     size_t found_0 = unprocessed_title.find_last_of(".");
     std::string removed_threadmarks = unprocessed_title.substr(0, found_0);
     size_t found_1 = removed_threadmarks.find_last_of("/\\");
+
     return removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
 }
 
@@ -388,6 +431,11 @@ std::string ParserXF::GetXFTitle(const std::string &title)
 
     return xf_title_name;
 }
+
+// ParserXmlNodeSeek ParserXF::SeekToFirstSectionPost()
+// {
+
+// }
 
 ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post)
 {
