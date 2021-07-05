@@ -116,6 +116,7 @@ inline std::ostream& operator << (std::ostream &o, const ParserJob &parser_job)
 {
     o << "uuid: " << parser_job.uuid << " ";
     o << "url: " << parser_job.url << " ";
+    o << "last_url: " << parser_job.last_url << " ";
     o << "start_number: " << parser_job.start_number << " ";
     o << "end_number: " << parser_job.end_number << " ";
     o << "is_error_job: " << parser_job.is_error_job;

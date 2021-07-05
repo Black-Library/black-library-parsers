@@ -47,11 +47,12 @@ void LinkedListParser::ExpendedAttempts()
 
 int LinkedListParser::PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job)
 {
-    (void) parser_job;
-    // if (parser_job.is_error_job)
-    //     next_url_ = parser_job.last_url;
-    // else
-    next_url_ = GetFirstUrl(root_node);
+    if (parser_job.url == parser_job.last_url)
+        next_url_ = GetFirstUrl(root_node, parser_job.url);
+    else
+        next_url_ = parser_job.last_url;
+
+    std::cout << next_url_ << std::endl;
 
     if (next_url_.empty())
     {

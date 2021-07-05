@@ -27,7 +27,7 @@ protected:
     ParseSectionInfo ParseSection();
     std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
-    std::string GetFirstUrl(xmlNodePtr root_node) override;
+    std::string GetFirstUrl(xmlNodePtr root_node, const std::string &data_url) override;
 
     std::string GetNextUrl(xmlNodePtr root_node);
     std::string GetSectionTitle(xmlNodePtr root_node);

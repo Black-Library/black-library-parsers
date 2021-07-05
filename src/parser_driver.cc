@@ -223,6 +223,7 @@ int main(int argc, char* argv[])
 
     ParserJob parser_job;
     parser_job.url = iter->second;
+    parser_job.last_url = iter->second;
     parser_job.uuid = "some-uuid";
     parser_job.start_number = opts.start_number;
     parser_job.end_number = opts.end_number;

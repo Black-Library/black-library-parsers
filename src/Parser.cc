@@ -137,6 +137,8 @@ std::string Parser::CurlRequest(const std::string &url)
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, HandleCurlResponse);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &html_raw);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);
 
     res = curl_easy_perform(curl);
