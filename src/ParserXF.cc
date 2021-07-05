@@ -76,10 +76,10 @@ ParseSectionInfo ParserXF::ParseSection()
 {
     ParseSectionInfo output;
 
-    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << next_url_ << std::endl;
-
-    const auto working_url = "https://" + source_url_ + next_url_;
+    const auto working_url = next_url_;
     const auto working_index = index_;
+
+    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << working_url << std::endl;
 
     if (working_index > target_end_index_)
     {
@@ -232,7 +232,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_
         return "";
     }
 
-    return data_url + "#" + post_id_result.result;
+    return data_url + '#' + post_id_result.result;
 }
 
 std::string ParserXF::GetNextUrl(xmlNodePtr root_node)
@@ -257,7 +257,6 @@ std::string ParserXF::GetNextUrl(xmlNodePtr root_node)
                 continue;
 
             found_next = true;
-            std::cout << "has next:" << href_result.result << std::endl;
             next_url = href_result.result;
 
             break;
@@ -270,7 +269,7 @@ std::string ParserXF::GetNextUrl(xmlNodePtr root_node)
         }
     }
 
-    return next_url;
+    return "https://" + source_url_ + next_url;
 }
 
 std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
@@ -382,21 +381,6 @@ std::string ParserXF::GetXFTitle(const std::string &title)
 
     return xf_title_name;
 }
-
-// ParserXmlNodeSeek ParserXF::SeekToFirstSectionPost(xmlNodePtr root_node)
-// {
-//     ParserXmlNodeSeek first_section_seek;
-//     xmlNodePtr current_node = NULL;
-//     bool found = false;
-
-//     for (current_node = root_node; current_node; current_node = current_node->next)
-//     {
-//         if (current_node->type != XML_ELEMENT_NODE)
-//             continue;
-
-//         if (NodeHasAttribute(current_node, ""))
-//     }
-// }
 
 ParserXmlNodeSeek ParserXF::SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post)
 {

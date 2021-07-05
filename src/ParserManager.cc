@@ -44,7 +44,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
 
     if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
     {
-        std::cout << "Error: parser manager could not access storage directory" << storage_dir_ << std::endl;
+        std::cout << "Error: parser manager could not access storage directory: " << storage_dir_ << std::endl;
         return;
     }
 
