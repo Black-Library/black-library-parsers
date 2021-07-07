@@ -138,6 +138,22 @@ struct ParserResultMetadata {
     time_t update_date = 0;
 };
 
+inline std::ostream& operator << (std::ostream &o, const ParserResultMetadata &parser_metadata)
+{
+    o << "uuid: " << parser_metadata.uuid << " ";
+    o << "title: " << parser_metadata.title << " ";
+    o << "author: " << parser_metadata.author << " ";
+    o << "nickname: " << parser_metadata.nickname << " ";
+    o << "source: " << parser_metadata.source << " ";
+    o << "url: " << parser_metadata.url << " ";
+    o << "last_url: " << parser_metadata.last_url << " ";
+    o << "series_length: " << parser_metadata.series_length << " ";
+    o << "media_path: " << parser_metadata.media_path << " ";
+    o << "update_date: " << parser_metadata.update_date;
+
+    return o;
+}
+
 struct ParserJobResult {
     ParserResultMetadata metadata;
 
@@ -156,6 +172,16 @@ struct ParserResult {
     error_job_rep is_error_job = false;
     bool has_error = true;
 };
+
+inline std::ostream& operator << (std::ostream &o, const ParserResult &parser_result)
+{
+    o << "metadata: " << parser_result.metadata << " ";
+    o << "debug_string: " << parser_result.debug_string << " ";
+    o << "is_error_job: " << parser_result.is_error_job << " ";
+    o << "has_error: " << parser_result.has_error;
+
+    return o;
+}
 
 struct ParserXmlAttributeResult {
     std::string result = "";

@@ -137,6 +137,7 @@ ParseSectionInfo ParserXF::ParseSection()
     // skip saving content if before target start index
     if (working_index < target_start_index_)
     {
+        std::cout << "Target start index: " << target_start_index_ << " - current index: " << working_index << " Skipping filesave" << std::endl;
         output.has_error = false;
         return output;
     }
@@ -266,6 +267,7 @@ std::string ParserXF::GetNextUrl(xmlNodePtr root_node)
         {
             std::cout << "does not have next" << std::endl;
             reached_end_ = true;
+            return next_url_;
         }
     }
 
