@@ -74,6 +74,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
         worker.second->RegisterManagerNotifyCallback(
             [this](ParserJobResult result)
             {
+                std::cout << "ParserManager recieved: " << result << std::endl;
                 result_queue_.push(result);
             }
         );

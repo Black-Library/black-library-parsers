@@ -165,6 +165,18 @@ struct ParserJobResult {
     bool has_error = true;
 };
 
+inline std::ostream& operator << (std::ostream &o, const ParserJobResult &job_result)
+{
+    o << "metadata: " << job_result.metadata << " ";
+    o << "start_number: " << job_result.start_number << " ";
+    o << "end_number: " << job_result.end_number << " ";
+    o << "debug_string: " << job_result.debug_string << " ";
+    o << "is_error_job: " << job_result.is_error_job << " ";
+    o << "has_error: " << job_result.has_error;
+
+    return o;
+}
+
 struct ParserResult {
     ParserResultMetadata metadata;
 
