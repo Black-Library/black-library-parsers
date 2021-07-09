@@ -265,7 +265,7 @@ std::string ParserXF::GetNextUrl(xmlNodePtr root_node)
 
         if (!found_next)
         {
-            std::cout << "does not have next" << std::endl;
+            std::cout <<  GetParserName(parser_type_) << " GetNextUrl - reached end" << std::endl;
             reached_end_ = true;
             return next_url_;
         }
