@@ -26,8 +26,8 @@ protected:
     void SaveLastUrl(ParserResult &parser_result);
     void SaveUpdateDate(ParserResult &parser_result);
 
-    virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    virtual void FindIndexEntries(xmlNodePtr root_node);
+    virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node) = 0;
+    virtual void FindIndexEntries(xmlNodePtr root_node) = 0;
 
     std::vector<ParserIndexEntry> index_entries_;
 };

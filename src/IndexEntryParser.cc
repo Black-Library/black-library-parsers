@@ -23,13 +23,6 @@ IndexEntryParser::IndexEntryParser(parser_t parser_type) :
     parser_behavior_ = parser_behavior_t::INDEX_ENTRY;
 }
 
-ParserIndexEntry IndexEntryParser::ExtractIndexEntry(xmlNodePtr root_node)
-{
-    (void) root_node;
-    ParserIndexEntry index_entry;
-    return index_entry;
-}
-
 int IndexEntryParser::CalculateIndexBounds(const ParserJob &parser_job)
 {
     if (parser_job.start_number > index_entries_.size())
@@ -62,11 +55,6 @@ int IndexEntryParser::CalculateIndexBounds(const ParserJob &parser_job)
 void IndexEntryParser::ExpendedAttempts()
 {
     ++index_;
-}
-
-void IndexEntryParser::FindIndexEntries(xmlNodePtr root_node)
-{
-    (void) root_node;
 }
 
 int IndexEntryParser::PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job)

@@ -22,6 +22,7 @@ public:
     ~ParserAO3();
 
 protected:
+    ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     virtual ParseSectionInfo ParseSection();

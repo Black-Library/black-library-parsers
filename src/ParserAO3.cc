@@ -31,6 +31,13 @@ ParserAO3::~ParserAO3()
     done_ = true;
 }
 
+ParserIndexEntry ParserAO3::ExtractIndexEntry(xmlNodePtr root_node)
+{
+    (void) root_node;
+    ParserIndexEntry index_entry;
+    return index_entry;
+}
+
 void ParserAO3::FindIndexEntries(xmlNodePtr root_node)
 {
     ParserIndexEntry index_entry;
