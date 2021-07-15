@@ -5,7 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
 
-#include "Parser.h"
+#include "IndexEntryParser.h"
 
 namespace black_library {
 
@@ -15,7 +15,7 @@ namespace parsers {
 
 namespace YT {
 
-class ParserYT : public Parser
+class ParserYT : public IndexEntryParser
 {
 public:
     explicit ParserYT();

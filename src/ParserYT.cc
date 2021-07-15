@@ -20,7 +20,7 @@ namespace YT {
 namespace BlackLibraryCommon = black_library::core::common;
 
 ParserYT::ParserYT() :
-    Parser(parser_t::YT_PARSER)
+    IndexEntryParser(parser_t::YT_PARSER)
 {
     title_ = "YT_parser_title";
     source_name_ = BlackLibraryCommon::YT::source_name;
