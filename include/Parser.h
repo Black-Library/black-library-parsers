@@ -59,8 +59,8 @@ protected:
     virtual void ParseLoop(ParserResult &parser_result);
     virtual ParseSectionInfo ParseSection();
     virtual void PostParseLoop(ParserResult &parser_result);
-    virtual int PreParseLoop(xmlNodePtr root_node);
-    virtual std::string PreprocessTargetUrl(const std::string &job_url);
+    virtual int PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job);
+    virtual std::string PreprocessTargetUrl(const ParserJob &parser_job);
     virtual bool ReachedEnd();
     virtual void SaveLastUrl(ParserResult &parser_result);
     virtual void SaveMetaData(ParserResult &parser_result);

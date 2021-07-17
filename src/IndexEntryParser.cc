@@ -23,13 +23,6 @@ IndexEntryParser::IndexEntryParser(parser_t parser_type) :
     parser_behavior_ = parser_behavior_t::INDEX_ENTRY;
 }
 
-ParserIndexEntry IndexEntryParser::ExtractIndexEntry(xmlNodePtr root_node)
-{
-    (void) root_node;
-    ParserIndexEntry index_entry;
-    return index_entry;
-}
-
 int IndexEntryParser::CalculateIndexBounds(const ParserJob &parser_job)
 {
     if (parser_job.start_number > index_entries_.size())
@@ -64,12 +57,7 @@ void IndexEntryParser::ExpendedAttempts()
     ++index_;
 }
 
-void IndexEntryParser::FindIndexEntries(xmlNodePtr root_node)
-{
-    (void) root_node;
-}
-
-int IndexEntryParser::PreParseLoop(xmlNodePtr root_node)
+int IndexEntryParser::PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job)
 {
     std::cout << GetParserName(parser_type_) << ": Find index entry nodes" << std::endl;
 
@@ -77,9 +65,9 @@ int IndexEntryParser::PreParseLoop(xmlNodePtr root_node)
 
     std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
 
-    if (index_entries_.size() <= 0)
+    if (index_entries_.size() <= 0 && index_entries_.size() < parser_job.start_number)
     {
-        std::cout << "Error: no index entries" << std::endl;
+        std::cout << "Error: index entries size error" << std::endl;
         return -1;
     }
 

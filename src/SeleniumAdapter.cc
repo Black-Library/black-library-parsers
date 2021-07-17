@@ -25,9 +25,10 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     std::stringstream ss;
     ss << absolute(std::experimental::filesystem::current_path()).string();
     ss << "/ext/black-library-parsers/src";
-    PyList_Append(sysPath, PyBytes_FromString(ss.str().c_str()));
+    std::cout << ss.str() << std::endl;
+    PyList_Append(sysPath, PyUnicode_FromString(ss.str().c_str()));
 
-    PyObject* pyModuleString = PyBytes_FromString("SeleniumAdapter");
+    PyObject* pyModuleString = PyUnicode_FromString("SeleniumAdapter");
     if(!pyModuleString)
     {
         result.debug_string = "Unable to parse PyString.";
@@ -44,11 +45,12 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyObject* networkRequestFunc = PyObject_GetAttrString(pyModule, "NetworkRequest");
     if(!networkRequestFunc)
     {
-        result.debug_string = "Unable to parse func name.";
+        result.debug_string = "Unable to get func.";
         return result;
     }
 
-    PyObject* args = PyTuple_Pack(1, PyBytes_FromString(url.c_str()));
+    PyObject* args = PyTuple_New(1);
+    PyTuple_SetItem(args, 0, PyUnicode_FromString(url));
     if(!args)
     {
         result.debug_string = "Unable to create args.";
@@ -62,7 +64,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
         return result;
     }
 
-    std::string html_raw = PyBytes_AsString(pyResult);
+    std::string html_raw = PyUnicode_AsString(pyResult);
 
     result.has_error = false;
     result.html = html_raw;

@@ -5,7 +5,7 @@
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
 
-#include "Parser.h"
+#include "IndexEntryParser.h"
 
 namespace black_library {
 
@@ -15,7 +15,7 @@ namespace parsers {
 
 namespace YT {
 
-class ParserYT : public Parser
+class ParserYT : public IndexEntryParser
 {
 public:
     explicit ParserYT();
@@ -25,7 +25,7 @@ protected:
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     ParseSectionInfo ParseSection();
-    std::string PreprocessTargetUrl(const std::string &job_url);
+    std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
     std::string GetYTIndexEntryTitle(const ParserIndexEntry &index_entry);
     ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);

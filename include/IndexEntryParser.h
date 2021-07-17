@@ -21,13 +21,13 @@ public:
 protected:
     int CalculateIndexBounds(const ParserJob &parser_job);
     void ExpendedAttempts();
-    int PreParseLoop(xmlNodePtr root_node) override;
+    int PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job) override;
     bool ReachedEnd();
     void SaveLastUrl(ParserResult &parser_result);
     void SaveUpdateDate(ParserResult &parser_result);
 
-    virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
-    virtual void FindIndexEntries(xmlNodePtr root_node);
+    virtual ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node) = 0;
+    virtual void FindIndexEntries(xmlNodePtr root_node) = 0;
 
     std::vector<ParserIndexEntry> index_entries_;
 };

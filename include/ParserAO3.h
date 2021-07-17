@@ -22,10 +22,11 @@ public:
     ~ParserAO3();
 
 protected:
+    ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
     virtual ParseSectionInfo ParseSection();
-    std::string PreprocessTargetUrl(const std::string &job_url);
+    std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 

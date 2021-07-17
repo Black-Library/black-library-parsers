@@ -20,7 +20,7 @@ namespace YT {
 namespace BlackLibraryCommon = black_library::core::common;
 
 ParserYT::ParserYT() :
-    Parser(parser_t::YT_PARSER)
+    IndexEntryParser(parser_t::YT_PARSER)
 {
     title_ = "YT_parser_title";
     source_name_ = BlackLibraryCommon::YT::source_name;
@@ -39,15 +39,28 @@ ParserIndexEntry ParserYT::ExtractIndexEntry(xmlNodePtr root_node)
 
 void ParserYT::FindIndexEntries(xmlNodePtr root_node)
 {
-    (void) root_node;
+    const auto index_entry = ExtractIndexEntry(root_node);
+
+    index_entries_.emplace_back(index_entry);
 }
 
 void ParserYT::FindMetaData(xmlNodePtr root_node)
 {
     std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
 
-    ParserXmlNodeSeek title_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "meta",
-        pattern_seek_t::XML_ATTRIBUTE, "name=title");
+    xmlNodePtr current_node = NULL;
+
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
+    if (!body_seek.found)
+    {
+        std::cout << "Error: failed body seek" << std::endl;
+        return;
+    }
+
+    current_node = body_seek.seek_node;
+
+    ParserXmlNodeSeek title_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "meta",
+        pattern_seek_t::XML_ATTRIBUTE, "itemprop=name");
     if (title_seek.found)
     {
         ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(title_seek.seek_node, "content");
@@ -57,7 +70,7 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
         }
     }
 
-    ParserXmlNodeSeek author_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "span",
+    ParserXmlNodeSeek author_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "span",
         pattern_seek_t::XML_ATTRIBUTE, "itemprop=author");
     if (author_seek.found)
     {
@@ -77,15 +90,19 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
 ParseSectionInfo ParserYT::ParseSection()
 {
     ParseSectionInfo output;
-    
+    const auto index_entry = index_entries_[index_];
+
+    const auto index_entry_url = "https://www." + source_url_ + index_entry.data_url;
+    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
+
     output.has_error = false;
 
     return output;
 }
 
-std::string ParserYT::PreprocessTargetUrl(const std::string &job_url)
+std::string ParserYT::PreprocessTargetUrl(const ParserJob &parser_job)
 {
-    return job_url;
+    return parser_job.url;
 }
 
 std::string ParserYT::GetYTIndexEntryTitle(const ParserIndexEntry &index_entry)

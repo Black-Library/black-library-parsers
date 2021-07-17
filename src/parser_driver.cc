@@ -223,6 +223,7 @@ int main(int argc, char* argv[])
 
     ParserJob parser_job;
     parser_job.url = iter->second;
+    parser_job.last_url = iter->second;
     parser_job.uuid = "some-uuid";
     parser_job.start_number = opts.start_number;
     parser_job.end_number = opts.end_number;
@@ -234,9 +235,9 @@ int main(int argc, char* argv[])
         }
     );
 
-    auto parser_result = parser->Parse(parser_job);
+    const auto parser_result = parser->Parse(parser_job);
 
-    std::cout << "parser_result update_date: " << parser_result.metadata.update_date << std::endl;
+    std::cout << "parser_result: " << parser_result << std::endl;
 
     curl_global_cleanup();
 

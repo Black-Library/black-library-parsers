@@ -23,16 +23,17 @@ public:
     explicit ParserXF(parser_t parser_type);
 
 protected:
-    virtual void FindMetaData(xmlNodePtr root_node);
-    virtual ParseSectionInfo ParseSection();
-    virtual std::string PreprocessTargetUrl(const std::string &job_url);
+    void FindMetaData(xmlNodePtr root_node);
+    ParseSectionInfo ParseSection();
+    std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
-    std::string GetFirstUrl(xmlNodePtr root_node) override;
+    std::string GetFirstUrl(xmlNodePtr root_node, const std::string &data_url) override;
 
     std::string GetNextUrl(xmlNodePtr root_node);
     std::string GetSectionTitle(xmlNodePtr root_node);
     std::string GetTargetPost(const std::string &data_url);
     time_t GetUpdateDate(xmlNodePtr root_node);
+    std::string GetWorkTitleFromUrl(const std::string &data_url);
     std::string GetXFTitle(const std::string &title);
     ParserXmlNodeSeek SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post);
     ParserXmlNodeSeek SeekToSectionPost(xmlNodePtr root_node, const std::string &target_post);

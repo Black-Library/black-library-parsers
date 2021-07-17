@@ -7,17 +7,22 @@
 #include <sstream>
 
 int main(int argc, char *argv[]) {
+    Py_Initialize();
+
+    PyObject* sysPath = PySys_GetObject("path");
+    if(!sysPath)
+    {
+        std::cout << "Unable to get PATH." << std::endl;
+        return 1;
+    }
 
     std::stringstream ss;
     ss << absolute(std::experimental::filesystem::current_path()).string();
-    ss << "/ext/black-library-parsers/practice";
-    const size_t cSize = strlen(ss.str()+1);
-    std::wstring str(cSize, ss.str().c_str());
+    //ss << "/ext/black-library-parsers/practice";
+    std::cout << ss.str() << std::endl;
+    PyList_Append(sysPath, PyUnicode_FromString(ss.str().c_str()));
 
-    Py_SetPath(str);
-    Py_Initialize();
-
-    PyObject* pyModuleString = PyBytes_FromString("test");
+    PyObject* pyModuleString = PyUnicode_FromString("testPy");
     if(!pyModuleString)
     {
         std::cout << "Unable to parse PyString." << std::endl;
@@ -31,21 +36,23 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    PyObject* networkRequestFunc = PyObject_GetAttrString(pyModule, "test");
-    if(!networkRequestFunc)
+    PyObject* pFunc = PyObject_GetAttrString(pyModule, "testFunc");
+    if(!pFunc)
     {
-        std::cout << "Unable to parse func name." << std::endl;
+        std::cout << "Unable to get func." << std::endl;
         return 1;
     }
 
-    PyObject* args = PyTuple_Pack(0, PyBytes_FromString((char*) "test"));
+    PyObject* args = PyTuple_New(2);
+    PyTuple_SetItem(args, 0, PyLong_FromLong(2));
+    PyTuple_SetItem(args, 1, PyUnicode_FromString("WORKED"));
     if(!args)
     {
         std::cout << "Unable to create args." << std::endl;
         return 1;
     }
 
-    PyObject* pyResult = PyObject_CallObject(networkRequestFunc, args);
+    PyObject* pyResult = PyObject_CallObject(pFunc, args);
     if(!pyResult)
     {
         std::cout << "Unable to get pyResult." << std::endl;

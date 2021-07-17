@@ -74,6 +74,7 @@ typedef bool error_job_rep;
 struct ParserJob {
     std::string uuid;
     std::string url;
+    std::string last_url;
     size_t start_number = 1;
     size_t end_number = 0;
     error_job_rep is_error_job = false;
@@ -85,11 +86,12 @@ struct ParserJobHash
     {
         std::size_t h1 = std::hash<std::string>()(parser_job.uuid);
         std::size_t h2 = std::hash<std::string>()(parser_job.url);
-        std::size_t h3 = std::hash<size_t>()(parser_job.start_number);
-        std::size_t h4 = std::hash<size_t>()(parser_job.end_number);
-        std::size_t h5 = std::hash<error_job_rep>()(parser_job.is_error_job);
+        std::size_t h3 = std::hash<std::string>()(parser_job.last_url);
+        std::size_t h4 = std::hash<size_t>()(parser_job.start_number);
+        std::size_t h5 = std::hash<size_t>()(parser_job.end_number);
+        std::size_t h6 = std::hash<error_job_rep>()(parser_job.is_error_job);
 
-        return h1 ^ h2 ^ h3 ^ h4 ^ h5;
+        return h1 ^ h2 ^ h3 ^ h4 ^ h5 ^ h6;
     }
 };
 
@@ -114,6 +116,7 @@ inline std::ostream& operator << (std::ostream &o, const ParserJob &parser_job)
 {
     o << "uuid: " << parser_job.uuid << " ";
     o << "url: " << parser_job.url << " ";
+    o << "last_url: " << parser_job.last_url << " ";
     o << "start_number: " << parser_job.start_number << " ";
     o << "end_number: " << parser_job.end_number << " ";
     o << "is_error_job: " << parser_job.is_error_job;
@@ -135,6 +138,22 @@ struct ParserResultMetadata {
     time_t update_date = 0;
 };
 
+inline std::ostream& operator << (std::ostream &o, const ParserResultMetadata &parser_metadata)
+{
+    o << "uuid: " << parser_metadata.uuid << " ";
+    o << "title: " << parser_metadata.title << " ";
+    o << "author: " << parser_metadata.author << " ";
+    o << "nickname: " << parser_metadata.nickname << " ";
+    o << "source: " << parser_metadata.source << " ";
+    o << "url: " << parser_metadata.url << " ";
+    o << "last_url: " << parser_metadata.last_url << " ";
+    o << "series_length: " << parser_metadata.series_length << " ";
+    o << "media_path: " << parser_metadata.media_path << " ";
+    o << "update_date: " << parser_metadata.update_date;
+
+    return o;
+}
+
 struct ParserJobResult {
     ParserResultMetadata metadata;
 
@@ -145,6 +164,18 @@ struct ParserJobResult {
     error_job_rep is_error_job = false;
     bool has_error = true;
 };
+
+inline std::ostream& operator << (std::ostream &o, const ParserJobResult &job_result)
+{
+    o << "metadata: " << job_result.metadata << " ";
+    o << "start_number: " << job_result.start_number << " ";
+    o << "end_number: " << job_result.end_number << " ";
+    o << "debug_string: " << job_result.debug_string << " ";
+    o << "is_error_job: " << job_result.is_error_job << " ";
+    o << "has_error: " << job_result.has_error;
+
+    return o;
+}
 
 struct ParserResult {
     ParserResultMetadata metadata;
@@ -160,6 +191,16 @@ struct NetworkRequestResult {
     std::string debug_string;
     bool has_error = true;
 };
+
+inline std::ostream& operator << (std::ostream &o, const ParserResult &parser_result)
+{
+    o << "metadata: " << parser_result.metadata << " ";
+    o << "debug_string: " << parser_result.debug_string << " ";
+    o << "is_error_job: " << parser_result.is_error_job << " ";
+    o << "has_error: " << parser_result.has_error;
+
+    return o;
+}
 
 struct ParserXmlAttributeResult {
     std::string result = "";
