@@ -31,8 +31,19 @@ ParserYT::ParserYT() :
 
 ParserIndexEntry ParserYT::ExtractIndexEntry(xmlNodePtr root_node)
 {
-    (void) root_node;
     ParserIndexEntry index_entry;
+
+    const auto url_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "meta",
+        pattern_seek_t::XML_ATTRIBUTE, "property=og:url");
+
+    if (url_seek.found)
+    {
+        const auto url_content_result = GetXmlAttributeContentByName(url_seek.seek_node, "content");
+        if (url_content_result.found)
+        {
+            std::cout << url_content_result.result << std::endl;
+        }
+    }
 
     return index_entry;
 }
@@ -50,7 +61,7 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
 
     xmlNodePtr current_node = NULL;
 
-    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
+    const auto body_seek = SeekToNodeByName(root_node, "body");
     if (!body_seek.found)
     {
         std::cout << "Error: failed body seek" << std::endl;
@@ -65,9 +76,7 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
     {
         ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(title_seek.seek_node, "content");
         if (content_result.found)
-        {
             title_ = content_result.result;
-        }
     }
 
     ParserXmlNodeSeek author_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "span",
