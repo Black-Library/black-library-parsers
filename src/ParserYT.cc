@@ -41,7 +41,7 @@ ParserIndexEntry ParserYT::ExtractIndexEntry(xmlNodePtr root_node)
         const auto url_content_result = GetXmlAttributeContentByName(url_seek.seek_node, "content");
         if (url_content_result.found)
         {
-            index_entry.data_url = url_content_result.result;
+            index_entry.data_url = BlackLibraryCommon::SubstringAfterString(url_content_result.result, source_url_);
             index_entry.index_num = 0;
         }
     }
