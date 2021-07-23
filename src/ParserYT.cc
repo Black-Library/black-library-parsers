@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 
 #include <FileOperations.h>
 #include <TimeOperations.h>
@@ -58,7 +59,7 @@ void ParserYT::FindIndexEntries(xmlNodePtr root_node)
 
 void ParserYT::FindMetaData(xmlNodePtr root_node)
 {
-    std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
+    // std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
 
     xmlNodePtr current_node = NULL;
 
@@ -104,6 +105,20 @@ ParseSectionInfo ParserYT::ParseSection()
 
     const auto index_entry_url = "https://www." + source_url_ + index_entry.data_url;
     std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
+
+    std::stringstream ss;
+
+    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --write-thumbnail --extract-audio --add-metadata ";
+    if (is_playlist)
+        ss << "--yes-playlist ";
+    ss << "--output '" << local_des_ << "/%(title)s.%(ext)s'" << index_entry_url;
+
+    std::cout << ss.str() << std::endl;
+
+    // int ret = system(command.c_str());
+
+    // if (ret < 0)
+    //     return output;
 
     output.has_error = false;
 
