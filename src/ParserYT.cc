@@ -115,10 +115,10 @@ ParseSectionInfo ParserYT::ParseSection()
 
     std::cout << ss.str() << std::endl;
 
-    // int ret = system(command.c_str());
+    int ret = system(command.c_str());
 
-    // if (ret < 0)
-    //     return output;
+    if (ret < 0)
+        return output;
 
     output.has_error = false;
 
