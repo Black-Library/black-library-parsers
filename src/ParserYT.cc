@@ -108,14 +108,14 @@ ParseSectionInfo ParserYT::ParseSection()
 
     std::stringstream ss;
 
-    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --write-thumbnail --extract-audio --add-metadata ";
+    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --extract-audio --keep-video --add-metadata ";
     if (is_playlist)
         ss << "--yes-playlist ";
-    ss << "--output '" << local_des_ << "/%(title)s.%(ext)s'" << index_entry_url;
+    ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
 
     std::cout << ss.str() << std::endl;
 
-    int ret = system(command.c_str());
+    int ret = system(ss.str().c_str());
 
     if (ret < 0)
         return output;
