@@ -107,15 +107,33 @@ ParseSectionInfo ParserYT::ParseSection()
     std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
 
     std::stringstream ss;
+    int ret = 0;
 
-    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --extract-audio --keep-video --add-metadata ";
+    // get audio
+    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --extract-audio --add-metadata ";
     if (is_playlist)
         ss << "--yes-playlist ";
     ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
 
     std::cout << ss.str() << std::endl;
 
-    int ret = system(ss.str().c_str());
+    ret = system(ss.str().c_str());
+
+    if (ret < 0)
+        return output;
+
+    // clear stringstream
+    ss.str(std::string());
+
+    // get video
+    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --add-metadata ";
+    if (is_playlist)
+        ss << "--yes-playlist ";
+    ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
+
+    std::cout << ss.str() << std::endl;
+
+    ret = system(ss.str().c_str());
 
     if (ret < 0)
         return output;
