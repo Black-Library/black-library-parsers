@@ -11,6 +11,7 @@ namespace core {
 namespace parsers {
 
 NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
+    (void) url;
     NetworkRequestResult result;
 
     Py_Initialize();
@@ -25,7 +26,6 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     std::stringstream ss;
     ss << absolute(std::experimental::filesystem::current_path()).string();
     ss << "/ext/black-library-parsers/src";
-    std::cout << ss.str() << std::endl;
     PyList_Append(sysPath, PyUnicode_FromString(ss.str().c_str()));
 
     PyObject* pyModuleString = PyUnicode_FromString("SeleniumAdapter");
@@ -50,7 +50,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     }
 
     PyObject* args = PyTuple_New(1);
-    PyTuple_SetItem(args, 0, PyUnicode_FromString(url));
+    PyTuple_SetItem(args, 0, PyUnicode_FromString(url.c_str()));
     if(!args)
     {
         result.debug_string = "Unable to create args.";
@@ -61,10 +61,14 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     if(!pyResult)
     {
         result.debug_string = "Unable to get pyResult.";
+        if (PyErr_Occurred()) {
+            PyErr_PrintEx(0);
+            PyErr_Clear(); // this will reset the error indicator so you can run Python code again
+        }
         return result;
     }
 
-    std::string html_raw = PyUnicode_AsString(pyResult);
+    std::string html_raw = _PyUnicode_AsString(pyResult);
 
     result.has_error = false;
     result.html = html_raw;

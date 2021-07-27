@@ -60,3 +60,11 @@ JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.mi
 
 ###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
 
+1626554838037	geckodriver	INFO	Listening on 127.0.0.1:57461
+1626554838041	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileIDV8Rh"
+1626554838313	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileIDV8Rh/search.json.mozlz4", (void 0)))
+1626554839715	Marionette	INFO	Listening on port 42729
+1626554839777	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js, line 4: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1626554841514	Marionette	INFO	Stopped listening on port 42729

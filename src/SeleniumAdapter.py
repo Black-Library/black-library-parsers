@@ -1,21 +1,17 @@
 import sys
 import time
+import pathlib
 
 from selenium import webdriver
 
 def NetworkRequest(url) :
-    driver = webdriver.Firefox(executable_path="../ext/geckodriver")
+    driverpath = pathlib.Path(__file__).parent.resolve()
+    driverpath = str(driverpath)
+    driverpath = driverpath[0:-4] + "/ext/geckodriver"
+    driver = webdriver.Firefox(executable_path=driverpath)
     driver.get(url)
     time.sleep(1)
     page_raw = driver.page_source
     driver.quit()
-    print(page_raw)
     return page_raw
 
-try:
-    url = sys.argv[1]
-    NetworkRequest(url)
-except IndexError:
-    raise Exception("Please provide url")
-except KeyError:
-    raise Exception("Function {} hasn't been found".format(function))

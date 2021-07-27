@@ -79,7 +79,6 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto working_url = next_url_;
     const auto working_index = index_;
 
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.html.c_str(), NULL, NULL,
     std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << working_url << std::endl;
 
     if (working_index > target_end_index_)
