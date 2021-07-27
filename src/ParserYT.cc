@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 
 #include <FileOperations.h>
 #include <TimeOperations.h>
@@ -31,8 +32,20 @@ ParserYT::ParserYT() :
 
 ParserIndexEntry ParserYT::ExtractIndexEntry(xmlNodePtr root_node)
 {
-    (void) root_node;
     ParserIndexEntry index_entry;
+
+    const auto url_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "meta",
+        pattern_seek_t::XML_ATTRIBUTE, "property=og:url");
+
+    if (url_seek.found)
+    {
+        const auto url_content_result = GetXmlAttributeContentByName(url_seek.seek_node, "content");
+        if (url_content_result.found)
+        {
+            index_entry.data_url = BlackLibraryCommon::SubstringAfterString(url_content_result.result, source_url_);
+            index_entry.index_num = 0;
+        }
+    }
 
     return index_entry;
 }
@@ -46,11 +59,11 @@ void ParserYT::FindIndexEntries(xmlNodePtr root_node)
 
 void ParserYT::FindMetaData(xmlNodePtr root_node)
 {
-    std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
+    // std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
 
     xmlNodePtr current_node = NULL;
 
-    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
+    const auto body_seek = SeekToNodeByName(root_node, "body");
     if (!body_seek.found)
     {
         std::cout << "Error: failed body seek" << std::endl;
@@ -65,9 +78,7 @@ void ParserYT::FindMetaData(xmlNodePtr root_node)
     {
         ParserXmlAttributeResult content_result = GetXmlAttributeContentByName(title_seek.seek_node, "content");
         if (content_result.found)
-        {
             title_ = content_result.result;
-        }
     }
 
     ParserXmlNodeSeek author_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "span",
@@ -94,6 +105,38 @@ ParseSectionInfo ParserYT::ParseSection()
 
     const auto index_entry_url = "https://www." + source_url_ + index_entry.data_url;
     std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
+
+    std::stringstream ss;
+    int ret = 0;
+
+    // get audio
+    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --extract-audio --add-metadata ";
+    if (is_playlist)
+        ss << "--yes-playlist ";
+    ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
+
+    std::cout << ss.str() << std::endl;
+
+    ret = system(ss.str().c_str());
+
+    if (ret < 0)
+        return output;
+
+    // clear stringstream
+    ss.str(std::string());
+
+    // get video
+    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --add-metadata ";
+    if (is_playlist)
+        ss << "--yes-playlist ";
+    ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
+
+    std::cout << ss.str() << std::endl;
+
+    ret = system(ss.str().c_str());
+
+    if (ret < 0)
+        return output;
 
     output.has_error = false;
 
