@@ -45,3 +45,4 @@ install
 # Python Binaries
 *.pyc
 src/__pycache__
+src/geckodriver.log
