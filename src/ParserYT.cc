@@ -20,6 +20,8 @@ namespace YT {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
+static constexpr const char YoutubeDlBaseString[] = "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --add-metadata ";
+
 ParserYT::ParserYT() :
     IndexEntryParser(parser_t::YT_PARSER)
 {
@@ -110,7 +112,7 @@ ParseSectionInfo ParserYT::ParseSection()
     int ret = 0;
 
     // get audio
-    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --extract-audio --add-metadata ";
+    ss << YoutubeDlBaseString << "--extract-audio ";
     if (is_playlist)
         ss << "--yes-playlist ";
     ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
@@ -126,7 +128,7 @@ ParseSectionInfo ParserYT::ParseSection()
     ss.str(std::string());
 
     // get video
-    ss << "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --add-metadata ";
+    ss << YoutubeDlBaseString;
     if (is_playlist)
         ss << "--yes-playlist ";
     ss << "--output '" << local_des_ << "%(title)s.%(ext)s' " << index_entry_url;
