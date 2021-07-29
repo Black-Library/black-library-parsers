@@ -61,8 +61,6 @@ void ParserYT::FindIndexEntries(xmlNodePtr root_node)
 
 void ParserYT::FindMetaData(xmlNodePtr root_node)
 {
-    // std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
-
     xmlNodePtr current_node = NULL;
 
     const auto body_seek = SeekToNodeByName(root_node, "body");
