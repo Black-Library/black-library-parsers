@@ -161,6 +161,10 @@ parser_t GetParserTypeByUrl(const std::string &url)
     {
         rep = parser_t::SBF_PARSER;
     }
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::SVF::source_url))
+    {
+        rep = parser_t::SVF_PARSER;
+    }
     else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::RR::source_url))
     {
         rep = parser_t::RR_PARSER;
