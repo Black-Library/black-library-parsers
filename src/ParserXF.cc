@@ -104,16 +104,18 @@ ParseSectionInfo ParserXF::ParseSection()
 
     const auto target_post = GetTargetPost(working_url);
 
-    const auto content_wrapper_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
-        pattern_seek_t::XML_ATTRIBUTE, "class=xb-content-wrapper");
-    if (!content_wrapper_seek.found)
+    // std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
+
+    const auto p_body_main_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=p-body-main  ");
+    if (!p_body_main_seek.found)
     {
         std::cout << "Error: failed content wrapper seek" << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    current_node = content_wrapper_seek.seek_node;
+    current_node = p_body_main_seek.seek_node;
 
     const auto section_post_seek = SeekToSectionPost(current_node, target_post);
     if (!section_post_seek.found)
@@ -321,8 +323,10 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
-    const auto message_attribution_main_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "div",
-        pattern_seek_t::XML_ATTRIBUTE, "class=message-attribution-main");
+    // std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
+
+    const auto message_attribution_main_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "ul",
+        pattern_seek_t::XML_ATTRIBUTE, "class=message-attribution-main listInline ");
     if (!message_attribution_main_seek.found)
     {
         std::cout << "Error: failed message attribution main seek" << std::endl;
@@ -330,6 +334,15 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     }
 
     current_node = message_attribution_main_seek.seek_node->children;
+
+    const auto li_seek = SeekToNodeByName(current_node, "li");
+    if (!li_seek.found)
+    {
+        std::cout << "Error: failed 'li' seek" << std::endl;
+        return 0;
+    }
+
+    current_node = li_seek.seek_node->children;
 
     const auto a_seek = SeekToNodeByName(current_node, "a");
     if (!a_seek.found)
