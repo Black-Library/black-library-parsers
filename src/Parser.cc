@@ -64,7 +64,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << std::endl;
 
     const auto curl_result = network_.get()->NetworkRequest(target_url_);
-    if(curl_result.has_error)
+    if (curl_result.has_error)
     {
         std::cout << curl_result.debug_string << std::endl;
         return parser_result;

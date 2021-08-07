@@ -27,6 +27,9 @@ public:
     ~SeleniumAdapter() {};
 
     NetworkRequestResult NetworkRequest(const std::string& url) override;
+
+private:
+    void PrintPythonError();
 };
 
 } // namespace parsers

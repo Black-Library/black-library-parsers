@@ -21,8 +21,9 @@
 
 #include "ParserCommon.h"
 #include "ParserTimeGenerator.h"
-#include "NetworkAdapter.h"
+
 #include "CurlAdapter.h"
+#include "NetworkAdapter.h"
 #include "SeleniumAdapter.h"
 
 namespace black_library {
