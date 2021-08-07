@@ -11,7 +11,6 @@ namespace core {
 namespace parsers {
 
 NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
-    (void) url;
     NetworkRequestResult result;
 
     Py_Initialize();

@@ -89,7 +89,7 @@ ParseSectionInfo ParserXF::ParseSection()
     }
 
     const auto section_curl_result = network_.get()->NetworkRequest(working_url);
-    if(section_curl_result.has_error)
+    if (section_curl_result.has_error)
     {
         std::cout << section_curl_result.debug_string << std::endl;
         return output;
