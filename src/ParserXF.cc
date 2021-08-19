@@ -37,23 +37,43 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     ParserXmlNodeSeek head_seek = SeekToNodeByName(root_node, "head");
     if (!head_seek.found)
     {
-        std::cout << "Warning: Could not get metadata from: " << uuid_ << std::endl;
+        std::cout << "Warning: Could not find head from: " << uuid_ << std::endl;
         return;
     }
 
     current_node = head_seek.seek_node;
 
-    const auto thread_starter_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "ul",
-        pattern_seek_t::XML_ATTRIBUTE, "class=listInline listInline--bullet");
-    if (!thread_starter_seek.found)
+    const auto has_threadmark_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "article",
+        pattern_seek_t::XML_ATTRIBUTE, "class=message message--post hasThreadmark  js-post js-inlineModContainer   ");
+    if (!has_threadmark_seek.found)
     {
-        std::cout << "Error: could not find thread starter" << std::endl;
+        std::cout << "Error: could not find hasThreadmark post" << std::endl;
         return;
     }
 
-    current_node = thread_starter_seek.seek_node->children->next->children;
+    current_node = has_threadmark_seek.seek_node;
 
-    const auto name_seek = SeekToNodeByName(current_node, "a");
+    const auto message_inner_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=message-inner");
+    if (!message_inner_seek.found)
+    {
+        std::cout << "Error: could not find message-inner" << std::endl;
+        return;
+    }
+
+    current_node = message_inner_seek.seek_node;
+
+    const auto message_userdetails_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=message-userDetails");
+    if (!message_userdetails_seek.found)
+    {
+        std::cout << "Error: could not find message-userDetails" << std::endl;
+        return;
+    }
+
+    current_node = message_userdetails_seek.seek_node->children;
+
+    const auto name_seek = SeekToNodeByName(current_node, "h4");
     if (!name_seek.found)
     {
         std::cout << "Error: could not find author content" << std::endl;
@@ -218,7 +238,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_
 {
     xmlNodePtr current_node = NULL;
 
-    ParserXmlNodeSeek has_threadmark_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "article",
+    const auto has_threadmark_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "article",
         pattern_seek_t::XML_ATTRIBUTE, "class=message message--post hasThreadmark  js-post js-inlineModContainer   ");
     if (!has_threadmark_seek.found)
     {
