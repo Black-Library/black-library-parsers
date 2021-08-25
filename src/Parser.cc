@@ -78,7 +78,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
-    std::cout << GetParserName(parser_type_) << ": Find metadata" << std::endl;
+    std::cout << GetParserName(parser_type_) << ": Find metadata: " << target_url_ << std::endl;
 
     FindMetaData(current_node);
 
@@ -144,7 +144,7 @@ std::string Parser::CurlRequest(const std::string &url)
     res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-        std::cout << "Curl Request Failed: " << curl_easy_strerror(res) << std::endl;
+        std::cout << GetParserName(parser_type_) <<  ": curl request failed: " << curl_easy_strerror(res) << std::endl;
         return "";
     }
 
