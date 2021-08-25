@@ -235,7 +235,7 @@ ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std
         return result;
     }
 
-    xmlAttr* prop = root->properties;
+    xmlAttrPtr prop = root->properties;
     while (prop)
     {
         if (memcmp(prop->name, attr.c_str(), attr.length()) == 0 &&
@@ -249,7 +249,7 @@ ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std
         prop = prop->next;
     }
 
-    xmlNode* current_node = root->children;
+    xmlNodePtr current_node = root->children;
 
     while (current_node)
     {
