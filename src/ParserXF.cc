@@ -34,16 +34,16 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
 
-    ParserXmlNodeSeek head_seek = SeekToNodeByName(root_node, "head");
-    if (!head_seek.found)
+    ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
+    if (!body_seek.found)
     {
-        std::cout << "Warning: Could not find head from: " << uuid_ << std::endl;
+        std::cout << "Warning: Could not find body from: " << uuid_ << std::endl;
         return;
     }
 
-    current_node = head_seek.seek_node;
+    current_node = body_seek.seek_node;
 
-    const auto has_threadmark_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "article",
+    const auto has_threadmark_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "article",
         pattern_seek_t::XML_ATTRIBUTE, "class=message message--post hasThreadmark  js-post js-inlineModContainer   ");
     if (!has_threadmark_seek.found)
     {
