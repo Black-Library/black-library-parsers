@@ -249,36 +249,24 @@ ParserXmlNodeSeek SeekToNodeByPattern(xmlNodePtr root_node, Args... args)
         return result;
     }
 
-    bool found = SeekToNodeByPatternHelper(root_node, args...);
-    if (found)
+    xmlNodePtr current_node = NULL;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
     {
-        result.seek_node = root_node;
-        result.found = true;
-        return result;
-    }
-
-
-    xmlNode* current_node = root_node->children;
-
-    while (current_node)
-    {
-        ParserXmlNodeSeek node_result = SeekToNodeByPattern(current_node, args...);
-
-        if (node_result.found)
+        const auto children_seek = SeekToNodeByPattern(current_node->children, args...);
+        if (children_seek.found)
         {
-            return node_result;
+            result.seek_node = children_seek.seek_node;
+            result.found = true;
+            return result;
         }
 
-        current_node = current_node->next;
-    }
-
-    if (root_node->next)
-    {
-        ParserXmlNodeSeek node_result = SeekToNodeByPattern(root_node->next, args...);
-
-        if (node_result.found)
+        bool found = SeekToNodeByPatternHelper(current_node, args...);
+        if (found)
         {
-            return node_result;
+            result.seek_node = current_node;
+            result.found = true;
+            return result;
         }
     }
 
@@ -318,9 +306,10 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std
             std::string value = attribute.substr(attribute.find('=') + 1);
 
             bool found = false;
-            xmlAttr* prop = root_node->properties;
+            xmlAttrPtr prop = root_node->properties;
             while (prop)
             {
+                // std::cout << "name: " << prop->name << " attr: " << attr << " content: " << prop->children->content << " value: " << value <<std::endl;
                 if (!xmlStrcmp(prop->name, (const xmlChar *) attr.c_str()) &&
                     !(xmlStrcmp(prop->children->content, (const xmlChar *) value.c_str())))
                 {
@@ -336,6 +325,8 @@ bool SeekToNodeByPatternHelper(xmlNodePtr root_node, pattern_seek_t pattern, std
             }
             break;
         }
+        default:
+            return false;
     }
 
     return SeekToNodeByPatternHelper(root_node, args...);
