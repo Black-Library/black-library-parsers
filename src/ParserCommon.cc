@@ -20,7 +20,7 @@ namespace core {
 
 namespace parsers {
 
-#define INDEX_ENTRY_FILENAME_BUFFER_SIZE 128
+#define PARSE_SECTION_FILENAME_BUFFER_SIZE 128
 
 namespace BlackLibraryCommon = black_library::core::common;
 
@@ -181,8 +181,8 @@ parser_t GetParserTypeByUrl(const std::string &url)
 // limited to 9999 sections right now (no CH10000), index starts at 1 for sections
 std::string GetSectionFileName(const size_t &index_num, const std::string &section_name)
 {
-    char buffer [INDEX_ENTRY_FILENAME_BUFFER_SIZE];
-    int res = snprintf(buffer, INDEX_ENTRY_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_num + 1, section_name.c_str());
+    char buffer [PARSE_SECTION_FILENAME_BUFFER_SIZE];
+    int res = snprintf(buffer, PARSE_SECTION_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_num + 1, section_name.c_str());
     if (res < 0)
         return "";
 
@@ -292,6 +292,7 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
     ParserXmlAttributeResult attr_result;
 
     xmlAttrPtr attribute = root_node->properties;
+    xmlChar *attr_content = NULL;
 
     while (attribute)
     {
@@ -300,19 +301,18 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
         {
             if (!target_name.compare(std::string((char *)attr_name)))
             {
-                xmlChar *attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
+                attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
                 if (attr_content != NULL)
                 {
                     attr_result.result = std::string((char *) attr_content);
                     attr_result.found = true;
                 }
-                xmlFree(attr_content);
                 break;
             }
         }
-
         attribute = attribute->next;
     }
+    xmlFree(attr_content);
 
     return attr_result;
 }
@@ -343,11 +343,12 @@ bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name)
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content)
 {
     xmlAttrPtr attribute = root_node->properties;
+    xmlChar *attr_content = NULL;
     bool found = false;
 
     while (attribute)
     {
-        xmlChar *attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
+        attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
         if (attr_content != NULL)
         {
             if (!target_content.compare(std::string((char *)attr_content)))
