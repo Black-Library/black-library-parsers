@@ -161,6 +161,7 @@ ParseSectionInfo ParserXF::ParseSection()
     {
         std::cout << "Target start index: " << target_start_index_ << " - current index: " << working_index << " Skipping filesave" << std::endl;
         output.has_error = false;
+        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
