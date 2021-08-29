@@ -155,7 +155,7 @@ int ParserWorker::RunOnce()
                 return job_result;
             }
 
-            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job <<  std::endl;
+            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": job: " << parser_job <<  std::endl;
 
             std::thread t([this, parser, &parser_job, &parser_error](){
 
@@ -169,7 +169,7 @@ int ParserWorker::RunOnce()
                     std::this_thread::sleep_until(deadline);
                 }
 
-                std::cout << GetParserName(parser->GetParserType()) << ": " << parser_job << " done" << std::endl;
+                std::cout << GetParserName(parser->GetParserType()) << ": job: " << parser_job << " done" << std::endl;
 
                 parser->Stop();
             });
@@ -196,7 +196,7 @@ int ParserWorker::RunOnce()
 
             t.join();
 
-            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": " << parser_job <<  std::endl;
+            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": job: " << parser_job <<  std::endl;
 
             job_result.metadata = parser_result.metadata;
             job_result.start_number = parser_job.start_number;

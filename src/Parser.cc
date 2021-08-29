@@ -61,7 +61,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     target_url_ = PreprocessTargetUrl(parser_job);
 
-    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << std::endl;
+    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << " target: " << target_url_ << std::endl;
 
     const auto curl_result = CurlRequest(target_url_);
 
