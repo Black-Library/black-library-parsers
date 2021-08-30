@@ -351,6 +351,7 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
         attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
         if (attr_content != NULL)
         {
+            std::cout << "attr_content: " << std::string((char *)attr_content) << std::endl;
             if (!target_content.compare(std::string((char *)attr_content)))
                 found = true;
         }
@@ -398,15 +399,17 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
         {
             seek.seek_node = current_node;
             seek.found = true;
-            break;
+            return seek;
         }
 
         ParserXmlNodeSeek children_seek = SeekToNodeByNameRecursive(current_node->children, name);
 
-        if (children_seek.seek_node != NULL)
+        if (children_seek.found)
+        {
             seek.seek_node = children_seek.seek_node;
-
-        seek.found = seek.found || children_seek.found;
+            seek.found = true;
+            return seek;
+        }
     }
 
     return seek;

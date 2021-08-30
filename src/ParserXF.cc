@@ -43,15 +43,14 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
 
     current_node = body_seek.seek_node;
 
-    const auto has_threadmark_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "article",
-        pattern_seek_t::XML_ATTRIBUTE, "class=message message--post hasThreadmark  js-post js-inlineModContainer   ");
-    if (!has_threadmark_seek.found)
+    const auto threadmark_seek = SeekToThreadmark(current_node);
+    if (!threadmark_seek.found)
     {
-        std::cout << "Error: could not find hasThreadmark post" << std::endl;
+        std::cout << "Error: could not find threadmark" << std::endl;
         return;
     }
 
-    current_node = has_threadmark_seek.seek_node;
+    current_node = threadmark_seek.seek_node;
 
     const auto message_inner_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
         pattern_seek_t::XML_ATTRIBUTE, "class=message-inner");
@@ -123,8 +122,6 @@ ParseSectionInfo ParserXF::ParseSection()
     size_t length = 0;
 
     const auto target_post = GetTargetPost(working_url);
-
-    // std::cout << GenerateXmlDocTreeString(current_node) << std::endl;
 
     const auto p_body_main_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
         pattern_seek_t::XML_ATTRIBUTE, "class=p-body-main  ");
@@ -232,22 +229,21 @@ std::string ParserXF::PreprocessTargetUrl(const ParserJob &parser_job)
         return parser_job.url;
     }
 
-    return parser_job.url;
+    return parser_job.last_url;
 }
 
 std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_url)
 {
     xmlNodePtr current_node = NULL;
 
-    const auto has_threadmark_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "article",
-        pattern_seek_t::XML_ATTRIBUTE, "class=message message--post hasThreadmark  js-post js-inlineModContainer   ");
-    if (!has_threadmark_seek.found)
+    const auto threadmark_seek = SeekToThreadmark(root_node);
+    if (!threadmark_seek.found)
     {
-        std::cout << "Error: could not find hasThreadmark post" << std::endl;
+        std::cout << "Error: could not find threadmark" << std::endl;
         return "";
     }
 
-    current_node = has_threadmark_seek.seek_node->children->next;
+    current_node = threadmark_seek.seek_node->children->next;
 
     const auto post_id_result = GetXmlAttributeContentByName(current_node, "id");
     if (!post_id_result.found)
@@ -343,8 +339,6 @@ std::string ParserXF::GetTargetPost(const std::string &data_url)
 time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
 {
     xmlNodePtr current_node = NULL;
-
-    // std::cout << GenerateXmlDocTreeString(root_node) << std::endl;
 
     const auto message_attribution_main_seek = SeekToNodeByPattern(root_node, pattern_seek_t::XML_NAME, "ul",
         pattern_seek_t::XML_ATTRIBUTE, "class=message-attribution-main listInline ");
@@ -493,6 +487,60 @@ ParserXmlNodeSeek ParserXF::SeekToSectionPost(xmlNodePtr root_node, const std::s
     section_post_seek.found = found;
 
     return section_post_seek;
+}
+
+ParserXmlNodeSeek ParserXF::SeekToThreadmark(xmlNodePtr root_node)
+{
+    ParserXmlNodeSeek threadmark_node_seek;
+
+    xmlNodePtr current_node = NULL;
+
+    for (current_node = root_node; current_node; current_node = current_node->next)
+    {
+        if (current_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        ParserXmlNodeSeek children_seek = SeekToThreadmark(current_node->children);
+        if (children_seek.found)
+        {
+            threadmark_node_seek.seek_node = children_seek.seek_node;
+            threadmark_node_seek.found = true;
+            return threadmark_node_seek;
+        }
+
+        if (NodeHasAttributeContent(current_node, "message message--post hasThreadmark  js-post js-inlineModContainer   "))
+        {
+            std::cout << GenerateXmlDocTreeString(current_node->children) << std::endl;
+            const auto threadmark_header_seek = SeekToNodeByPattern(current_node->children, pattern_seek_t::XML_NAME, "div",
+                pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
+            if (!threadmark_node_seek.found)
+            {
+                std::cout << "Error: could not find threadmark header" << std::endl;
+                continue;
+            }
+
+            std::cout << "met a threadmark header" << std::endl;
+            
+            const auto label_seek = SeekToNodeByName(threadmark_header_seek.seek_node, "label");
+            if (!label_seek.found)
+                continue;
+
+            std::cout << "met a label" << std::endl;
+            
+            const auto label_content = GetXmlNodeContent(label_seek.seek_node);
+
+            std::cout << "content: " << label_content.result << std::endl;
+
+            if (label_content.result == "Threadmarks")
+            {
+                threadmark_node_seek.seek_node = current_node;
+                threadmark_node_seek.found = true;
+                return threadmark_node_seek;
+            }
+        }
+    }
+
+    return threadmark_node_seek;
 }
 
 } // namespace XF
