@@ -351,7 +351,7 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
         attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
         if (attr_content != NULL)
         {
-            std::cout << "attr_content: " << std::string((char *)attr_content) << std::endl;
+            // std::cout << "attr_content: " << std::string((char *)attr_content) << std::endl;
             if (!target_content.compare(std::string((char *)attr_content)))
                 found = true;
         }
