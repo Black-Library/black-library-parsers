@@ -510,26 +510,22 @@ ParserXmlNodeSeek ParserXF::SeekToThreadmark(xmlNodePtr root_node)
 
         if (NodeHasAttributeContent(current_node, "message message--post hasThreadmark  js-post js-inlineModContainer   "))
         {
-            std::cout << GenerateXmlDocTreeString(current_node->children) << std::endl;
             const auto threadmark_header_seek = SeekToNodeByPattern(current_node->children, pattern_seek_t::XML_NAME, "div",
                 pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
-            if (!threadmark_node_seek.found)
+            if (!threadmark_header_seek.found)
             {
                 std::cout << "Error: could not find threadmark header" << std::endl;
                 continue;
             }
 
-            std::cout << "met a threadmark header" << std::endl;
-            
-            const auto label_seek = SeekToNodeByName(threadmark_header_seek.seek_node, "label");
+            const auto label_seek = SeekToNodeByName(threadmark_header_seek.seek_node->children, "label");
             if (!label_seek.found)
+            {
+                std::cout << "Error: could not find label" << std::endl;
                 continue;
-
-            std::cout << "met a label" << std::endl;
+            }
             
             const auto label_content = GetXmlNodeContent(label_seek.seek_node);
-
-            std::cout << "content: " << label_content.result << std::endl;
 
             if (label_content.result == "Threadmarks")
             {
