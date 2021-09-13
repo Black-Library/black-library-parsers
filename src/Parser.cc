@@ -316,9 +316,9 @@ void Parser::SaveLastUrl(ParserResult &parser_result)
 
 void Parser::SaveMetaData(ParserResult &parser_result)
 {
-    std::cout << "\tTitle: " << title_ << std::endl;
-    std::cout << "\tAuthor: " << author_ << std::endl;
-    std::cout << "\tNickname: " << nickname_ << std::endl;
+    // std::cout << "\tTitle: " << title_ << std::endl;
+    // std::cout << "\tAuthor: " << author_ << std::endl;
+    // std::cout << "\tNickname: " << nickname_ << std::endl;
 
     parser_result.metadata.title = title_;
     parser_result.metadata.author = author_;
