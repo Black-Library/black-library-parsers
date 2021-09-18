@@ -111,34 +111,34 @@ std::string GetParserName(parser_t rep)
     switch (rep)
     {
     case parser_t::ERROR_PARSER:
-        return "ERROR_PARSER";
+        return "error_parser";
         break;
     case parser_t::AO3_PARSER:
-        return "AO3_PARSER";
+        return "ao3_parser";
         break;
     case parser_t::FFN_PARSER:
-        return "FFN_PARSER";
+        return "ffn_parser";
         break;
     case parser_t::RR_PARSER:
-        return "RR_PARSER";
+        return "rr_parser";
         break;
     case parser_t::SBF_PARSER:
-        return "SBF_PARSER";
+        return "sbf_parser";
         break;
     case parser_t::SVF_PARSER:
-        return "SVF_PARSER";
+        return "svf_parser";
         break;
     case parser_t::XF_PARSER:
-        return "XF_PARSER";
+        return "xf_parser";
         break;
     case parser_t::YT_PARSER:
-        return "YT_PARSER";
+        return "yt_parser";
         break;
     case parser_t::_NUM_PARSERS_TYPE:
-        return "_NUM_PARSERS_TYPE";
+        return "_num_parsers_type";
         break;
     default:
-        return "NO_PARSER";
+        return "no_parser";
         break;
     }
 }

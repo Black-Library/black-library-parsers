@@ -7,6 +7,8 @@
 #include <iostream>
 #include <thread>
 
+#include <LogOperations.h>
+
 #include <Parser.h>
 #include <ShortTimeGenerator.h>
 
@@ -21,17 +23,24 @@ namespace BlackLibraryCommon = black_library::core::common;
 Parser::Parser(parser_t parser_type) : 
     progress_number_callback_(),
     time_generator_(std::make_shared<ShortTimeGenerator>()),
-    title_("ERROR_parser_title"),
+    uuid_(""),
+    title_(GetParserName(parser_type) + "_title"),
     nickname_(""),
     source_name_(BlackLibraryCommon::ERROR::source_name),
     source_url_(BlackLibraryCommon::ERROR::source_url),
     author_("unknown-author"),
+    target_url_(""),
+    local_des_(""),
+    parser_name_(""),
     index_(0),
     end_index_(0),
     parser_type_(parser_type),
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false)
 {
+    parser_name_ = GetParserName(parser_type_);
+
+    BlackLibraryCommon::InitRotatingLogger(parser_name_, "/mnt/black-library/log/");
 }
 
 Parser::Parser(const Parser &parser) :
@@ -61,7 +70,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     target_url_ = PreprocessTargetUrl(parser_job);
 
-    std::cout << "Start " << GetParserName(parser_type_) << " Parse: " << parser_job << " target: " << target_url_ << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "Start parser job: {} target_url: {}", parser_job, target_url_);
 
     const auto curl_result = CurlRequest(target_url_);
 
@@ -69,7 +78,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (doc_tree == NULL)
     {
-        std::cout << "Error: libxml HTMLparser unable to parse: " << parser_job.url << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "libxml HTMLparser unable to parse url: {}", parser_job.url);
         return parser_result;
     }
 
@@ -78,7 +87,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
     xmlNodePtr root_node = xmlDocGetRootElement(doc_tree);
     xmlNodePtr current_node = root_node->children;
 
-    std::cout << GetParserName(parser_type_) << ": Find metadata: " << target_url_ << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "Find metadata from url: {}", target_url_);
 
     FindMetaData(current_node);
 
@@ -87,6 +96,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     if (PreParseLoop(current_node, parser_job))
     {
+        BlackLibraryCommon::LogError(parser_name_, "PreParseLoop failure");
         return parser_result;
     }
 
@@ -129,7 +139,7 @@ std::string Parser::CurlRequest(const std::string &url)
 
     if (!curl)
     {
-        std::cout << "Error: curl did not initialize" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Curl request failed, curl did not intialize");
         return "";
     }
 
@@ -144,7 +154,8 @@ std::string Parser::CurlRequest(const std::string &url)
     res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-        std::cout << GetParserName(parser_type_) <<  ": curl request failed: " << curl_easy_strerror(res) << std::endl;
+
+        BlackLibraryCommon::LogError(parser_name_, "Curl request failed: {}", curl_easy_strerror(res));
         return "";
     }
 
@@ -238,13 +249,13 @@ void Parser::ParseLoop(ParserResult &parser_result)
             if (ReachedEnd())
             {
                 done_ = true;
-                std::cout << GetParserName(parser_type_) << " - " << uuid_ << " reached end" << std::endl;
+                BlackLibraryCommon::LogDebug(parser_name_, "UUID: {} reached end", uuid_);
                 continue;
             }
 
             if (remaining_attempts <= 0)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse section - index: " << index_ << std::endl;
+                BlackLibraryCommon::LogError(parser_name_, "Max failures for UUID: {} index: {} reached", uuid_, index_);
                 remaining_attempts = 5;
                 ExpendedAttempts();
                 continue;
@@ -258,16 +269,16 @@ void Parser::ParseLoop(ParserResult &parser_result)
 
             if (parse_section_info.has_error)
             {
-                std::cout << "Error: " << GetParserName(parser_type_) << " failed to parse section - index: " << index_ << " - remaining attempts: " << remaining_attempts
-                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+                BlackLibraryCommon::LogError(parser_name_, "Failed to parse section for UUID: {} index: {} remaining attempts: {} waiting {} seconds - wait time total: {} seconds", 
+                    uuid_, index_, remaining_attempts, wait_time, wait_time_total);
 
                 if (remaining_attempts == 0 && progress_number_callback_)
                     progress_number_callback_(uuid_, index_ + 1, true);
             }
             else
             {
-                std::cout << GetParserName(parser_type_) << ": " << title_ << " - " << index_ << " section length is " << parse_section_info.length
-                        << " - waiting " << wait_time << " seconds - wait time total: "  << wait_time_total << " seconds" << std::endl;
+                BlackLibraryCommon::LogDebug(parser_name_, "Title: {} index: {} section length: {} waiting {} seconds - wait time total: {} seconds",
+                    title_, index_, parse_section_info.length, wait_time, wait_time_total);
 
                 if (progress_number_callback_)
                     progress_number_callback_(uuid_, index_ + 1, false);
@@ -316,9 +327,7 @@ void Parser::SaveLastUrl(ParserResult &parser_result)
 
 void Parser::SaveMetaData(ParserResult &parser_result)
 {
-    // std::cout << "\tTitle: " << title_ << std::endl;
-    // std::cout << "\tAuthor: " << author_ << std::endl;
-    // std::cout << "\tNickname: " << nickname_ << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "Title: {} Author: {} Nickname: {}", title_, author_, nickname_);
 
     parser_result.metadata.title = title_;
     parser_result.metadata.author = author_;

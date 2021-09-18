@@ -25,7 +25,6 @@ static constexpr const char YoutubeDlBaseString[] = "youtube-dl --no-overwrites 
 ParserYT::ParserYT() :
     IndexEntryParser(parser_t::YT_PARSER)
 {
-    title_ = "YT_parser_title";
     source_name_ = BlackLibraryCommon::YT::source_name;
     source_url_ = BlackLibraryCommon::YT::source_url;
 

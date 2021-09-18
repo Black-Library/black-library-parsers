@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <ParserFactory.h>
+#include <LogOperations.h>
 
 #include <ParserCommon.h>
 
@@ -15,15 +15,20 @@
 #include <ParserSBF.h>
 #include <ParserSVF.h>
 
+#include <ParserFactory.h>
+
 namespace black_library {
 
 namespace core {
 
 namespace parsers {
 
+namespace BlackLibraryCommon = black_library::core::common;
+
 ParserFactory::ParserFactory()
 {
-    std::cout << "Initialize ParserFactory" << std::endl;
+    BlackLibraryCommon::InitRotatingLogger("parser_factory", "/mnt/black-library/log/");
+    BlackLibraryCommon::LogInfo("parser_factory", "Initialize ParserFactory");
     InitParserMap();
 }
 
@@ -40,8 +45,8 @@ ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
 
     if (parser_type == parser_t::ERROR_PARSER)
     {
+        BlackLibraryCommon::LogError("parser_factory", "Could not get parser from url: {}", url);
         result.has_error = true;
-        result.debug_string = "Error: ParserFactory could not match url\n";
         return result;
     }
 
@@ -57,16 +62,14 @@ ParserFactoryResult ParserFactory::GetParserByType(parser_t parser_type)
 
     if (parser_map_itr == parser_map_.end())
     {
+        BlackLibraryCommon::LogError("parser_factory", "Could not match parser with type: {}", GetParserName(parser_type));
         result.has_error = true;
-        result.debug_string = "Error: ParserFactory could not match parser\n";
         return result;
     }
 
     result = parser_map_itr->second();
 
-    ss << "Got Parser: " << GetParserName(result.parser_result->GetParserType());
-
-    result.debug_string = ss.str();
+    BlackLibraryCommon::LogDebug("parser_factory", "Got parser: {}", GetParserName(result.parser_result->GetParserType()));
 
     return result;
 }
@@ -106,7 +109,7 @@ int ParserFactory::InitParserMap()
         return result;
     });
 
-    std::cout << "Initialized Parser map with " << parser_map_.size() << " elements" << std::endl;
+    BlackLibraryCommon::LogInfo("parser_factory", "Initialized parser map with {} elements", parser_map_.size());
 
     return 0;
 }

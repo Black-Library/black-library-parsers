@@ -13,6 +13,7 @@
 #include <string>
 
 #include <libxml/tree.h>
+#include <spdlog/fmt/ostr.h>
 
 namespace black_library {
 
@@ -160,7 +161,6 @@ struct ParserJobResult {
     size_t start_number = 0;
     size_t end_number = 0;
 
-    std::string debug_string;
     error_job_rep is_error_job = false;
     bool has_error = true;
 };
@@ -170,7 +170,6 @@ inline std::ostream& operator << (std::ostream &o, const ParserJobResult &job_re
     o << "metadata: " << job_result.metadata << " ";
     o << "start_number: " << job_result.start_number << " ";
     o << "end_number: " << job_result.end_number << " ";
-    o << "debug_string: " << job_result.debug_string << " ";
     o << "is_error_job: " << job_result.is_error_job << " ";
     o << "has_error: " << job_result.has_error;
 

@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <FileOperations.h>
+#include <LogOperations.h>
 
 #include <ParserWorker.h>
 
@@ -28,11 +29,16 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     job_status_callback_(),
     notify_callback_(),
     storage_dir_(storage_dir),
+    worker_name_(""), 
     parser_factory_(parser_factory),
     parser_type_(parser_type),
     done_(false)
 {
-    std::cout << "Initialize ParserWorker: " << GetParserName(parser_type) << " with pool size: " << pool_.GetSize() << std::endl;
+    worker_name_ = GetParserName(parser_type_) + "_worker";
+
+    BlackLibraryCommon::InitRotatingLogger(worker_name_, "/mnt/black-library/log/");
+
+    BlackLibraryCommon::LogInfo(worker_name_, "Initialize parser worker: {} with pool size: {}", GetParserName(parser_type), pool_.GetSize());
 }
 
 int ParserWorker::Run()
@@ -79,12 +85,11 @@ int ParserWorker::RunOnce()
 
             if (job_result.has_error)
             {
-                std::cout << "ParserWorker: " << GetParserName(parser_type_) << " error: " << job_result.debug_string << std::endl;
+                BlackLibraryCommon::LogError(worker_name_, "Job result returned error: {}", job_result);
                 pool_erases_.push(i);
             }
             else
             {
-                std::cout << job_result.debug_string << std::endl;
                 if (notify_callback_)
                     notify_callback_(job_result);
                 pool_erases_.push(i);
@@ -123,8 +128,7 @@ int ParserWorker::RunOnce()
 
             if (factory_result.has_error)
             {
-                ss << "Factory Error: " << factory_result.debug_string << std::endl;
-                job_result.debug_string = ss.str();
+                BlackLibraryCommon::LogError(worker_name_, "Factory could not match url");
                 return job_result;
             }
 
@@ -136,26 +140,23 @@ int ParserWorker::RunOnce()
 
             if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
             {
-                ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access storage directory: " << storage_dir_ << std::endl;
-                job_result.debug_string = ss.str();
+                BlackLibraryCommon::LogError(worker_name_, "Could not access storage directory: {}", storage_dir_);
                 return job_result;
             }
 
             if (!BlackLibraryCommon::MakeDirectories(local_file_path))
             {
-                ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could make local file path directory: " << local_file_path << std::endl;
-                job_result.debug_string = ss.str();
+                BlackLibraryCommon::LogError(worker_name_, "Could not make local file path directory: {}", local_file_path);
                 return job_result;
             }
 
             if (!BlackLibraryCommon::CheckFilePermission(local_file_path))
             {
-                ss << "Error: ParserWorker " << GetParserName(parser_type_) << " could not access uuid directory: " << local_file_path << std::endl;
-                job_result.debug_string = ss.str();
+                BlackLibraryCommon::LogError(worker_name_, "Could not access UUID directory: {}", local_file_path);
                 return job_result;
             }
 
-            ss << "Starting parser: " << GetParserName(parser->GetParserType()) << ": job: " << parser_job <<  std::endl;
+            BlackLibraryCommon::LogDebug(worker_name_, "Starting parser: {} job: {}", GetParserName(parser->GetParserType()), parser_job);
 
             std::thread t([this, parser, &parser_job, &parser_error](){
 
@@ -169,7 +170,7 @@ int ParserWorker::RunOnce()
                     std::this_thread::sleep_until(deadline);
                 }
 
-                std::cout << GetParserName(parser->GetParserType()) << ": job: " << parser_job << " done" << std::endl;
+                BlackLibraryCommon::LogDebug(worker_name_, "Job: {} done", parser_job);
 
                 parser->Stop();
             });
@@ -196,12 +197,11 @@ int ParserWorker::RunOnce()
 
             t.join();
 
-            ss << "Stopping parser: " << GetParserName(parser->GetParserType()) << ": job: " << parser_job <<  std::endl;
+            BlackLibraryCommon::LogDebug(worker_name_, "Stopping parser: {} job: {}", GetParserName(parser->GetParserType()), parser_job);
 
             job_result.metadata = parser_result.metadata;
             job_result.start_number = parser_job.start_number;
             job_result.end_number = parser_job.end_number;
-            job_result.debug_string = ss.str();
 
             if (!parser_result.has_error)
                 job_result.has_error = false;
@@ -222,12 +222,12 @@ int ParserWorker::Stop()
     {
         if (result.valid())
         {
-            std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop one" << std::endl;
+            BlackLibraryCommon::LogWarn(worker_name_, "Stopping a job");
             result.wait();
         }
     }
 
-    std::cout << "ParserWorker " << GetParserName(parser_type_) << " stop all" << std::endl;
+    BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker");
 
     return 0;
 }
@@ -236,18 +236,17 @@ int ParserWorker::AddJob(const ParserJob &parser_job)
 {
     if (parser_job.uuid.empty())
     {
-        std::cout << "Error: ParserWorker " << GetParserName(parser_type_) << " was sent parser_job with empty uuid" << std::endl;
+        BlackLibraryCommon::LogError(worker_name_, "Sent job with empty uuid, job: {}", parser_job);
         return -1;
     }
 
     if (parser_job.url.empty())
     {
-        std::cout << "Error: ParserWorker " << GetParserName(parser_type_) << " was sent parser_job with empty url" << std::endl;
+        BlackLibraryCommon::LogError(worker_name_, "Sent job with empty url, job: {}", parser_job);
         return -1;
     }
 
-    std::cout << "ParserWorker " << GetParserName(parser_type_) <<
-        " adding parser_job: " << parser_job << std::endl;
+    BlackLibraryCommon::LogDebug(worker_name_, "Adding job: {}", parser_job);
 
     if (job_status_callback_)
         job_status_callback_(parser_job, job_status_t::JOB_WORKER_QUEUED);

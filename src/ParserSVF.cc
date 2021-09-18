@@ -17,7 +17,6 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserSVF::ParserSVF() :
     ParserXF(parser_t::SVF_PARSER)
 {
-    title_ = "SVF_parser_title";
     source_name_ = BlackLibraryCommon::SVF::source_name;
     source_url_ = BlackLibraryCommon::SVF::source_url;
 }

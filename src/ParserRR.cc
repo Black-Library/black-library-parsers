@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <FileOperations.h>
+#include <LogOperations.h>
 #include <TimeOperations.h>
 
 #include <ParserRR.h>
@@ -22,7 +23,6 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserRR::ParserRR() :
     IndexEntryParser(parser_t::RR_PARSER)
 {
-    title_ = "RR_parser_title";
     source_name_ = BlackLibraryCommon::RR::source_name;
     source_url_ = BlackLibraryCommon::RR::source_url;
 }
@@ -109,7 +109,7 @@ void ParserRR::FindIndexEntries(xmlNodePtr root_node)
 
     if (!body_seek.found)
     {
-        std::cout << "Could not find index entries" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed body seek for UUID: {}", uuid_);
         return;
     }
 
@@ -144,7 +144,7 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
 
     if (!head_seek.found)
     {
-        std::cout << "Warning: Could not get metadata from: " << uuid_ << std::endl;
+        BlackLibraryCommon::LogWarn(parser_name_, "Could not get metadata for UUID: {}", uuid_);
         return;
     }
 
@@ -191,14 +191,14 @@ ParseSectionInfo ParserRR::ParseSection()
     const auto index_entry = index_entries_[index_];
 
     const auto index_entry_url = "https://www." + source_url_ + index_entry.data_url;
-    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << index_entry_url << " - " << index_entry.name << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "ParseSection: {} section_url: {} - {}", GetParserBehaviorName(parser_behavior_), index_entry_url, index_entry.name);
 
     const auto curl_request_result = CurlRequest(index_entry_url);
     xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {
-        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Unable to parse into doc_tree for UUID: {}", uuid_);
         return output;
     }
 
@@ -210,7 +210,7 @@ ParseSectionInfo ParserRR::ParseSection()
     ParserXmlNodeSeek index_entry_content_seek = SeekToIndexEntryContent(current_node);
     if (!index_entry_content_seek.found)
     {
-        std::cout << "Error: Failed content seek" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed content seek for UUID: {}", uuid_);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -226,34 +226,34 @@ ParseSectionInfo ParserRR::ParseSection()
 
     output.length = length;
 
-    std::string index_entry_title = GetRRIndexEntryTitle(index_entry);
+    const auto section_name = GetRRIndexEntryTitle(index_entry);
 
-    index_entry_title = BlackLibraryCommon::SanitizeFileName(index_entry_title);
+    const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(section_name);
 
-    if (index_entry_title.empty())
+    if (sanatized_section_name.empty())
     {
-        std::cout << "Error: Unable to generate " << GetParserName(parser_type_) << " index entry title name" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Unable to generate index entry title name from: {}", section_name);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    std::string section_file_name = GetSectionFileName(index_entry.index_num, index_entry_title);
+    const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name);
 
-    FILE* index_entry_file;
-    std::string file_name = local_des_ + section_file_name;
-    std::cout << "FILENAME: " << file_name << std::endl;
-    index_entry_file = fopen(file_name.c_str(), "w+");
+    FILE* section_output_file;
+    std::string file_path = local_des_ + section_file_name;
+    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
+    section_output_file = fopen(file_path.c_str(), "w+");
 
-    if (index_entry_file == NULL)
+    if (section_output_file == NULL)
     {
-        std::cout << "Error: could not open file with name: " << file_name << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Could not open file with path: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    xmlElemDump(index_entry_file, section_doc_tree, current_node);
+    xmlElemDump(section_output_file, section_doc_tree, current_node);
 
-    fclose(index_entry_file);
+    fclose(section_output_file);
 
     xmlFreeDoc(section_doc_tree);
 

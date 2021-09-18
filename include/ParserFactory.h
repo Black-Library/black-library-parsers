@@ -18,7 +18,6 @@ namespace parsers {
 
 struct ParserFactoryResult {
     std::shared_ptr<Parser> parser_result;
-    std::string debug_string;
     bool has_error = false;
 };
 

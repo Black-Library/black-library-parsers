@@ -50,6 +50,7 @@ private:
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
     std::string storage_dir_;
+    std::string worker_name_;
     std::shared_ptr<ParserFactory> parser_factory_;
     std::mutex mutex_;
     parser_t parser_type_;

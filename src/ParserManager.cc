@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <FileOperations.h>
+#include <LogOperations.h>
 
 #include <ParserManager.h>
 
@@ -32,10 +33,12 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
     done_(true),
     initialized_(false)
 {
+    BlackLibraryCommon::InitRotatingLogger("parser_manager", "/mnt/black-library/log/");
+
     if (storage_dir_.empty())
     {
         storage_dir_ = "/mnt/black-library/store";
-        std::cout << "Empty storage dir given, using default: " << storage_dir_ << std::endl;
+        BlackLibraryCommon::LogDebug("parser_manager", "Empty storage dir given, using default: {}", storage_dir_);
     }
 
     // okay to pop_back(), string isn't empty
@@ -44,11 +47,11 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
 
     if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
     {
-        std::cout << "Error: parser manager could not access storage directory: " << storage_dir_ << std::endl;
+        BlackLibraryCommon::LogError("parser_manager", "Could not access storage directory: {}", storage_dir_);
         return;
     }
 
-    std::cout << "Using storage dir: " << storage_dir_ << std::endl;
+    BlackLibraryCommon::LogInfo("parser_manager", "Using storage dir: {}", storage_dir_);
 
     AddWorker(parser_t::AO3_PARSER, 1);
     AddWorker(parser_t::RR_PARSER, 1);
@@ -68,13 +71,13 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
             [this](const ParserJob &parser_job, job_status_t job_status)
             {
                 if (!current_jobs_.find_and_replace(std::make_pair(parser_job.uuid, parser_job.is_error_job), job_status))
-                    std::cout << "Error: could not replace job status" << std::endl;
+                    BlackLibraryCommon::LogError("parser_manager", "Could not replace job status for job with UUID: {}", parser_job.uuid);
             }
         );
         worker.second->RegisterManagerNotifyCallback(
             [this](ParserJobResult result)
             {
-                std::cout << "ParserManager recieved: " << result << std::endl;
+                BlackLibraryCommon::LogDebug("parser_manager", "Recieved result: {}", result);
                 result_queue_.push(result);
             }
         );
@@ -111,7 +114,7 @@ int ParserManager::RunOnce()
 
         if (parser_type == parser_t::ERROR_PARSER)
         {
-            std::cout << "Error: could not match url to parser" << std::endl;
+            BlackLibraryCommon::LogError("parser_manager", "Could not match url {} to parser", job.url);
             continue;
         }
 
@@ -119,7 +122,7 @@ int ParserManager::RunOnce()
 
         if (worker == worker_map_.end())
         {
-            std::cout << "Error: could not find parser with rep: " << GetParserName(parser_type) << std::endl;
+            BlackLibraryCommon::LogError("parser_manager", "Could not find parser with rep: {}", GetParserName(parser_type));
             continue;
         }
 
@@ -136,15 +139,15 @@ int ParserManager::RunOnce()
         auto job_result = result_queue_.pop();
         if (job_result.metadata.uuid.empty() || job_result.metadata.url.empty())
         {
-            std::cout << "ParserManager: got job result with empty uuid or url" << std::endl;
+            BlackLibraryCommon::LogWarn("parser_manager", "Got job result with emptry UUID or url");
             continue;
         }
 
-        std::cout << "ParserManager: finished job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
+        BlackLibraryCommon::LogInfo("parser_manager", "Finished job with UUID: {} url: {}", job_result.metadata.uuid, job_result.metadata.url);
         current_jobs_.erase(std::make_pair(job_result.metadata.uuid, job_result.is_error_job));
 
         if (job_result.has_error)
-            std::cout << "\tParserManager: Error in job with uuid: " << job_result.metadata.uuid << " - " << job_result.metadata.url << std::endl;
+            BlackLibraryCommon::LogError("parser_manager", "Job error with UUID: {}, url: {}", job_result.metadata.uuid, job_result.metadata.url);
 
         if (!job_result.has_error && database_status_callback_)
             database_status_callback_(job_result);
@@ -202,11 +205,11 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     parser_job.end_number = end_number;
     parser_job.is_error_job = is_error_job;
 
-    std::cout << "ParserManager adding job: " << parser_job << std::endl;
+    BlackLibraryCommon::LogDebug("parser_manager", "Adding job: {}", parser_job);
 
     if (current_jobs_.count(std::make_pair(parser_job.uuid, parser_job.is_error_job)))
     {
-        std::cout << "ParserManager already working on job: " << parser_job << std::endl;
+        BlackLibraryCommon::LogWarn("parser_manager", "Already working on job: {}", parser_job);
         return 0;
     }
     else
@@ -226,7 +229,7 @@ bool ParserManager::GetDone()
 
 int ParserManager::AddWorker(parser_t parser_type, size_t num_parsers)
 {
-    std::cout << "ParserManager AddWorker: " << GetParserName(parser_type) << " num: " << num_parsers << std::endl;
+    BlackLibraryCommon::LogInfo("parser_manager", "Adding worker {} with {} parsers", GetParserName(parser_type), num_parsers);
 
     worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, storage_dir_, parser_type, num_parsers));
 

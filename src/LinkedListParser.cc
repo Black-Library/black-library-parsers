@@ -5,6 +5,8 @@
 #include <iostream>
 #include <limits>
 
+#include <LogOperations.h>
+
 #include <LinkedListParser.h>
 #include <ShortTimeGenerator.h>
 
@@ -54,9 +56,11 @@ int LinkedListParser::PreParseLoop(xmlNodePtr root_node, const ParserJob &parser
 
     if (next_url_.empty())
     {
-        std::cout << "Error: PreParseLoop empty first url" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "PreParseLoop empty first url");
         return -1;
     }
+
+    BlackLibraryCommon::LogDebug(parser_name_, "next_url_: {}", next_url_);
 
     return 0;
 }

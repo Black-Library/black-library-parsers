@@ -9,6 +9,7 @@
 #include <thread>
 
 #include <FileOperations.h>
+#include <LogOperations.h>
 
 #include <ParserXF.h>
 
@@ -25,7 +26,6 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserXF::ParserXF(parser_t parser_type) :
     LinkedListParser(parser_type)
 {
-    title_ = "XF_parser_title";
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     source_url_ = BlackLibraryCommon::ERROR::source_url;
 }
@@ -37,7 +37,8 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     ParserXmlNodeSeek body_seek = SeekToNodeByName(root_node, "body");
     if (!body_seek.found)
     {
-        std::cout << "Warning: Could not find body from: " << uuid_ << std::endl;
+
+        BlackLibraryCommon::LogWarn(parser_name_, "Failed body seek for UUID: {}", uuid_);
         return;
     }
 
@@ -46,7 +47,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     const auto threadmark_seek = SeekToThreadmark(current_node);
     if (!threadmark_seek.found)
     {
-        std::cout << "Error: could not find threadmark" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Could not find threadmark for UUID: {}", uuid_);
         return;
     }
 
@@ -56,7 +57,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-inner");
     if (!message_inner_seek.found)
     {
-        std::cout << "Error: could not find message-inner" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed message-inner seek for UUID: {}", uuid_);
         return;
     }
 
@@ -66,7 +67,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-userDetails");
     if (!message_userdetails_seek.found)
     {
-        std::cout << "Error: could not find message-userDetails" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed message-userDetails seek for UUID: {}", uuid_);
         return;
     }
 
@@ -75,7 +76,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     const auto name_seek = SeekToNodeByName(current_node, "h4");
     if (!name_seek.found)
     {
-        std::cout << "Error: could not find author content" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed author content seek for UUID: {}", uuid_);
         return;
     }
 
@@ -84,7 +85,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     const auto author_result = GetXmlNodeContent(current_node->children);
     if (!author_result.found)
     {
-        std::cout << "Error: could not get author content" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Could not get author content for UUID: {}", uuid_);
         return;
     }
 
@@ -98,7 +99,7 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto working_url = next_url_;
     const auto working_index = index_;
 
-    std::cout << GetParserName(parser_type_) << " ParseSection: " << GetParserBehaviorName(parser_behavior_) << " - parse url: " << working_url << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "ParseSection: {} section_url: {}", GetParserBehaviorName(parser_behavior_), working_url);
 
     if (working_index > target_end_index_)
     {
@@ -112,7 +113,7 @@ ParseSectionInfo ParserXF::ParseSection()
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {
-        std::cout << "Error: libxml HTMLparser unable to parse" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Unable to parse into doc_tree for UUID: {}", uuid_);
         return output;
     }
 
@@ -127,7 +128,7 @@ ParseSectionInfo ParserXF::ParseSection()
         pattern_seek_t::XML_ATTRIBUTE, "class=p-body-main  ");
     if (!p_body_main_seek.found)
     {
-        std::cout << "Error: failed content wrapper seek" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed p-body-main seek for UUID: {}", uuid_);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -137,7 +138,7 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto section_post_seek = SeekToSectionPost(current_node, target_post);
     if (!section_post_seek.found)
     {
-        std::cout << "Error: failed post seek" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed post seek for UUID: {}", uuid_);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -156,7 +157,7 @@ ParseSectionInfo ParserXF::ParseSection()
     // skip saving content if before target start index
     if (working_index < target_start_index_)
     {
-        std::cout << "Target start index: " << target_start_index_ << " - current index: " << working_index << " Skipping filesave" << std::endl;
+        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping filesave");
         output.has_error = false;
         xmlFreeDoc(section_doc_tree);
         return output;
@@ -168,7 +169,7 @@ ParseSectionInfo ParserXF::ParseSection()
     const auto section_content_seek = SeekToSectionContent(current_node, target_post);
     if (!section_content_seek.found)
     {
-        std::cout << "Error: failed section content seek" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed section content seek for UUID: {}", uuid_);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -184,34 +185,34 @@ ParseSectionInfo ParserXF::ParseSection()
 
     output.length = length;
 
-    auto section_title_name = GetXFTitle(section_title);
+    const auto section_name = GetXFTitle(section_title);
 
-    section_title_name = BlackLibraryCommon::SanitizeFileName(section_title_name);
+    const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(section_name);
 
-    if (section_title_name.empty())
+    if (sanatized_section_name.empty())
     {
-        std::cout << "Error: unable to generate " << GetParserName(parser_type_) << " section name" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Unable to generate section name from: {}", section_name);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    auto section_file_name = GetSectionFileName(working_index, section_title_name);
+    const auto section_file_name = GetSectionFileName(working_index, sanatized_section_name);
 
-    FILE* index_entry_file;
-    const auto file_name = local_des_ + section_file_name;
-    std::cout << "FILENAME: " << file_name << std::endl;
-    index_entry_file = fopen(file_name.c_str(), "w+");
+    FILE* section_output_file;
+    std::string file_path = local_des_ + section_file_name;
+    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
+    section_output_file = fopen(file_path.c_str(), "w+");
 
-    if (index_entry_file == NULL)
+    if (section_output_file == NULL)
     {
-        std::cout << "Error: could not open file with name: " << file_name << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Could not open file with path: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    xmlElemDump(index_entry_file, section_doc_tree, current_node);
+    xmlElemDump(section_output_file, section_doc_tree, current_node);
 
-    fclose(index_entry_file);
+    fclose(section_output_file);
 
     xmlFreeDoc(section_doc_tree);
 
@@ -239,7 +240,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_
     const auto threadmark_seek = SeekToThreadmark(root_node);
     if (!threadmark_seek.found)
     {
-        std::cout << "Error: could not find threadmark" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed threadmark seek from url: {}", data_url);
         return "";
     }
 
@@ -248,7 +249,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_
     const auto post_id_result = GetXmlAttributeContentByName(current_node, "id");
     if (!post_id_result.found)
     {
-        std::cout << "Error: could not get post id" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Could not get post id from url: {}", data_url);
         return "";
     }
 
@@ -284,7 +285,7 @@ std::string ParserXF::GetNextUrl(xmlNodePtr root_node)
 
         if (!found_next)
         {
-            std::cout <<  GetParserName(parser_type_) << " GetNextUrl - reached end" << std::endl;
+            BlackLibraryCommon::LogDebug(parser_name_, "Reached end of linked list for UUID: {}", uuid_);
             reached_end_ = true;
             return next_url_;
         }
@@ -301,7 +302,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
     if (!section_threadmark_header_seek.found)
     {
-        std::cout << "Error: failed threadmark header seek" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed threadmark header seek for UUID: {}", uuid_);
         return "";
     }
 
@@ -311,7 +312,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
 
     if (!span_seek.found)
     {
-        std::cout << "Error: could not find span node" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Could not find span node for UUID: {}", uuid_);
         return "";
     }
 
@@ -321,7 +322,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
 
     if (!title_result.found)
     {
-        std::cout << "Error: could not find title content" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Could not find title content for UUID: {}", uuid_);
         return "";
     }
 
@@ -344,7 +345,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-attribution-main listInline ");
     if (!message_attribution_main_seek.found)
     {
-        std::cout << "Error: failed message attribution main seek" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed message attribution main seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -353,7 +354,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     const auto li_seek = SeekToNodeByName(current_node, "li");
     if (!li_seek.found)
     {
-        std::cout << "Error: failed 'li' seek" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed 'li' seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -362,7 +363,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     const auto a_seek = SeekToNodeByName(current_node, "a");
     if (!a_seek.found)
     {
-        std::cout << "Error: failed 'a' seek" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed 'a' seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -371,7 +372,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     const auto time_seek = SeekToNodeByName(current_node, "time");
     if (!time_seek.found)
     {
-        std::cout << "Error: failed time seek" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed time seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -381,7 +382,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
 
     if (!time_result.found)
     {
-        std::cout << "Error: failed time result" << std::endl;
+        BlackLibraryCommon::LogError("parser_name_", "Failed time result for UUID: {}", uuid_);
         return 0;
     }
 
@@ -514,14 +515,14 @@ ParserXmlNodeSeek ParserXF::SeekToThreadmark(xmlNodePtr root_node)
                 pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
             if (!threadmark_header_seek.found)
             {
-                std::cout << "Error: could not find threadmark header" << std::endl;
+                BlackLibraryCommon::LogError("parser_name_", "Could not find threadmark header for UUID: {}", uuid_);
                 continue;
             }
 
             const auto label_seek = SeekToNodeByName(threadmark_header_seek.seek_node->children, "label");
             if (!label_seek.found)
             {
-                std::cout << "Error: could not find label" << std::endl;
+                BlackLibraryCommon::LogError("parser_name_", "Could not find label for UUID: {}", uuid_);
                 continue;
             }
             
