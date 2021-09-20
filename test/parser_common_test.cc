@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <SourceInformation.h>
+#include <FileOperations.h>
 #include <StringOperations.h>
 
-#include <ParserCommon.h>
+#include <SourceInformation.h>
 
 namespace black_library {
 
@@ -54,6 +54,12 @@ TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
     REQUIRE( BlackLibraryCommon::TrimWhitespace("\ra\r") == "a" );
     REQUIRE( BlackLibraryCommon::TrimWhitespace("\na\n") == "a" );
     REQUIRE( BlackLibraryCommon::TrimWhitespace("") == "" );
+}
+
+TEST_CASE( "SanatizeFileName generic tests (pass)", "[single-file]" )
+{
+    REQUIRE( BlackLibraryCommon::SanitizeFileName(" /\\*?<>:;=[]!@|.,%#'\"") == "" );
+    REQUIRE( BlackLibraryCommon::SanitizeFileName("SEC0114_segment-\"when-they-say-'\''stand-at-your-side'\''-they'\''re-really-saying-'\''i-love-you'\''\"") == "SEC0114_segment-when-they-say-stand-at-your-side-they-re-really-saying-i-love-you" );
 }
 
 } // namespace parsers
