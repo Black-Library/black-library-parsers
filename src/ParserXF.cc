@@ -47,7 +47,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     const auto threadmark_seek = SeekToThreadmark(current_node);
     if (!threadmark_seek.found)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Could not find threadmark for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to find threadmark for UUID: {}", uuid_);
         return;
     }
 
@@ -85,7 +85,7 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
     const auto author_result = GetXmlNodeContent(current_node->children);
     if (!author_result.found)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Could not get author content for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to get author content for UUID: {}", uuid_);
         return;
     }
 
@@ -205,7 +205,7 @@ ParseSectionInfo ParserXF::ParseSection()
 
     if (section_output_file == NULL)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Could not open file with path: {}", file_path);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -240,7 +240,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_
     const auto threadmark_seek = SeekToThreadmark(root_node);
     if (!threadmark_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed threadmark seek from url: {}", data_url);
+        BlackLibraryCommon::LogError(parser_name_, "Failed threadmark seek from url: {}", data_url);
         return "";
     }
 
@@ -249,7 +249,7 @@ std::string ParserXF::GetFirstUrl(xmlNodePtr root_node, const std::string &data_
     const auto post_id_result = GetXmlAttributeContentByName(current_node, "id");
     if (!post_id_result.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Could not get post id from url: {}", data_url);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to get post id from url: {}", data_url);
         return "";
     }
 
@@ -302,7 +302,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
     if (!section_threadmark_header_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed threadmark header seek for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed threadmark header seek for UUID: {}", uuid_);
         return "";
     }
 
@@ -312,7 +312,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
 
     if (!span_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Could not find span node for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to find span node for UUID: {}", uuid_);
         return "";
     }
 
@@ -322,7 +322,7 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
 
     if (!title_result.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Could not find title content for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to find title content for UUID: {}", uuid_);
         return "";
     }
 
@@ -345,7 +345,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
         pattern_seek_t::XML_ATTRIBUTE, "class=message-attribution-main listInline ");
     if (!message_attribution_main_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed message attribution main seek for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed message attribution main seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -354,7 +354,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     const auto li_seek = SeekToNodeByName(current_node, "li");
     if (!li_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed 'li' seek for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed 'li' seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -363,7 +363,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     const auto a_seek = SeekToNodeByName(current_node, "a");
     if (!a_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed 'a' seek for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed 'a' seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -372,7 +372,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
     const auto time_seek = SeekToNodeByName(current_node, "time");
     if (!time_seek.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed time seek for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed time seek for UUID: {}", uuid_);
         return 0;
     }
 
@@ -382,7 +382,7 @@ time_t ParserXF::GetUpdateDate(xmlNodePtr root_node)
 
     if (!time_result.found)
     {
-        BlackLibraryCommon::LogError("parser_name_", "Failed time result for UUID: {}", uuid_);
+        BlackLibraryCommon::LogError(parser_name_, "Failed time result for UUID: {}", uuid_);
         return 0;
     }
 
@@ -515,14 +515,14 @@ ParserXmlNodeSeek ParserXF::SeekToThreadmark(xmlNodePtr root_node)
                 pattern_seek_t::XML_ATTRIBUTE, "class=message-cell message-cell--threadmark-header");
             if (!threadmark_header_seek.found)
             {
-                BlackLibraryCommon::LogError("parser_name_", "Could not find threadmark header for UUID: {}", uuid_);
+                BlackLibraryCommon::LogError(parser_name_, "Failed to find threadmark header for UUID: {}", uuid_);
                 continue;
             }
 
             const auto label_seek = SeekToNodeByName(threadmark_header_seek.seek_node->children, "label");
             if (!label_seek.found)
             {
-                BlackLibraryCommon::LogError("parser_name_", "Could not find label for UUID: {}", uuid_);
+                BlackLibraryCommon::LogError(parser_name_, "Failed to find label for UUID: {}", uuid_);
                 continue;
             }
             

@@ -45,7 +45,7 @@ ParserFactoryResult ParserFactory::GetParserByUrl(const std::string &url)
 
     if (parser_type == parser_t::ERROR_PARSER)
     {
-        BlackLibraryCommon::LogError("parser_factory", "Could not get parser from url: {}", url);
+        BlackLibraryCommon::LogError("parser_factory", "Failed to get parser from url: {}", url);
         result.has_error = true;
         return result;
     }
@@ -62,7 +62,7 @@ ParserFactoryResult ParserFactory::GetParserByType(parser_t parser_type)
 
     if (parser_map_itr == parser_map_.end())
     {
-        BlackLibraryCommon::LogError("parser_factory", "Could not match parser with type: {}", GetParserName(parser_type));
+        BlackLibraryCommon::LogError("parser_factory", "Failed to match parser with type: {}", GetParserName(parser_type));
         result.has_error = true;
         return result;
     }

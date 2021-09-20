@@ -128,7 +128,7 @@ int ParserWorker::RunOnce()
 
             if (factory_result.has_error)
             {
-                BlackLibraryCommon::LogError(worker_name_, "Factory could not match url");
+                BlackLibraryCommon::LogError(worker_name_, "Factory failed to match url");
                 return job_result;
             }
 
@@ -140,19 +140,19 @@ int ParserWorker::RunOnce()
 
             if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
             {
-                BlackLibraryCommon::LogError(worker_name_, "Could not access storage directory: {}", storage_dir_);
+                BlackLibraryCommon::LogError(worker_name_, "Failed to access storage directory: {}", storage_dir_);
                 return job_result;
             }
 
             if (!BlackLibraryCommon::MakeDirectories(local_file_path))
             {
-                BlackLibraryCommon::LogError(worker_name_, "Could not make local file path directory: {}", local_file_path);
+                BlackLibraryCommon::LogError(worker_name_, "Failed to make local file path directory: {}", local_file_path);
                 return job_result;
             }
 
             if (!BlackLibraryCommon::CheckFilePermission(local_file_path))
             {
-                BlackLibraryCommon::LogError(worker_name_, "Could not access UUID directory: {}", local_file_path);
+                BlackLibraryCommon::LogError(worker_name_, "Failed to access UUID directory: {}", local_file_path);
                 return job_result;
             }
 

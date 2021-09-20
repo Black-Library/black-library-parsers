@@ -47,7 +47,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
 
     if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
     {
-        BlackLibraryCommon::LogError("parser_manager", "Could not access storage directory: {}", storage_dir_);
+        BlackLibraryCommon::LogError("parser_manager", "Failed to access storage directory: {}", storage_dir_);
         return;
     }
 
@@ -71,7 +71,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
             [this](const ParserJob &parser_job, job_status_t job_status)
             {
                 if (!current_jobs_.find_and_replace(std::make_pair(parser_job.uuid, parser_job.is_error_job), job_status))
-                    BlackLibraryCommon::LogError("parser_manager", "Could not replace job status for job with UUID: {}", parser_job.uuid);
+                    BlackLibraryCommon::LogError("parser_manager", "Failed to replace job status for job with UUID: {}", parser_job.uuid);
             }
         );
         worker.second->RegisterManagerNotifyCallback(
@@ -114,7 +114,7 @@ int ParserManager::RunOnce()
 
         if (parser_type == parser_t::ERROR_PARSER)
         {
-            BlackLibraryCommon::LogError("parser_manager", "Could not match url {} to parser", job.url);
+            BlackLibraryCommon::LogError("parser_manager", "Failed to match url {} to parser", job.url);
             continue;
         }
 
@@ -122,7 +122,7 @@ int ParserManager::RunOnce()
 
         if (worker == worker_map_.end())
         {
-            BlackLibraryCommon::LogError("parser_manager", "Could not find parser with rep: {}", GetParserName(parser_type));
+            BlackLibraryCommon::LogError("parser_manager", "Failed to find parser with rep: {}", GetParserName(parser_type));
             continue;
         }
 

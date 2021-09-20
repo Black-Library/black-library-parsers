@@ -144,7 +144,7 @@ void ParserRR::FindMetaData(xmlNodePtr root_node)
 
     if (!head_seek.found)
     {
-        BlackLibraryCommon::LogWarn(parser_name_, "Could not get metadata for UUID: {}", uuid_);
+        BlackLibraryCommon::LogWarn(parser_name_, "Failed to get metadata for UUID: {}", uuid_);
         return;
     }
 
@@ -246,7 +246,7 @@ ParseSectionInfo ParserRR::ParseSection()
 
     if (section_output_file == NULL)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Could not open file with path: {}", file_path);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }

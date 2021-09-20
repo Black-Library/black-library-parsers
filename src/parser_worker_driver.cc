@@ -64,7 +64,7 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 }
                 else
                 {
-                    std::cout << "Could not match source" << std::endl;
+                    std::cout << "Failed to match source" << std::endl;
                     Usage(argv[0]);
                     exit(1);
                 }
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 
     if (opts.source == BlackLibraryParsers::parser_t::ERROR_PARSER)
     {
-        std::cout << "could not match parser source" << std::endl;
+        std::cout << "Failed to match parser source" << std::endl;
     }
 
     dummy_worker dummy_worker_1(factory, "/mnt/black-library/store", opts.source, 2);
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::cout << "could not match parser source" << std::endl;
+        std::cout << "Failed to match parser source" << std::endl;
         Usage(argv[0]);
         exit(1);
     }
