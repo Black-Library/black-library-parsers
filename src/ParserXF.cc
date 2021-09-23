@@ -396,13 +396,19 @@ std::string ParserXF::GetWorkTitleFromUrl(const std::string &data_url)
     std::string removed_threadmarks = unprocessed_title.substr(0, found_0);
     size_t found_1 = removed_threadmarks.find_last_of("/\\");
 
-    return removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
+    auto processed_title = removed_threadmarks.substr(found_1 + 1, removed_threadmarks.size());
+
+    BlackLibraryCommon::SanatizeString(processed_title);
+
+    return processed_title;
 }
 
 std::string ParserXF::GetXFTitle(const std::string &title)
 {
     std::locale loc;
     std::string xf_title_name = title;
+
+    BlackLibraryCommon::SanatizeString(xf_title_name);
 
     std::transform(xf_title_name.begin(), xf_title_name.end(), xf_title_name.begin(),
     [&loc](char ch)
