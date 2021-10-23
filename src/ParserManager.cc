@@ -33,7 +33,7 @@ ParserManager::ParserManager(const std::string &storage_dir, const std::string &
     done_(true),
     initialized_(false)
 {
-    BlackLibraryCommon::InitRotatingLogger("parser_manager", "/mnt/black-library/log/");
+    BlackLibraryCommon::InitRotatingLogger("parser_manager", "/mnt/black-library/log/", false);
 
     if (storage_dir_.empty())
     {
@@ -204,6 +204,12 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     parser_job.start_number = start_number;
     parser_job.end_number = end_number;
     parser_job.is_error_job = is_error_job;
+
+    // parser_job.start_number should be at least 1
+    if (parser_job.start_number <= 0)
+    {
+        parser_job.start_number = 1;
+    }
 
     BlackLibraryCommon::LogDebug("parser_manager", "Adding job: {}", parser_job);
 
