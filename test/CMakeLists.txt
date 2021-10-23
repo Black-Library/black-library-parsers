@@ -17,3 +17,10 @@ foreach( name ${TARGETS_TESTS} )
     set_property(TARGET ${name} PROPERTY CXX_STANDARD 14)
     set_property(TARGET ${name} PROPERTY CXX_EXTENSIONS OFF)
 endforeach()
+
+foreach( name ${TARGETS_LIST} )
+    install(TARGETS
+        ${name}
+        RUNTIME DESTINATION bin
+    )
+endforeach()

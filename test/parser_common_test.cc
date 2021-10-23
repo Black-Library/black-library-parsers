@@ -42,6 +42,20 @@ TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" )
     REQUIRE( BlackLibraryCommon::ContainsString( BlackLibraryCommon::RR::source_url, RR_DUMMY_URL) == false );
 }
 
+TEST_CASE( "SanatizeFileName generic tests (pass)", "[single-file]" )
+{
+    REQUIRE( BlackLibraryCommon::SanitizeFileName(" /\\*?<>:;=[]!@|.,%#'\"") == "" );
+    REQUIRE( BlackLibraryCommon::SanitizeFileName("SEC0114_segment-\"when-they-say-'\''stand-at-your-side'\''-they'\''re-really-saying-'\''i-love-you'\''\"") == "SEC0114_segment-when-they-say-stand-at-your-side-they-re-really-saying-i-love-you" );
+    REQUIRE( BlackLibraryCommon::SanitizeFileName("Prologue: I'M A MOTHER GOO! NOT A SINGLE MOM!") == "Prologue-I-M-A-MOTHER-GOO-NOT-A-SINGLE-MOM" );
+}
+
+TEST_CASE( "StartsWithString generic tests (pass)", "[single-file]" )
+{
+    REQUIRE( BlackLibraryCommon::StartsWithString("gotothetop", "oto") == false);
+    REQUIRE( BlackLibraryCommon::StartsWithString("gotothetop", "top") == false);
+    REQUIRE( BlackLibraryCommon::StartsWithString("gotothetop", "goto") == true);
+}
+
 TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
 {
     REQUIRE( BlackLibraryCommon::TrimWhitespace(" \t\r\n\0") == "" );
@@ -54,12 +68,6 @@ TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
     REQUIRE( BlackLibraryCommon::TrimWhitespace("\ra\r") == "a" );
     REQUIRE( BlackLibraryCommon::TrimWhitespace("\na\n") == "a" );
     REQUIRE( BlackLibraryCommon::TrimWhitespace("") == "" );
-}
-
-TEST_CASE( "SanatizeFileName generic tests (pass)", "[single-file]" )
-{
-    REQUIRE( BlackLibraryCommon::SanitizeFileName(" /\\*?<>:;=[]!@|.,%#'\"") == "" );
-    REQUIRE( BlackLibraryCommon::SanitizeFileName("SEC0114_segment-\"when-they-say-'\''stand-at-your-side'\''-they'\''re-really-saying-'\''i-love-you'\''\"") == "SEC0114_segment-when-they-say-stand-at-your-side-they-re-really-saying-i-love-you" );
 }
 
 } // namespace parsers
