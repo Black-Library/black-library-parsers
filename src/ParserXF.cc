@@ -157,7 +157,7 @@ ParseSectionInfo ParserXF::ParseSection()
     // skip saving content if before target start index
     if (working_index < target_start_index_)
     {
-        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping filesave");
+        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping filesave", target_start_index_, working_index);
         output.has_error = false;
         xmlFreeDoc(section_doc_tree);
         return output;
@@ -408,13 +408,14 @@ std::string ParserXF::GetXFTitle(const std::string &title)
     std::locale loc;
     std::string xf_title_name = title;
 
-    BlackLibraryCommon::SanatizeString(xf_title_name);
-
     std::transform(xf_title_name.begin(), xf_title_name.end(), xf_title_name.begin(),
     [&loc](char ch)
     {
         return ch == ' ' ? '-' : std::tolower(ch, loc);
     });
+
+    // sanatize removes spaces
+    BlackLibraryCommon::SanatizeString(xf_title_name);
 
     return xf_title_name;
 }
