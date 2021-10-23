@@ -27,7 +27,7 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 ParserFactory::ParserFactory()
 {
-    BlackLibraryCommon::InitRotatingLogger("parser_factory", "/mnt/black-library/log/");
+    BlackLibraryCommon::InitRotatingLogger("parser_factory", "/mnt/black-library/log/", false);
     BlackLibraryCommon::LogInfo("parser_factory", "Initialize ParserFactory");
     InitParserMap();
 }

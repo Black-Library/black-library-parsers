@@ -40,7 +40,7 @@ Parser::Parser(parser_t parser_type) :
 {
     parser_name_ = GetParserName(parser_type_);
 
-    BlackLibraryCommon::InitRotatingLogger(parser_name_, "/mnt/black-library/log/");
+    BlackLibraryCommon::InitRotatingLogger(parser_name_, "/mnt/black-library/log/", false);
 }
 
 Parser::Parser(const Parser &parser) :

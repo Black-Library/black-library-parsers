@@ -36,7 +36,7 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
 {
     worker_name_ = GetParserName(parser_type_) + "_worker";
 
-    BlackLibraryCommon::InitRotatingLogger(worker_name_, "/mnt/black-library/log/");
+    BlackLibraryCommon::InitRotatingLogger(worker_name_, "/mnt/black-library/log/", false);
 
     BlackLibraryCommon::LogInfo(worker_name_, "Initialize parser worker: {} with pool size: {}", GetParserName(parser_type), pool_.GetSize());
 }
