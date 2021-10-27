@@ -147,6 +147,12 @@ ParseSectionInfo ParserXF::ParseSection()
 
     // get title
     const auto section_title = GetSectionTitle(current_node->children);
+    if (section_title.empty())
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Failed to get section title");
+        xmlFreeDoc(section_doc_tree);
+        return output;
+    }
 
     // get next url
     next_url_ = GetNextUrl(current_node->children);
@@ -308,15 +314,25 @@ std::string ParserXF::GetSectionTitle(xmlNodePtr root_node)
 
     current_node = section_threadmark_header_seek.seek_node->children;
 
-    const auto span_seek = SeekToNodeByName(current_node, "span");
+    const auto span_seek_0 = SeekToNodeByName(current_node, "span");
 
-    if (!span_seek.found)
+    if (!span_seek_0.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to find span node for UUID: {}", uuid_);
         return "";
     }
 
-    current_node = span_seek.seek_node;
+    current_node = span_seek_0.seek_node->children;
+
+    const auto span_seek_1 = SeekToNodeByName(current_node, "span");
+
+    if (!span_seek_1.found)
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Failed to find span node for UUID: {}", uuid_);
+        return "";
+    }
+
+    current_node = span_seek_1.seek_node;
 
     const auto title_result = GetXmlNodeContent(current_node->children);
 
@@ -526,7 +542,7 @@ ParserXmlNodeSeek ParserXF::SeekToThreadmark(xmlNodePtr root_node)
                 continue;
             }
 
-            const auto label_seek = SeekToNodeByName(threadmark_header_seek.seek_node->children, "label");
+            const auto label_seek = SeekToNodeByPattern(threadmark_header_seek.seek_node->children, pattern_seek_t::XML_NAME, "label");
             if (!label_seek.found)
             {
                 BlackLibraryCommon::LogError(parser_name_, "Failed to find label for UUID: {}", uuid_);
