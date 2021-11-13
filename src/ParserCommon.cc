@@ -20,7 +20,7 @@ namespace core {
 
 namespace parsers {
 
-#define INDEX_ENTRY_FILENAME_BUFFER_SIZE 128
+#define PARSE_SECTION_FILENAME_BUFFER_SIZE 128
 
 namespace BlackLibraryCommon = black_library::core::common;
 
@@ -111,34 +111,34 @@ std::string GetParserName(parser_t rep)
     switch (rep)
     {
     case parser_t::ERROR_PARSER:
-        return "ERROR_PARSER";
+        return "error_parser";
         break;
     case parser_t::AO3_PARSER:
-        return "AO3_PARSER";
+        return "ao3_parser";
         break;
     case parser_t::FFN_PARSER:
-        return "FFN_PARSER";
+        return "ffn_parser";
         break;
     case parser_t::RR_PARSER:
-        return "RR_PARSER";
+        return "rr_parser";
         break;
     case parser_t::SBF_PARSER:
-        return "SBF_PARSER";
+        return "sbf_parser";
         break;
     case parser_t::SVF_PARSER:
-        return "SVF_PARSER";
+        return "svf_parser";
         break;
     case parser_t::XF_PARSER:
-        return "XF_PARSER";
+        return "xf_parser";
         break;
     case parser_t::YT_PARSER:
-        return "YT_PARSER";
+        return "yt_parser";
         break;
     case parser_t::_NUM_PARSERS_TYPE:
-        return "_NUM_PARSERS_TYPE";
+        return "_num_parsers_type";
         break;
     default:
-        return "NO_PARSER";
+        return "no_parser";
         break;
     }
 }
@@ -161,6 +161,10 @@ parser_t GetParserTypeByUrl(const std::string &url)
     {
         rep = parser_t::SBF_PARSER;
     }
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::SVF::source_url))
+    {
+        rep = parser_t::SVF_PARSER;
+    }
     else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::RR::source_url))
     {
         rep = parser_t::RR_PARSER;
@@ -177,8 +181,8 @@ parser_t GetParserTypeByUrl(const std::string &url)
 // limited to 9999 sections right now (no CH10000), index starts at 1 for sections
 std::string GetSectionFileName(const size_t &index_num, const std::string &section_name)
 {
-    char buffer [INDEX_ENTRY_FILENAME_BUFFER_SIZE];
-    int res = snprintf(buffer, INDEX_ENTRY_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_num + 1, section_name.c_str());
+    char buffer [PARSE_SECTION_FILENAME_BUFFER_SIZE];
+    int res = snprintf(buffer, PARSE_SECTION_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_num + 1, section_name.c_str());
     if (res < 0)
         return "";
 
@@ -231,7 +235,7 @@ ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std
         return result;
     }
 
-    xmlAttr* prop = root->properties;
+    xmlAttrPtr prop = root->properties;
     while (prop)
     {
         if (memcmp(prop->name, attr.c_str(), attr.length()) == 0 &&
@@ -245,7 +249,7 @@ ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std
         prop = prop->next;
     }
 
-    xmlNode* current_node = root->children;
+    xmlNodePtr current_node = root->children;
 
     while (current_node)
     {
@@ -288,6 +292,7 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
     ParserXmlAttributeResult attr_result;
 
     xmlAttrPtr attribute = root_node->properties;
+    xmlChar *attr_content = NULL;
 
     while (attribute)
     {
@@ -296,19 +301,18 @@ ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, cons
         {
             if (!target_name.compare(std::string((char *)attr_name)))
             {
-                xmlChar *attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
+                attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
                 if (attr_content != NULL)
                 {
                     attr_result.result = std::string((char *) attr_content);
                     attr_result.found = true;
                 }
-                xmlFree(attr_content);
                 break;
             }
         }
-
         attribute = attribute->next;
     }
+    xmlFree(attr_content);
 
     return attr_result;
 }
@@ -339,13 +343,15 @@ bool NodeHasAttribute(xmlNodePtr root_node, const std::string &target_name)
 bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_content)
 {
     xmlAttrPtr attribute = root_node->properties;
+    xmlChar *attr_content = NULL;
     bool found = false;
 
     while (attribute)
     {
-        xmlChar *attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
+        attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
         if (attr_content != NULL)
         {
+            // std::cout << "attr_content: " << std::string((char *)attr_content) << std::endl;
             if (!target_content.compare(std::string((char *)attr_content)))
                 found = true;
         }
@@ -393,15 +399,17 @@ ParserXmlNodeSeek SeekToNodeByNameRecursive(xmlNodePtr root_node, const std::str
         {
             seek.seek_node = current_node;
             seek.found = true;
-            break;
+            return seek;
         }
 
         ParserXmlNodeSeek children_seek = SeekToNodeByNameRecursive(current_node->children, name);
 
-        if (children_seek.seek_node != NULL)
+        if (children_seek.found)
+        {
             seek.seek_node = children_seek.seek_node;
-
-        seek.found = seek.found || children_seek.found;
+            seek.found = true;
+            return seek;
+        }
     }
 
     return seek;

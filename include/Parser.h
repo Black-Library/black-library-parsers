@@ -71,6 +71,7 @@ protected:
     progress_number_callback progress_number_callback_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;
 
+    std::string uuid_;
     std::string title_;
     std::string nickname_;
     std::string source_name_;
@@ -78,8 +79,8 @@ protected:
     std::string author_;
 
     std::string target_url_;
-    std::string uuid_;
     std::string local_des_;
+    std::string parser_name_;
 
     size_t index_;
     size_t end_index_;

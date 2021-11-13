@@ -5,6 +5,8 @@
 #include <functional>
 #include <iostream>
 
+#include <LogOperations.h>
+
 #include <IndexEntryParser.h>
 #include <ShortTimeGenerator.h>
 
@@ -45,7 +47,7 @@ int IndexEntryParser::CalculateIndexBounds(const ParserJob &parser_job)
 
     if (index_ > index_entries_.size() || index_entries_.empty())
     {
-        std::cout << "Error: " <<  GetParserName(parser_type_) << " requested start index greater than detected entries" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Requested start index {} greater than detected entries size: {}", index_, index_entries_.size());
         return -1;
     }
 
@@ -59,15 +61,15 @@ void IndexEntryParser::ExpendedAttempts()
 
 int IndexEntryParser::PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job)
 {
-    std::cout << GetParserName(parser_type_) << ": Find index entry nodes" << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "Find index entry nodes");
 
     FindIndexEntries(root_node);
 
-    std::cout << GetParserName(parser_type_) << ": Found " << index_entries_.size() << " nodes" << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "Found {} nodes", index_entries_.size());
 
     if (index_entries_.size() <= 0 && index_entries_.size() < parser_job.start_number)
     {
-        std::cout << "Error: index entries size error" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Index entries size error");
         return -1;
     }
 

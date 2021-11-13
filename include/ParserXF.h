@@ -37,7 +37,7 @@ protected:
     std::string GetXFTitle(const std::string &title);
     ParserXmlNodeSeek SeekToSectionContent(xmlNodePtr root_node, const std::string &target_post);
     ParserXmlNodeSeek SeekToSectionPost(xmlNodePtr root_node, const std::string &target_post);
-
+    ParserXmlNodeSeek SeekToThreadmark(xmlNodePtr root_node);
 };
 
 } // namespace XF

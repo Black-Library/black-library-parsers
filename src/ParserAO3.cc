@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <LogOperations.h>
 #include <TimeOperations.h>
 
 #include <ParserAO3.h>
@@ -21,7 +22,6 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserAO3::ParserAO3() :
     IndexEntryParser(parser_t::AO3_PARSER)
 {
-    title_ = "AO3_parser_title";
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
     network_ = std::make_shared<SeleniumAdapter>();
@@ -100,7 +100,12 @@ ParseSectionInfo ParserAO3::ParseSection()
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (!section_doc_tree)
     {
+<<<<<<< HEAD
         std::cout << "Unable to Parse" << std::endl;
+=======
+        BlackLibraryCommon::LogError(parser_name_, "Unable to parse into doc_tree");
+        output.has_error = true;
+>>>>>>> 281fdf7dbb80f622945b77ac93ffe7f27d2587be
         return output;
     }
 
@@ -116,7 +121,7 @@ ParseSectionInfo ParserAO3::ParseSection()
 
     if (!workskin_result.found)
     {
-        std::cout << "Error: workskin seek" << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "workskin seek failure");
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -128,7 +133,7 @@ ParseSectionInfo ParserAO3::ParseSection()
         pattern_seek_t::XML_NAME, "dd", pattern_seek_t::XML_ATTRIBUTE, "class=words");
     if (!words_result.found)
     {
-        std::cout << "Error: " << GetParserName(parser_type_) << " could not get length" << std::endl;
+        BlackLibraryCommon::LogWarn(parser_name_, "Could not get work length");
     }
     else
     {
@@ -140,22 +145,22 @@ ParseSectionInfo ParserAO3::ParseSection()
         }
     }
 
-    std::string section_file_name = GetSectionFileName(index_entry.index_num, title_);
-    FILE* index_entry_file;
-    std::string file_name = local_des_ + section_file_name;
-    std::cout << "FILENAME: " << file_name << std::endl;
-    index_entry_file = fopen(file_name.c_str(), "w+");
+    const auto section_file_name = GetSectionFileName(index_entry.index_num, title_);
+    FILE* section_output_file;
+    std::string file_path = local_des_ + section_file_name;
+    std::cout << "FILEPATH: " << file_path << std::endl;
+    section_output_file = fopen(file_path.c_str(), "w+");
 
-    if (index_entry_file == NULL)
+    if (section_output_file == NULL)
     {
-        std::cout << "Error: could not open file with name: " << file_name << std::endl;
+        std::cout << "Error: could not open file with name: " << file_path << std::endl;
         xmlFreeDoc(section_doc_tree);
         return output;
     }
 
-    xmlElemDump(index_entry_file, section_doc_tree, workskin_result.seek_node);
+    xmlElemDump(section_output_file, section_doc_tree, workskin_result.seek_node);
     // TODO: figure out how to handle seg faults/other errors in threadpool/thread
-    fclose(index_entry_file);
+    fclose(section_output_file);
 
     output.has_error = false;
 

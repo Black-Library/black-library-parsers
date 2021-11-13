@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <SourceInformation.h>
+#include <FileOperations.h>
 #include <StringOperations.h>
 
-#include <ParserCommon.h>
+#include <SourceInformation.h>
 
 namespace black_library {
 
@@ -40,6 +40,20 @@ TEST_CASE( "ContainsString parser url tests (pass)", "[single-file]" )
     REQUIRE( BlackLibraryCommon::ContainsString( RR_DUMMY_URL, BlackLibraryCommon::RR::source_url) == true );
     REQUIRE( BlackLibraryCommon::ContainsString( RR_DUMMY_URL, BlackLibraryCommon::SBF::source_url) == false );
     REQUIRE( BlackLibraryCommon::ContainsString( BlackLibraryCommon::RR::source_url, RR_DUMMY_URL) == false );
+}
+
+TEST_CASE( "SanatizeFileName generic tests (pass)", "[single-file]" )
+{
+    REQUIRE( BlackLibraryCommon::SanitizeFileName(" /\\*?<>:;=[]!@|.,%#'\"") == "" );
+    REQUIRE( BlackLibraryCommon::SanitizeFileName("SEC0114_segment-\"when-they-say-'\''stand-at-your-side'\''-they'\''re-really-saying-'\''i-love-you'\''\"") == "SEC0114_segment-when-they-say-stand-at-your-side-they-re-really-saying-i-love-you" );
+    REQUIRE( BlackLibraryCommon::SanitizeFileName("Prologue: I'M A MOTHER GOO! NOT A SINGLE MOM!") == "Prologue-I-M-A-MOTHER-GOO-NOT-A-SINGLE-MOM" );
+}
+
+TEST_CASE( "StartsWithString generic tests (pass)", "[single-file]" )
+{
+    REQUIRE( BlackLibraryCommon::StartsWithString("gotothetop", "oto") == false);
+    REQUIRE( BlackLibraryCommon::StartsWithString("gotothetop", "top") == false);
+    REQUIRE( BlackLibraryCommon::StartsWithString("gotothetop", "goto") == true);
 }
 
 TEST_CASE( "TrimWhitespace generic tests (pass)", "[single-file]" )
