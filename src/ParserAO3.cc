@@ -89,6 +89,8 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto index_entry = index_entries_[index_];
 
     const auto url_adult = index_entry.data_url;
+    BlackLibraryCommon::LogDebug(parser_name_, "ParseSection: {} section_url: {} - {}", GetParserBehaviorName(parser_behavior_), url_adult, index_entry.name);
+
     const auto index_entry_curl_result = network_.get()->NetworkRequest(url_adult);
     if (index_entry_curl_result.has_error)
     {
@@ -135,7 +137,7 @@ ParseSectionInfo ParserAO3::ParseSection()
         ParserXmlContentResult w_result = GetXmlNodeContent(words_result.seek_node);
         if (w_result.found && strcmp(w_result.result.c_str(), ""))
         {
-            std::cout << w_result.result << std::endl;
+            
             output.length = (size_t) std::stoi(w_result.result) / 1000;
         }
     }
@@ -143,12 +145,12 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto section_file_name = GetSectionFileName(index_entry.index_num, title_);
     FILE* section_output_file;
     std::string file_path = local_des_ + section_file_name;
-    std::cout << "FILEPATH: " << file_path << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
     section_output_file = fopen(file_path.c_str(), "w+");
 
     if (section_output_file == NULL)
     {
-        std::cout << "Error: could not open file with name: " << file_path << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Could not open file with name: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
