@@ -92,7 +92,6 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto index_entry_curl_result = network_.get()->NetworkRequest(url_adult);
     if (index_entry_curl_result.has_error)
     {
-        std::cout << index_entry_curl_result.debug_string << std::endl;
         return output;
     }
 

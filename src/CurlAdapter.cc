@@ -4,11 +4,19 @@
 
 #include <CurlAdapter.h>
 
+#include <LogOperations.h>
+
 namespace black_library {
 
 namespace core {
 
 namespace parsers {
+
+namespace BlackLibraryCommon = black_library::core::common;
+
+CurlAdapter::CurlAdapter() {
+    BlackLibraryCommon::InitRotatingLogger("CurlAdapter", "/mnt/black-library/log/", false);
+}
 
 NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) {
     NetworkRequestResult result;
@@ -20,7 +28,7 @@ NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) {
 
     if (!curl)
     {
-        result.debug_string = "Error: curl did not initialize";
+        BlackLibraryCommon::LogError("CurlAdapter", "Curl did not initialize");
         return result;
     }
 
@@ -35,7 +43,7 @@ NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) {
     {
         std::stringstream ss;
         ss << "Curl Request Failed: " << curl_easy_strerror(res);
-        result.debug_string = ss.str();
+        BlackLibraryCommon::LogError("CurlAdapter", ss.str());
         return result;
     }
 

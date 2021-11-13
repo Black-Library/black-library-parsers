@@ -4,11 +4,19 @@
 
 #include <SeleniumAdapter.h>
 
+#include <LogOperations.h>
+
 namespace black_library {
 
 namespace core {
 
 namespace parsers {
+
+namespace BlackLibraryCommon = black_library::core::common;
+
+SeleniumAdapter::SeleniumAdapter() {
+    BlackLibraryCommon::InitRotatingLogger("SeleniumAdapter", "/mnt/black-library/log/", false);
+}
 
 NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     NetworkRequestResult result;
@@ -18,7 +26,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyObject* sysPath = PySys_GetObject("path");
     if (!sysPath)
     {
-        result.debug_string = "Unable to get PATH.";
+        BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to get Python PATH.");
         PrintPythonError();
         return result;
     }
@@ -31,7 +39,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyObject* pyModuleString = PyUnicode_FromString("SeleniumAdapter");
     if (!pyModuleString)
     {
-        result.debug_string = "Unable to parse PyString.";
+        BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to parse PyString.");
         PrintPythonError();
         return result;
     }
@@ -39,7 +47,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyObject* pyModule = PyImport_Import(pyModuleString);
     if (!pyModule)
     {
-        result.debug_string = "Unable to find module.";
+        BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to find module.");
         PrintPythonError();
         return result;
     }
@@ -47,7 +55,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyObject* networkRequestFunc = PyObject_GetAttrString(pyModule, "NetworkRequest");
     if (!networkRequestFunc)
     {
-        result.debug_string = "Unable to get func.";
+        BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to get func.");
         PrintPythonError();
         return result;
     }
@@ -56,7 +64,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyTuple_SetItem(args, 0, PyUnicode_FromString(url.c_str()));
     if (!args)
     {
-        result.debug_string = "Unable to create args.";
+        BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to create args.");
         PrintPythonError();
         return result;
     }
@@ -64,7 +72,7 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
     PyObject* pyResult = PyObject_CallObject(networkRequestFunc, args);
     if (!pyResult)
     {
-        result.debug_string = "Unable to get pyResult.";
+        BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to get pyResult.");
         PrintPythonError();
         return result;
     }

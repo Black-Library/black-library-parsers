@@ -21,7 +21,7 @@ namespace parsers {
 class CurlAdapter : public NetworkAdapter
 {
 public:
-    CurlAdapter() {};
+    CurlAdapter();
     ~CurlAdapter() {};
 
     NetworkRequestResult NetworkRequest(const std::string& url) override;

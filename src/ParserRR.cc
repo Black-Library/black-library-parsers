@@ -196,7 +196,6 @@ ParseSectionInfo ParserRR::ParseSection()
     const auto curl_request_result = network_.get()->NetworkRequest(index_entry_url);
     if (curl_request_result.has_error)
     {
-        std::cout << curl_request_result.debug_string << std::endl;
         return output;
     }
 
