@@ -100,12 +100,8 @@ ParseSectionInfo ParserAO3::ParseSection()
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (!section_doc_tree)
     {
-<<<<<<< HEAD
-        std::cout << "Unable to Parse" << std::endl;
-=======
         BlackLibraryCommon::LogError(parser_name_, "Unable to parse into doc_tree");
         output.has_error = true;
->>>>>>> 281fdf7dbb80f622945b77ac93ffe7f27d2587be
         return output;
     }
 

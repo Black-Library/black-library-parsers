@@ -18,5 +18,3 @@ add_subdirectory(src)
 add_subdirectory(test)
 
 add_parser_docker_targets()
-
-option(REQUIRE_PYTHON "Check for Python Dependencies required for certain adapters and parsers" ON)

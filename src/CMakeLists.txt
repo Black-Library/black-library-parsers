@@ -14,6 +14,8 @@ if (REQUIRE_PYTHON)
         message(FATAL_ERROR "ERROR: Missing Python Deps: " ${PYTHON_DEPS_OUTPUT})
         return(1)
     endif()
+else()
+    message("REQUIRE_PYTHON OFF")
 endif()
 
 message("LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
