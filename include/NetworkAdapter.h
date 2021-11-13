@@ -6,8 +6,9 @@
 #define __BLACK_LIBRARY_CORE_PARSERS_NETWORKADAPTER_H__
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
+
 
 #include "ParserCommon.h"
 

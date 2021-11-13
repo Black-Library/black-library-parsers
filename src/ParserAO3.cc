@@ -9,6 +9,8 @@
 
 #include <ParserAO3.h>
 
+#include "SeleniumAdapter.h"
+
 namespace black_library {
 
 namespace core {
@@ -24,7 +26,7 @@ ParserAO3::ParserAO3() :
 {
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
-    network_ = std::make_shared<SeleniumAdapter>();
+    network_adapter_ = std::make_shared<SeleniumAdapter>();
 }
 
 ParserAO3::~ParserAO3()
@@ -91,7 +93,7 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto url_adult = index_entry.data_url;
     BlackLibraryCommon::LogDebug(parser_name_, "ParseSection: {} section_url: {} - {}", GetParserBehaviorName(parser_behavior_), url_adult, index_entry.name);
 
-    const auto index_entry_curl_result = network_.get()->NetworkRequest(url_adult);
+    const auto index_entry_curl_result = network_adapter_.get()->NetworkRequest(url_adult);
     if (index_entry_curl_result.has_error)
     {
         return output;

@@ -12,6 +12,9 @@
 #include <Parser.h>
 #include <ShortTimeGenerator.h>
 
+#include "CurlAdapter.h"
+#include "SeleniumAdapter.h"
+
 namespace black_library {
 
 namespace core {
@@ -39,6 +42,7 @@ Parser::Parser(parser_t parser_type) :
     done_(false)
 {
     parser_name_ = GetParserName(parser_type_);
+    network_adapter_ =  std::make_shared<CurlAdapter>();
 
     BlackLibraryCommon::InitRotatingLogger(parser_name_, "/mnt/black-library/log/", false);
 }
@@ -72,7 +76,7 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     BlackLibraryCommon::LogDebug(parser_name_, "Start parser job: {} target_url: {}", parser_job, target_url_);
 
-    const auto curl_result = network_.get()->NetworkRequest(target_url_);
+    const auto curl_result = network_adapter_.get()->NetworkRequest(target_url_);
     if (curl_result.has_error)
     {
         return parser_result;

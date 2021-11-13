@@ -108,7 +108,7 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    const auto section_curl_result = network_.get()->NetworkRequest(working_url);
+    const auto section_curl_result = network_adapter_.get()->NetworkRequest(working_url);
     if (section_curl_result.has_error)
     {
         return output;

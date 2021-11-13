@@ -193,7 +193,7 @@ ParseSectionInfo ParserRR::ParseSection()
     const auto index_entry_url = "https://" + source_url_ + index_entry.data_url;
     BlackLibraryCommon::LogDebug(parser_name_, "ParseSection: {} section_url: {} - {}", GetParserBehaviorName(parser_behavior_), index_entry_url, index_entry.name);
 
-    const auto curl_request_result = network_.get()->NetworkRequest(index_entry_url);
+    const auto curl_request_result = network_adapter_.get()->NetworkRequest(index_entry_url);
     if (curl_request_result.has_error)
     {
         return output;
