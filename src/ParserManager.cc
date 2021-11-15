@@ -143,8 +143,16 @@ int ParserManager::RunOnce()
             continue;
         }
 
-        BlackLibraryCommon::LogInfo("parser_manager", "Finished job with UUID: {} url: {}", job_result.metadata.uuid, job_result.metadata.url);
-        current_jobs_.erase(std::make_pair(job_result.metadata.uuid, job_result.is_error_job));
+        BlackLibraryCommon::LogInfo("parser_manager", "Finished job with UUID: {} url: {} author: {} is_error_job: {}", job_result.metadata.uuid, job_result.metadata.url, job_result.metadata.author, job_result.is_error_job);
+
+        if (current_jobs_.count(std::make_pair(job_result.metadata.uuid, job_result.is_error_job)))
+        {
+            current_jobs_.erase(std::make_pair(job_result.metadata.uuid, job_result.is_error_job));
+        }
+        else
+        {
+            BlackLibraryCommon::LogError("parser_manager", "Failed to find current job with UUID: {} is_error_job: {}", job_result.metadata.uuid, job_result.is_error_job);
+        }
 
         if (job_result.has_error)
             BlackLibraryCommon::LogError("parser_manager", "Job error with UUID: {}, url: {}", job_result.metadata.uuid, job_result.metadata.url);
