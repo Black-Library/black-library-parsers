@@ -43,6 +43,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!td_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry td seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -52,6 +53,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!a_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry a seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -59,6 +61,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!NodeHasAttribute(current_node, "href"))
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry hrf seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -66,6 +69,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!url_result.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry url result for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -77,6 +81,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!index_entry_name_result.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry name content result for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -86,6 +91,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!time_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry time seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -93,10 +99,15 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!time_attr_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry time attribute seek for UUID: {}", uuid_);
         return index_entry;
     }
 
-    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%A, %B %d, %Y %I:%M %p");
+    BlackLibraryCommon::LogTrace(parser_name_, "time attribute seek result for UUID: {} : {}", uuid_, time_attr_seek.result);
+
+    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%m/%d/%Y %I:%M:%S %p");
+
+    BlackLibraryCommon::LogTrace(parser_name_, "index entry time for UUID: {} : {}", uuid_, index_entry.time_published);
 
     return index_entry;
 }
