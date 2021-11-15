@@ -202,6 +202,7 @@ int ParserWorker::RunOnce()
             job_result.metadata = parser_result.metadata;
             job_result.start_number = parser_job.start_number;
             job_result.end_number = parser_job.end_number;
+            job_result.is_error_job = parser_job.is_error_job;
 
             if (!parser_result.has_error)
                 job_result.has_error = false;
