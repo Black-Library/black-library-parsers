@@ -93,6 +93,9 @@ void IndexEntryParser::SaveUpdateDate(ParserResult &parser_result)
         if (index_entry.time_published > parser_result.metadata.update_date)
             parser_result.metadata.update_date = index_entry.time_published;
     }
+
+    if (parser_result.metadata.update_date <= 0)
+        BlackLibraryCommon::LogError(parser_name_, "Failed to get update date for UUID: {}", uuid_);
 }
 
 } // namespace parsers
