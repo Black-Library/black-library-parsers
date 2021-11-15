@@ -161,7 +161,8 @@ ParseSectionInfo ParserXF::ParseSection()
     last_update_date_ = GetUpdateDate(current_node->children);
 
     // skip saving content if before target start index
-    if (working_index < target_start_index_)
+    BlackLibraryCommon::LogDebug(parser_name_, "working index: {} start index: {}", working_index, target_start_index_);
+    if (working_index <= target_start_index_)
     {
         BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping filesave", target_start_index_, working_index);
         output.has_error = false;
