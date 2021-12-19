@@ -173,6 +173,8 @@ int ParserManager::Stop()
         worker.second->Stop();
     }
 
+    BlackLibraryCommon::LogInfo("parser_manager", "Stopped manager");
+
     return 0;
 }
 
@@ -239,6 +241,11 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
 bool ParserManager::GetDone()
 {
     return done_;
+}
+
+bool ParserManager::StillWorkingOn(const std::string &uuid)
+{
+    return current_jobs_.count(std::make_pair(uuid, true)) || current_jobs_.count(std::make_pair(uuid, false));
 }
 
 int ParserManager::AddWorker(parser_t parser_type, size_t num_parsers)

@@ -41,6 +41,7 @@ public:
     int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number);
     int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number,  const error_job_rep &is_error_job);
     bool GetDone();
+    bool StillWorkingOn(const std::string &uuid);
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
