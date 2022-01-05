@@ -8,6 +8,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <ConfigOperations.h>
+
 #include "Parser.h"
 
 namespace black_library {
@@ -26,7 +28,7 @@ typedef std::function<ParserFactoryResult(void)> factory_function;
 class ParserFactory
 {
 public:
-    ParserFactory();
+    ParserFactory(const njson &config);
     ~ParserFactory();
 
     ParserFactoryResult GetParserByUrl(const std::string &url);

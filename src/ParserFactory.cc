@@ -25,9 +25,23 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserFactory::ParserFactory()
+ParserFactory::ParserFactory(const njson &config)
 {
-    BlackLibraryCommon::InitRotatingLogger("parser_factory", "/mnt/black-library/log/", false);
+    njson nconfig = config["config"];
+
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    if (nconfig.contains("logger_path"))
+    {
+        logger_path = nconfig["logger_path"];
+    }
+
+    bool factory_log_level = BlackLibraryCommon::DefaultLogLevel;
+    if (nconfig.contains("factory_debug_log"))
+    {
+        factory_log_level = nconfig["factory_debug_log"];
+    }
+
+    BlackLibraryCommon::InitRotatingLogger("parser_factory", logger_path, factory_log_level);
     BlackLibraryCommon::LogInfo("parser_factory", "Initialize ParserFactory");
     InitParserMap();
 }
