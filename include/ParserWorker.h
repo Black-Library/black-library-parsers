@@ -26,7 +26,7 @@ namespace parsers {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const std::string &storage_dir, parser_t parser_type, size_t num_parsers);
+    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const njson &config, parser_t parser_type, size_t num_parsers);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
@@ -49,7 +49,7 @@ private:
     progress_number_callback progress_number_callback_;
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
-    std::string storage_dir_;
+    std::string storage_path_;
     std::string worker_name_;
     std::shared_ptr<ParserFactory> parser_factory_;
     std::mutex mutex_;

@@ -20,43 +20,66 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserManager::ParserManager(const std::string &storage_dir, const std::string &config) :
+ParserManager::ParserManager(const njson &config) :
     worker_map_(),
-    parser_factory_(std::make_shared<ParserFactory>()),
+    parser_factory_(std::make_shared<ParserFactory>(config)),
     current_jobs_(),
     job_queue_(),
     result_queue_(),
     progress_number_callback_(),
     database_status_callback_(),
     config_(config),
-    storage_dir_(storage_dir),
     done_(true),
     initialized_(false)
 {
-    BlackLibraryCommon::InitRotatingLogger("parser_manager", "/mnt/black-library/log/", false);
+    njson nconfig = config["config"];
 
-    if (storage_dir_.empty())
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    std::string storage_path = BlackLibraryCommon::DefaultStoragePath;
+    bool logger_level = BlackLibraryCommon::DefaultLogLevel;
+    int worker_count = 1;
+
+    if (nconfig.contains("logger_path"))
     {
-        storage_dir_ = "/mnt/black-library/store";
-        BlackLibraryCommon::LogDebug("parser_manager", "Empty storage dir given, using default: {}", storage_dir_);
+        logger_path = nconfig["logger_path"];
     }
 
-    // okay to pop_back(), string isn't empty
-    if (storage_dir_.back() == '/')
-        storage_dir_.pop_back();
-
-    if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
+    if (nconfig.contains("manager_debug_log"))
     {
-        BlackLibraryCommon::LogError("parser_manager", "Failed to access storage directory: {}", storage_dir_);
+        logger_level = nconfig["manager_debug_log"];
+    }
+
+    if (nconfig.contains("storage_path"))
+    {
+        storage_path = nconfig["storage_path"];
+    }
+
+    if (nconfig.contains("manager_worker_count"))
+    {
+        worker_count = nconfig["manager_worker_count"];
+    }
+
+    BlackLibraryCommon::InitRotatingLogger("parser_manager", logger_path, logger_level);
+
+    if (storage_path.empty())
+    {
+        storage_path = BlackLibraryCommon::DefaultStoragePath;
+        BlackLibraryCommon::LogDebug("parser_manager", "Empty storage path given, using default: {}", storage_path);
+    }
+
+    if (!BlackLibraryCommon::CheckFilePermission(storage_path))
+    {
+        BlackLibraryCommon::LogError("parser_manager", "Failed to access storage path: {}", storage_path);
         return;
     }
 
-    BlackLibraryCommon::LogInfo("parser_manager", "Using storage dir: {}", storage_dir_);
+    BlackLibraryCommon::LogInfo("parser_manager", "Using storage path: {}", storage_path);
+    BlackLibraryCommon::LogDebug("parser_manager", "workers will use {} parsers", worker_count);
 
-    AddWorker(parser_t::AO3_PARSER, 1);
-    AddWorker(parser_t::RR_PARSER, 1);
-    AddWorker(parser_t::SBF_PARSER, 1);
-    AddWorker(parser_t::SVF_PARSER, 1);
+    AddWorker(parser_t::AO3_PARSER, worker_count);
+    AddWorker(parser_t::RR_PARSER, worker_count);
+    AddWorker(parser_t::SBF_PARSER, worker_count);
+    AddWorker(parser_t::SVF_PARSER, worker_count);
 
     for (auto & worker : worker_map_)
     {
@@ -252,7 +275,7 @@ int ParserManager::AddWorker(parser_t parser_type, size_t num_parsers)
 {
     BlackLibraryCommon::LogInfo("parser_manager", "Adding worker {} with {} parsers", GetParserName(parser_type), num_parsers);
 
-    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, storage_dir_, parser_type, num_parsers));
+    worker_map_.emplace(parser_type, std::make_shared<ParserWorker>(parser_factory_, config_, parser_type, num_parsers));
 
     return 0;
 }

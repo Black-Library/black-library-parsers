@@ -20,7 +20,7 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const std::string &storage_dir, parser_t parser_type, size_t num_parsers) :
+ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const njson &config, parser_t parser_type, size_t num_parsers) :
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
@@ -28,15 +28,34 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     progress_number_callback_(),
     job_status_callback_(),
     notify_callback_(),
-    storage_dir_(storage_dir),
-    worker_name_(""), 
+    storage_path_(BlackLibraryCommon::DefaultStoragePath),
+    worker_name_(""),
     parser_factory_(parser_factory),
     parser_type_(parser_type),
     done_(false)
 {
+    njson nconfig = config["config"];
+
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    if (nconfig.contains("logger_path"))
+    {
+        logger_path = nconfig["logger_path"];
+    }
+
+    bool logger_level = BlackLibraryCommon::DefaultLogLevel;
+    if (nconfig.contains("worker_debug_log"))
+    {
+        logger_level = nconfig["worker_debug_log"];
+    }
+
+    if (nconfig.contains("storage_path"))
+    {
+        storage_path_ = nconfig["storage_path"];
+    }
+
     worker_name_ = GetParserName(parser_type_) + "_worker";
 
-    BlackLibraryCommon::InitRotatingLogger(worker_name_, "/mnt/black-library/log/", false);
+    BlackLibraryCommon::InitRotatingLogger(worker_name_, logger_path, logger_level);
 
     BlackLibraryCommon::LogInfo(worker_name_, "Initialize parser worker: {} with pool size: {}", GetParserName(parser_type), pool_.GetSize());
 }
@@ -134,13 +153,13 @@ int ParserWorker::RunOnce()
 
             auto parser = factory_result.parser_result;
 
-            std::string local_file_path = storage_dir_ + '/' + parser_job.uuid + '/';
+            std::string local_file_path = storage_path_ + parser_job.uuid + '/';
 
             parser->SetLocalFilePath(local_file_path);
 
-            if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
+            if (!BlackLibraryCommon::CheckFilePermission(storage_path_))
             {
-                BlackLibraryCommon::LogError(worker_name_, "Failed to access storage directory: {}", storage_dir_);
+                BlackLibraryCommon::LogError(worker_name_, "Failed to access storage directory: {}", storage_path_);
                 return job_result;
             }
 

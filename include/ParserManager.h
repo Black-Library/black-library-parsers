@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <ConfigOperations.h>
+
 #include "BlockingQueue.h"
 #include "BlockingUnorderedMap.h"
 #include "ThreadPool.h"
@@ -27,7 +29,7 @@ namespace parsers {
 class ParserManager
 {
 public:
-    explicit ParserManager(const std::string &storage_dir, const std::string &config);
+    explicit ParserManager(const njson &config);
     ParserManager &operator = (ParserManager &&) = default;
 
     int Run();
@@ -57,8 +59,7 @@ private:
     BlockingQueue<ParserJobResult> result_queue_;
     progress_number_callback progress_number_callback_;
     database_status_callback database_status_callback_;
-    std::string config_;
-    std::string storage_dir_;
+    njson config_;
     std::atomic_bool done_;
     std::atomic_bool initialized_;
 };
