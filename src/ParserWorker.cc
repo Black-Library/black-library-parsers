@@ -53,6 +53,10 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
         storage_path_ = nconfig["storage_path"];
     }
 
+    // okay to pop_back(), string isn't empty
+    if (storage_path_.back() == '/')
+        storage_path_.pop_back();
+
     worker_name_ = GetParserName(parser_type_) + "_worker";
 
     BlackLibraryCommon::InitRotatingLogger(worker_name_, logger_path, logger_level);
@@ -153,7 +157,7 @@ int ParserWorker::RunOnce()
 
             auto parser = factory_result.parser_result;
 
-            std::string local_file_path = storage_path_ + parser_job.uuid + '/';
+            std::string local_file_path = storage_path_ + '/' + parser_job.uuid + '/';
 
             parser->SetLocalFilePath(local_file_path);
 

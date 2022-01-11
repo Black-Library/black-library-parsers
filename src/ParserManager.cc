@@ -61,6 +61,10 @@ ParserManager::ParserManager(const njson &config) :
 
     BlackLibraryCommon::InitRotatingLogger("parser_manager", logger_path, logger_level);
 
+    // okay to pop_back(), string isn't empty
+    if (storage_path.back() == '/')
+        storage_path.pop_back();
+
     if (storage_path.empty())
     {
         storage_path = BlackLibraryCommon::DefaultStoragePath;
@@ -280,16 +284,16 @@ int ParserManager::AddWorker(parser_t parser_type, size_t num_parsers)
     return 0;
 }
 
-int ParserManager::RegisterProgressNumberCallback(const progress_number_callback &callback)
+int ParserManager::RegisterDatabaseStatusCallback(const database_status_callback &callback)
 {
-    progress_number_callback_ = callback;
+    database_status_callback_ = callback;
 
     return 0;
 }
 
-int ParserManager::RegisterDatabaseStatusCallback(const database_status_callback &callback)
+int ParserManager::RegisterProgressNumberCallback(const progress_number_callback &callback)
 {
-    database_status_callback_ = callback;
+    progress_number_callback_ = callback;
 
     return 0;
 }
