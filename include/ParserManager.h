@@ -45,8 +45,8 @@ public:
     bool GetDone();
     bool StillWorkingOn(const std::string &uuid);
 
-    int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
+    int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 private:
     int AddResult(ParserJobResult result);
