@@ -47,6 +47,8 @@ public:
 
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
+    int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 private:
     int AddResult(ParserJobResult result);
@@ -59,6 +61,8 @@ private:
     BlockingQueue<ParserJobResult> result_queue_;
     progress_number_callback progress_number_callback_;
     database_status_callback database_status_callback_;
+    version_read_callback version_read_callback_;
+    version_update_callback version_update_callback_;
     njson config_;
     std::atomic_bool done_;
     std::atomic_bool initialized_;

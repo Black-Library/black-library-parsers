@@ -28,6 +28,8 @@ ParserManager::ParserManager(const njson &config) :
     result_queue_(),
     progress_number_callback_(),
     database_status_callback_(),
+    version_read_callback_(),
+    version_update_callback_(),
     config_(config),
     done_(true),
     initialized_(false)
@@ -106,6 +108,20 @@ ParserManager::ParserManager(const njson &config) :
             {
                 BlackLibraryCommon::LogDebug("parser_manager", "Recieved result: {}", result);
                 result_queue_.push(result);
+            }
+        );
+        worker.second->RegisterVersionReadCallback(
+            [this](const std::string &uuid, size_t index_num)
+            {
+                if (version_read_callback_)
+                    version_read_callback_(uuid, index_num);
+            }
+        );
+        worker.second->RegisterVersionUpdateCallback(
+            [this](const std::string &uuid, size_t index_num, const std::string &md5_sum)
+            {
+                if (version_update_callback_)
+                    version_update_callback_(uuid, index_num, md5_sum);
             }
         );
     }
@@ -294,6 +310,20 @@ int ParserManager::RegisterDatabaseStatusCallback(const database_status_callback
 int ParserManager::RegisterProgressNumberCallback(const progress_number_callback &callback)
 {
     progress_number_callback_ = callback;
+
+    return 0;
+}
+
+int ParserManager::RegisterVersionReadCallback(const version_read_callback &callback)
+{
+    version_read_callback_ = callback;
+
+    return 0;
+}
+
+int ParserManager::RegisterVersionUpdateCallback(const version_update_callback &callback)
+{
+    version_update_callback_ = callback;
 
     return 0;
 }

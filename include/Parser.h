@@ -50,6 +50,8 @@ public:
     std::string GetSourceUrl();
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
+    int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 protected:
     virtual int CalculateIndexBounds(const ParserJob &parser_job);
@@ -66,6 +68,8 @@ protected:
     virtual void SaveUpdateDate(ParserResult &parser_result);
 
     progress_number_callback progress_number_callback_;
+    version_read_callback version_read_callback_;
+    version_update_callback version_update_callback_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;
 
     std::string uuid_;

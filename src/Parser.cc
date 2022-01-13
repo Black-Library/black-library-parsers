@@ -22,6 +22,8 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 Parser::Parser(parser_t parser_type) : 
     progress_number_callback_(),
+    version_read_callback_(),
+    version_update_callback_(),
     time_generator_(std::make_shared<ShortTimeGenerator>()),
     uuid_(""),
     title_(GetParserName(parser_type) + "_title"),
@@ -198,6 +200,20 @@ std::string Parser::GetSourceUrl()
 int Parser::RegisterProgressNumberCallback(const progress_number_callback &callback)
 {
     progress_number_callback_ = callback;
+
+    return 0;
+}
+
+int Parser::RegisterVersionReadCallback(const version_read_callback &callback)
+{
+    version_read_callback_ = callback;
+
+    return 0;
+}
+
+int Parser::RegisterVersionUpdateCallback(const version_update_callback &callback)
+{
+    version_update_callback_ = callback;
 
     return 0;
 }
