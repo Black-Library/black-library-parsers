@@ -219,8 +219,8 @@ using database_status_callback = std::function<void(ParserJobResult result)>;
 using job_status_callback = std::function<void(const ParserJob &parser_job, job_status_t job_status)>;
 using manager_notify_callback = std::function<void(ParserJobResult result)>;
 using progress_number_callback = std::function<void(const std::string &uuid, size_t progress_num, bool error)>;
-using version_read_callback = std::function<void(const std::string &uuid, size_t index_num)>;
-using version_update_callback = std::function<void(const std::string &uuid, size_t index_num, const std::string &md5_sum)>;
+using version_read_callback = std::function<std::string(const std::string &uuid, size_t index_num)>;
+using version_update_callback = std::function<void(const std::string &uuid, size_t index_num, const std::string &md5_sum, uint64_t version_num)>;
 
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);

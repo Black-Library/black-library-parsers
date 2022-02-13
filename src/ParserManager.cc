@@ -113,15 +113,18 @@ ParserManager::ParserManager(const njson &config) :
         worker.second->RegisterVersionReadCallback(
             [this](const std::string &uuid, size_t index_num)
             {
+                std::string check_sum;
                 if (version_read_callback_)
-                    version_read_callback_(uuid, index_num);
+                    check_sum = version_read_callback_(uuid, index_num);
+
+                return check_sum;
             }
         );
         worker.second->RegisterVersionUpdateCallback(
-            [this](const std::string &uuid, size_t index_num, const std::string &md5_sum)
+            [this](const std::string &uuid, size_t index_num, const std::string &md5_sum, uint64_t version_num)
             {
                 if (version_update_callback_)
-                    version_update_callback_(uuid, index_num, md5_sum);
+                    version_update_callback_(uuid, index_num, md5_sum, version_num);
             }
         );
     }

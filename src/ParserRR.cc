@@ -7,6 +7,7 @@
 #include <FileOperations.h>
 #include <LogOperations.h>
 #include <TimeOperations.h>
+#include <VersionOperations.h>
 
 #include <ParserRR.h>
 
@@ -237,6 +238,7 @@ ParseSectionInfo ParserRR::ParseSection()
 
     output.length = length;
 
+    // generate section file name from index entry
     const auto section_name = GetRRIndexEntryTitle(index_entry);
 
     const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(section_name);
@@ -248,7 +250,11 @@ ParseSectionInfo ParserRR::ParseSection()
         return output;
     }
 
+    SectionVersionCheck(section_doc_tree);
+
     const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name);
+
+    // SectionFileSave(section_file_name);
 
     FILE* section_output_file;
     std::string file_path = local_des_ + section_file_name;

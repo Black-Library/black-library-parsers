@@ -254,12 +254,12 @@ int ParserWorker::Stop()
     {
         if (result.valid())
         {
-            BlackLibraryCommon::LogWarn(worker_name_, "Stopping a job");
+            BlackLibraryCommon::LogDebug(worker_name_, "Stopping a job");
             result.wait();
         }
     }
 
-    BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker");
+    BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker with: {} remaining jobs", pool_results_.size());
 
     return 0;
 }

@@ -1,7 +1,7 @@
 find_package(CURL REQUIRED)
 find_package(LibXml2 REQUIRED)
 
-message("LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
+message(STATUS "LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
 
 include(GNUInstallDirs)
 
@@ -56,6 +56,6 @@ set_target_properties(parser_worker_driver PROPERTIES INSTALL_RPATH
 set_target_properties(parser_manager_driver PROPERTIES INSTALL_RPATH
     "$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 
-message("linker path: $LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
+message(STATUS "linker path: $LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 
 install(TARGETS parser_driver parser_worker_driver parser_manager_driver thread_pool_example RUNTIME DESTINATION bin)
