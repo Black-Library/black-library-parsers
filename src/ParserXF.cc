@@ -108,8 +108,8 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    const auto section_curl_result = CurlRequest(working_url);
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.c_str(), NULL, NULL,
+    const auto curl_request_result = CurlRequest(working_url);
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {
@@ -164,7 +164,7 @@ ParseSectionInfo ParserXF::ParseSection()
     BlackLibraryCommon::LogDebug(parser_name_, "working index: {} start index: {}", working_index, target_start_index_);
     if (working_index <= target_start_index_)
     {
-        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping filesave", target_start_index_, working_index);
+        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping file save", target_start_index_, working_index);
         output.has_error = false;
         xmlFreeDoc(section_doc_tree);
         return output;
@@ -203,7 +203,7 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    const auto section_file_name = GetSectionFileName(working_index, sanatized_section_name);
+    const auto section_file_name = GetSectionFileName(working_index, sanatized_section_name, 0);
 
     FILE* section_output_file;
     std::string file_path = local_des_ + section_file_name;

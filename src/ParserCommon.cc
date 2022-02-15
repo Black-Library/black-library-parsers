@@ -178,11 +178,11 @@ parser_t GetParserTypeByUrl(const std::string &url)
 }
 
 
-// limited to 9999 sections right now (no CH10000), index starts at 1 for sections
-std::string GetSectionFileName(const size_t &index_num, const std::string &section_name)
+// limited to 9999 sections right now (no CH10000), index starts at 1 for sections, max  version_num is 65535
+std::string GetSectionFileName(const size_t &index_num, const std::string &section_name, const uint16_t &version_num)
 {
     char buffer [PARSE_SECTION_FILENAME_BUFFER_SIZE];
-    int res = snprintf(buffer, PARSE_SECTION_FILENAME_BUFFER_SIZE, "SEC%04lu_%s.html", index_num + 1, section_name.c_str());
+    int res = snprintf(buffer, PARSE_SECTION_FILENAME_BUFFER_SIZE, "SEC%04lu_%s_VER%03d.html", index_num + 1, section_name.c_str(), version_num);
     if (res < 0)
         return "";
 

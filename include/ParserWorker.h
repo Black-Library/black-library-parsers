@@ -39,6 +39,7 @@ public:
     int RegisterJobStatusCallback(const job_status_callback &callback);
     int RegisterManagerNotifyCallback(const manager_notify_callback &callback);
     int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionReadNumCallback(const version_read_num_callback &callback);
     int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 private:
@@ -52,6 +53,7 @@ private:
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
     version_read_callback version_read_callback_;
+    version_read_num_callback version_read_num_callback_;
     version_update_callback version_update_callback_;
     std::string storage_path_;
     std::string worker_name_;

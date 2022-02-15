@@ -39,7 +39,6 @@ Parser::Parser(parser_t parser_type) :
     end_index_(0),
     parser_type_(parser_type),
     parser_behavior_(parser_behavior_t::ERROR),
-    skip_file_save_(false),
     done_(false)
 {
     parser_name_ = GetParserName(parser_type_);
@@ -213,6 +212,13 @@ int Parser::RegisterVersionReadCallback(const version_read_callback &callback)
     return 0;
 }
 
+int Parser::RegisterVersionReadNumCallback(const version_read_num_callback &callback)
+{
+    version_read_num_callback_ = callback;
+
+    return 0;
+}
+
 int Parser::RegisterVersionUpdateCallback(const version_update_callback &callback)
 {
     version_update_callback_ = callback;
@@ -220,12 +226,31 @@ int Parser::RegisterVersionUpdateCallback(const version_update_callback &callbac
     return 0;
 }
 
-int Parser::SectionVersionCheck(xmlDocPtr doc_ptr)
+bool Parser::SectionFileSave(xmlDocPtr doc_ptr, xmlNodePtr save_node, const std::string &section_file_name)
+{
+    FILE* section_output_file;
+    std::string file_path = local_des_ + section_file_name;
+    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
+    section_output_file = fopen(file_path.c_str(), "w+");
+
+    if (section_output_file == NULL)
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
+        return true;
+    }
+
+    xmlElemDump(section_output_file, doc_ptr, save_node);
+
+    fclose(section_output_file);
+
+    return false;
+}
+
+bool Parser::SectionVersionCheck(xmlDocPtr doc_ptr)
 {
     std::string section_content;
     std::string saved_version = BlackLibraryCommon::EmptyMD5Version;
     int section_size;
-    bool skip_version_check = false;
 
     if (version_read_callback_)
         saved_version = version_read_callback_(uuid_, index_);
@@ -233,24 +258,21 @@ int Parser::SectionVersionCheck(xmlDocPtr doc_ptr)
     if (saved_version == BlackLibraryCommon::EmptyMD5Version)
     {
         BlackLibraryCommon::LogDebug(parser_name_, "No MD5 sum for: {} index: {}", uuid_, index_);
-        skip_version_check = true;
+        return false;
     }
 
     // version check
-    if (!skip_version_check)
+    xmlChar *section_content_char;
+    xmlDocDumpMemory(doc_ptr, &section_content_char, &section_size);
+    auto sec_version = BlackLibraryCommon::GetMD5Hash(std::string((char *) section_content_char));
+    xmlFree(section_content_char);
+    if (saved_version == sec_version)
     {
-        xmlChar *section_content_char;
-        xmlDocDumpMemory(doc_ptr, &section_content_char, &section_size);
-        auto sec_version = BlackLibraryCommon::GetMD5Hash(std::string((char *) section_content_char));
-        xmlFree(section_content_char);
-        if (saved_version == sec_version)
-        {
-            BlackLibraryCommon::LogDebug(parser_name_, "Version hash matches: {} index: {}, skip file save", uuid_, index_);
-            skip_file_save_ = true;
-        }
+        BlackLibraryCommon::LogDebug(parser_name_, "Version hash matches: {} index: {}, skip file save", uuid_, index_);
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 int Parser::CalculateIndexBounds(const ParserJob &parser_job)

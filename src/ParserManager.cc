@@ -9,6 +9,7 @@
 
 #include <FileOperations.h>
 #include <LogOperations.h>
+#include <VersionOperations.h>
 
 #include <ParserManager.h>
 
@@ -29,6 +30,7 @@ ParserManager::ParserManager(const njson &config) :
     progress_number_callback_(),
     database_status_callback_(),
     version_read_callback_(),
+    version_read_num_callback_(),
     version_update_callback_(),
     config_(config),
     done_(true),
@@ -113,7 +115,7 @@ ParserManager::ParserManager(const njson &config) :
         worker.second->RegisterVersionReadCallback(
             [this](const std::string &uuid, size_t index_num)
             {
-                std::string check_sum;
+                std::string check_sum = BlackLibraryCommon::EmptyMD5Version;
                 if (version_read_callback_)
                     check_sum = version_read_callback_(uuid, index_num);
 
@@ -320,6 +322,13 @@ int ParserManager::RegisterProgressNumberCallback(const progress_number_callback
 int ParserManager::RegisterVersionReadCallback(const version_read_callback &callback)
 {
     version_read_callback_ = callback;
+
+    return 0;
+}
+
+int ParserManager::RegisterVersionReadNumCallback(const version_read_num_callback &callback)
+{
+    version_read_num_callback_ = callback;
 
     return 0;
 }

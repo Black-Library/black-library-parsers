@@ -29,6 +29,7 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     job_status_callback_(),
     notify_callback_(),
     version_read_callback_(),
+    version_read_num_callback_(),
     version_update_callback_(),
     storage_path_(BlackLibraryCommon::DefaultStoragePath),
     worker_name_(""),
@@ -209,6 +210,9 @@ int ParserWorker::RunOnce()
             if (version_read_callback_)
                 parser->RegisterVersionReadCallback(version_read_callback_);
 
+            if (version_read_num_callback_)
+                parser->RegisterVersionReadNumCallback(version_read_num_callback_);
+
             if (version_update_callback_)
                 parser->RegisterVersionUpdateCallback(version_update_callback_);
 
@@ -312,6 +316,13 @@ int ParserWorker::RegisterJobStatusCallback(const job_status_callback &callback)
 int ParserWorker::RegisterVersionReadCallback(const version_read_callback &callback)
 {
     version_read_callback_ = callback;
+
+    return 0;
+}
+
+int ParserWorker::RegisterVersionReadNumCallback(const version_read_num_callback &callback)
+{
+    version_read_num_callback_ = callback;
 
     return 0;
 }

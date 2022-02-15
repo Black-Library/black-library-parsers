@@ -48,6 +48,7 @@ public:
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionReadNumCallback(const version_read_num_callback &callback);
     int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 private:
@@ -62,6 +63,7 @@ private:
     progress_number_callback progress_number_callback_;
     database_status_callback database_status_callback_;
     version_read_callback version_read_callback_;
+    version_read_num_callback version_read_num_callback_;
     version_update_callback version_update_callback_;
     njson config_;
     std::atomic_bool done_;

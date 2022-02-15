@@ -135,15 +135,16 @@ ParseSectionInfo ParserAO3::ParseSection()
         }
     }
 
-    const auto section_file_name = GetSectionFileName(index_entry.index_num, title_);
+    const auto section_file_name = GetSectionFileName(index_entry.index_num, title_, 0);
+
     FILE* section_output_file;
     std::string file_path = local_des_ + section_file_name;
-    std::cout << "FILEPATH: " << file_path << std::endl;
+    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
     section_output_file = fopen(file_path.c_str(), "w+");
 
     if (section_output_file == NULL)
     {
-        std::cout << "Error: could not open file with name: " << file_path << std::endl;
+        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -151,6 +152,8 @@ ParseSectionInfo ParserAO3::ParseSection()
     xmlElemDump(section_output_file, section_doc_tree, workskin_result.seek_node);
     // TODO: figure out how to handle seg faults/other errors in threadpool/thread
     fclose(section_output_file);
+
+    xmlFreeDoc(section_doc_tree);
 
     output.has_error = false;
 

@@ -51,10 +51,12 @@ public:
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionReadNumCallback(const version_read_num_callback &callback);
     int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 protected:
-    int SectionVersionCheck(xmlDocPtr doc_ptr);
+    bool SectionFileSave(xmlDocPtr doc_ptr, xmlNodePtr save_node, const std::string &section_file_name);
+    bool SectionVersionCheck(xmlDocPtr doc_ptr);
     virtual int CalculateIndexBounds(const ParserJob &parser_job);
     virtual void ExpendedAttempts();
     virtual void FindMetaData(xmlNodePtr root_node);
@@ -70,6 +72,7 @@ protected:
 
     progress_number_callback progress_number_callback_;
     version_read_callback version_read_callback_;
+    version_read_num_callback version_read_num_callback_;
     version_update_callback version_update_callback_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;
 
@@ -90,7 +93,6 @@ protected:
     std::mutex mutex_;
     parser_t parser_type_;
     parser_behavior_t parser_behavior_;
-    bool skip_file_save_;
     std::atomic_bool done_;
 
 private:
