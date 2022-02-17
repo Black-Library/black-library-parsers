@@ -18,8 +18,8 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-IndexEntryParser::IndexEntryParser(parser_t parser_type) : 
-    Parser(parser_type),
+IndexEntryParser::IndexEntryParser(parser_t parser_type, const njson &config) : 
+    Parser(parser_type, config),
     index_entries_()
 {
     parser_behavior_ = parser_behavior_t::INDEX_ENTRY;

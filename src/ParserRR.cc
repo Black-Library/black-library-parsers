@@ -21,8 +21,8 @@ namespace RR {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserRR::ParserRR() :
-    IndexEntryParser(parser_t::RR_PARSER)
+ParserRR::ParserRR(const njson &config) :
+    IndexEntryParser(parser_t::RR_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::RR::source_name;
     source_url_ = BlackLibraryCommon::RR::source_url;
@@ -250,9 +250,7 @@ ParseSectionInfo ParserRR::ParseSection()
         return output;
     }
 
-    std::string section_content;
     std::string saved_version = BlackLibraryCommon::EmptyMD5Version;
-    int section_size;
     bool skip_file_check = false;
 
     if (version_read_callback_)
@@ -264,10 +262,15 @@ ParseSectionInfo ParserRR::ParseSection()
     }
 
     // version check
-    xmlChar *section_content_char;
-    xmlDocDumpMemory(section_doc_tree, &section_content_char, &section_size);
-    auto sec_version = BlackLibraryCommon::GetMD5Hash(std::string((char *) section_content_char));
-    xmlFree(section_content_char);
+    xmlBufferPtr section_buf = xmlBufferCreate();
+    xmlNodeDump(section_buf, section_doc_tree, current_node, 0, 1);
+    const std::string section_content = std::string((char *) section_buf->content);
+    xmlFree(section_buf);
+    xmlFreeDoc(section_doc_tree);
+
+    auto sec_version = BlackLibraryCommon::GetMD5Hash(section_content);
+    BlackLibraryCommon::LogDebug(parser_name_, "Version hash: {}", sec_version);
+
     if (saved_version == sec_version)
     {
         BlackLibraryCommon::LogDebug(parser_name_, "Version hash matches: {} index: {}, skip file save", uuid_, index_);
@@ -277,7 +280,6 @@ ParseSectionInfo ParserRR::ParseSection()
     // if we skip the file check we can just return after freeing the doc
     if (skip_file_check)
     {
-        xmlFreeDoc(section_doc_tree);
         output.has_error = false;
         return output;
     }
@@ -289,17 +291,14 @@ ParseSectionInfo ParserRR::ParseSection()
 
     const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name, version_num);
 
-    if (SectionFileSave(section_doc_tree, current_node, section_file_name))
+    if (SectionFileSave(section_content, section_file_name))
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed section file save with UUID: {}", uuid_);
-        xmlFreeDoc(section_doc_tree);
         return output;
     }
 
     if (version_update_callback_)
         version_update_callback_(uuid_, index_, sec_version, version_num);
-
-    xmlFreeDoc(section_doc_tree);
 
     output.has_error = false;
 

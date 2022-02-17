@@ -19,8 +19,8 @@ namespace AO3 {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserAO3::ParserAO3() :
-    IndexEntryParser(parser_t::AO3_PARSER)
+ParserAO3::ParserAO3(const njson &config) :
+    IndexEntryParser(parser_t::AO3_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;

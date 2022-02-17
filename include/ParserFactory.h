@@ -35,7 +35,7 @@ public:
     ParserFactoryResult GetParserByType(parser_t parser_type);
 
 protected:
-    int InitParserMap();
+    int InitParserMap(const njson &config);
 
     std::unordered_map<parser_t, factory_function> parser_map_;
 

@@ -17,6 +17,7 @@
 #include <libxml/HTMLparser.h>
 #include <libxml/tree.h>
 
+#include <ConfigOperations.h>
 #include <SourceInformation.h>
 
 #include "ParserCommon.h"
@@ -31,8 +32,8 @@ namespace parsers {
 class Parser
 {
 public:
-    Parser(parser_t parser_type);
-    Parser() : Parser(parser_t::ERROR_PARSER){};
+    Parser(parser_t parser_type, const njson &config);
+    // Parser() : Parser(parser_t::ERROR_PARSER, some base config?){}; TODO
     Parser(const Parser &parser);
     virtual ~Parser();
 
@@ -55,7 +56,7 @@ public:
     int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 protected:
-    bool SectionFileSave(xmlDocPtr doc_ptr, xmlNodePtr save_node, const std::string &section_file_name);
+    bool SectionFileSave(const std::string &section_content, const std::string &section_file_name);
     bool SectionVersionCheck(xmlDocPtr doc_ptr);
     virtual int CalculateIndexBounds(const ParserJob &parser_job);
     virtual void ExpendedAttempts();

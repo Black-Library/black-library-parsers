@@ -18,7 +18,7 @@ namespace RR {
 class ParserRR : public IndexEntryParser
 {
 public:
-    explicit ParserRR();
+    explicit ParserRR(const njson &config);
 
 protected:
     std::string GetRRIndexEntryTitle(const ParserIndexEntry &index_entry);

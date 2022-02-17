@@ -14,8 +14,8 @@ namespace SBF {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserSBF::ParserSBF() :
-    ParserXF(parser_t::SBF_PARSER)
+ParserSBF::ParserSBF(const njson &config) :
+    ParserXF(parser_t::SBF_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::SBF::source_name;
     source_url_ = BlackLibraryCommon::SBF::source_url;

@@ -18,7 +18,7 @@ namespace AO3 {
 class ParserAO3 : public IndexEntryParser
 {
 public:
-    explicit ParserAO3();
+    explicit ParserAO3(const njson &config);
     ~ParserAO3();
 
 protected:

@@ -18,7 +18,7 @@ namespace YT {
 class ParserYT : public IndexEntryParser
 {
 public:
-    explicit ParserYT();
+    explicit ParserYT(const njson &config);
 
 protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);

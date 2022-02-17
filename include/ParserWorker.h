@@ -11,6 +11,8 @@
 #include <queue>
 #include <vector>
 
+#include <ConfigOperations.h>
+
 #include "BlockingQueue.h"
 #include "ThreadPool.h"
 

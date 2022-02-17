@@ -21,7 +21,7 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-Parser::Parser(parser_t parser_type) : 
+Parser::Parser(parser_t parser_type, const njson &config) : 
     progress_number_callback_(),
     version_read_callback_(),
     version_update_callback_(),
@@ -41,9 +41,23 @@ Parser::Parser(parser_t parser_type) :
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false)
 {
+    njson nconfig = config["config"];
+
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    if (nconfig.contains("logger_path"))
+    {
+        logger_path = nconfig["logger_path"];
+    }
+
+    bool logger_level = BlackLibraryCommon::DefaultLogLevel;
+    if (nconfig.contains("parser_debug_log"))
+    {
+        logger_level = nconfig["parser_debug_log"];
+    }
+
     parser_name_ = GetParserName(parser_type_);
 
-    BlackLibraryCommon::InitRotatingLogger(parser_name_, "/mnt/black-library/log/", false);
+    BlackLibraryCommon::InitRotatingLogger(parser_name_, logger_path, logger_level);
 }
 
 Parser::Parser(const Parser &parser) :
@@ -226,22 +240,20 @@ int Parser::RegisterVersionUpdateCallback(const version_update_callback &callbac
     return 0;
 }
 
-bool Parser::SectionFileSave(xmlDocPtr doc_ptr, xmlNodePtr save_node, const std::string &section_file_name)
+bool Parser::SectionFileSave(const std::string &section_content, const std::string &section_file_name)
 {
-    FILE* section_output_file;
-    std::string file_path = local_des_ + section_file_name;
+    const std::string file_path = local_des_ + section_file_name;
     BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
-    section_output_file = fopen(file_path.c_str(), "w+");
 
-    if (section_output_file == NULL)
+    std::ofstream ofs;
+    ofs.open(file_path);
+    if (!ofs.is_open())
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
         return true;
     }
-
-    xmlElemDump(section_output_file, doc_ptr, save_node);
-
-    fclose(section_output_file);
+    ofs << section_content;
+    ofs.close();
 
     return false;
 }

@@ -23,8 +23,8 @@ namespace XF {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserXF::ParserXF(parser_t parser_type) :
-    LinkedListParser(parser_type)
+ParserXF::ParserXF(parser_t parser_type, const njson &config) :
+    LinkedListParser(parser_type, config)
 {
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     source_url_ = BlackLibraryCommon::ERROR::source_url;
