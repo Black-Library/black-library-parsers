@@ -3,6 +3,8 @@
 #include <Parser.h>
 #include <ParserRR.h>
 
+#include <ParserTestUtils.h>
+
 namespace black_library {
 
 namespace core {
@@ -15,13 +17,15 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 TEST_CASE( "Generic parser tests (pass)", "[single-file]" )
 {
-    Parser parser;
+    auto config = GenerateTestConfig();
+    Parser parser(parser_t::ERROR_PARSER, config);
     parser.SetLocalFilePath("foo");
 }
 
 TEST_CASE( "RR parser tests (pass)", "[single-file]" )
 {
-    RR::ParserRR parser;
+    auto config = GenerateTestConfig();
+    RR::ParserRR parser(config);
     parser.SetLocalFilePath("foo");
     REQUIRE(parser.GetParserType() == parser_t::RR_PARSER);
     REQUIRE(parser.GetSourceUrl() == BlackLibraryCommon::RR::source_url);
