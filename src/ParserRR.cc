@@ -261,15 +261,18 @@ ParseSectionInfo ParserRR::ParseSection()
         BlackLibraryCommon::LogDebug(parser_name_, "No MD5 sum for: {} index: {}", uuid_, index_);
     }
 
-    // version check
-    xmlBufferPtr section_buf = xmlBufferCreate();
-    xmlNodeDump(section_buf, section_doc_tree, current_node, 0, 1);
-    const std::string section_content = std::string((char *) section_buf->content);
-    xmlFree(section_buf);
+    // dump content
+    auto section_content = SectionDumpContent(section_doc_tree, current_node);
     xmlFreeDoc(section_doc_tree);
 
+    if (section_content.empty())
+    {
+        return output;
+    }
+
+    // version check
     auto sec_version = BlackLibraryCommon::GetMD5Hash(section_content);
-    BlackLibraryCommon::LogDebug(parser_name_, "Version hash: {}", sec_version);
+    BlackLibraryCommon::LogDebug(parser_name_, "Section UUID: {} index: {} checksum hash: {}", uuid_, index_, sec_version);
 
     if (saved_version == sec_version)
     {

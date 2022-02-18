@@ -56,8 +56,8 @@ public:
     int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 protected:
+    std::string SectionDumpContent(const xmlDocPtr doc_ptr, const xmlNodePtr node_ptr);
     bool SectionFileSave(const std::string &section_content, const std::string &section_file_name);
-    bool SectionVersionCheck(xmlDocPtr doc_ptr);
     virtual int CalculateIndexBounds(const ParserJob &parser_job);
     virtual void ExpendedAttempts();
     virtual void FindMetaData(xmlNodePtr root_node);

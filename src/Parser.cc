@@ -240,6 +240,16 @@ int Parser::RegisterVersionUpdateCallback(const version_update_callback &callbac
     return 0;
 }
 
+std::string Parser::SectionDumpContent(const xmlDocPtr doc_ptr, const xmlNodePtr node_ptr)
+{
+    xmlBufferPtr section_buf = xmlBufferCreate();
+    xmlNodeDump(section_buf, doc_ptr, node_ptr, 0, 1);
+    const std::string section_content = std::string((char *) section_buf->content);
+    xmlFree(section_buf);
+
+    return section_content;
+}
+
 bool Parser::SectionFileSave(const std::string &section_content, const std::string &section_file_name)
 {
     const std::string file_path = local_des_ + section_file_name;
@@ -254,35 +264,6 @@ bool Parser::SectionFileSave(const std::string &section_content, const std::stri
     }
     ofs << section_content;
     ofs.close();
-
-    return false;
-}
-
-bool Parser::SectionVersionCheck(xmlDocPtr doc_ptr)
-{
-    std::string section_content;
-    std::string saved_version = BlackLibraryCommon::EmptyMD5Version;
-    int section_size;
-
-    if (version_read_callback_)
-        saved_version = version_read_callback_(uuid_, index_);
-
-    if (saved_version == BlackLibraryCommon::EmptyMD5Version)
-    {
-        BlackLibraryCommon::LogDebug(parser_name_, "No MD5 sum for: {} index: {}", uuid_, index_);
-        return false;
-    }
-
-    // version check
-    xmlChar *section_content_char;
-    xmlDocDumpMemory(doc_ptr, &section_content_char, &section_size);
-    auto sec_version = BlackLibraryCommon::GetMD5Hash(std::string((char *) section_content_char));
-    xmlFree(section_content_char);
-    if (saved_version == sec_version)
-    {
-        BlackLibraryCommon::LogDebug(parser_name_, "Version hash matches: {} index: {}, skip file save", uuid_, index_);
-        return true;
-    }
 
     return false;
 }
