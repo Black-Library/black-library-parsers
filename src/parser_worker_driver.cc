@@ -142,6 +142,12 @@ int main(int argc, char* argv[])
         job_1.url = "";
         job_2.url = "";
     }
+    if (opts.source == BlackLibraryParsers::parser_t::FFN_PARSER)
+    {
+        job_0.url = "";
+        job_1.url = "";
+        job_2.url = "";
+    }
     else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
     {
         job_0.url = "https://www.royalroad.com/fiction/21220/mother-of-learning";

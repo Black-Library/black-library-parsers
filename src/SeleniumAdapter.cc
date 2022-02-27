@@ -14,11 +14,12 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-SeleniumAdapter::SeleniumAdapter() {
+SeleniumAdapter::SeleniumAdapter(size_t wait_time) :NetworkAdapter(wait_time) {
     BlackLibraryCommon::InitRotatingLogger("SeleniumAdapter", "/mnt/black-library/log/", false);
 }
 
-NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
+NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url)
+{
     NetworkRequestResult result;
 
     Py_Initialize();
@@ -60,8 +61,9 @@ NetworkRequestResult SeleniumAdapter::NetworkRequest(const std::string& url) {
         return result;
     }
 
-    PyObject* args = PyTuple_New(1);
+    PyObject* args = PyTuple_New(2);
     PyTuple_SetItem(args, 0, PyUnicode_FromString(url.c_str()));
+    PyTuple_SetItem(args, 1, PyUnicode_FromFormat("%u", wait_time_));
     if (!args)
     {
         BlackLibraryCommon::LogError("SeleniumAdapter", "Unable to create args.");

@@ -14,11 +14,13 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-CurlAdapter::CurlAdapter() {
+CurlAdapter::CurlAdapter(size_t wait_time) : NetworkAdapter(wait_time) {
     BlackLibraryCommon::InitRotatingLogger("CurlAdapter", "/mnt/black-library/log/", false);
 }
 
-NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) {
+
+NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) 
+{
     NetworkRequestResult result;
 
     CURL* curl;

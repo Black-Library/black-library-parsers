@@ -20,10 +20,12 @@ namespace parsers {
 class NetworkAdapter
 {
 public:
-    NetworkAdapter();
+    NetworkAdapter(size_t wait_time = 1);
     virtual ~NetworkAdapter();
 
     virtual NetworkRequestResult NetworkRequest(const std::string& url) = 0;
+protected:
+    size_t wait_time_;
 };
 
 } // namespace parsers

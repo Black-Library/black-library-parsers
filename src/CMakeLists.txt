@@ -33,7 +33,7 @@ add_library(blacklibraryparsers
     ParserWorker.cc
 
     ParserAO3.cc
-    # ParserFFN.cc
+    ParserFFN.cc
     ParserRR.cc
     ParserSBF.cc
     ParserSVF.cc

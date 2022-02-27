@@ -10,7 +10,11 @@ namespace core {
 
 namespace parsers {
 
-NetworkAdapter::NetworkAdapter() {};
+NetworkAdapter::NetworkAdapter(size_t wait_time) 
+{
+    wait_time_ = wait_time;
+};
+
 NetworkAdapter::~NetworkAdapter() {};
 
 } // namespace parsers

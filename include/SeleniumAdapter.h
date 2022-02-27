@@ -23,7 +23,7 @@ namespace parsers {
 class SeleniumAdapter : public NetworkAdapter
 {
 public:
-    SeleniumAdapter();
+    SeleniumAdapter(size_t wait_time = 1);
     ~SeleniumAdapter() {};
 
     NetworkRequestResult NetworkRequest(const std::string& url) override;
