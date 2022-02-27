@@ -23,9 +23,7 @@
 #include "ParserCommon.h"
 #include "ParserTimeGenerator.h"
 
-#include "CurlAdapter.h"
 #include "NetworkAdapter.h"
-#include "SeleniumAdapter.h"
 
 namespace black_library {
 
@@ -73,7 +71,7 @@ protected:
     virtual void SaveMetaData(ParserResult &parser_result);
     virtual void SaveUpdateDate(ParserResult &parser_result);
 
-    std::shared_ptr<NetworkAdapter> network_ = std::make_shared<CurlAdapter>();
+    std::shared_ptr<NetworkAdapter> network_adapter_;
     progress_number_callback progress_number_callback_;
     version_read_callback version_read_callback_;
     version_read_num_callback version_read_num_callback_;
