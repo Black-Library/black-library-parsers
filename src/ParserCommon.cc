@@ -128,6 +128,9 @@ std::string GetParserName(parser_t rep)
     case parser_t::SVF_PARSER:
         return "svf_parser";
         break;
+    case parser_t::SVF_PARSER:
+        return "wp_parser";
+        break;
     case parser_t::XF_PARSER:
         return "xf_parser";
         break;
