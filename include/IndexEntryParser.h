@@ -16,7 +16,7 @@ namespace parsers {
 class IndexEntryParser : public Parser
 {
 public:
-    explicit IndexEntryParser(parser_t parser_type);
+    explicit IndexEntryParser(parser_t parser_type, const njson &config);
 
 protected:
     int CalculateIndexBounds(const ParserJob &parser_job);

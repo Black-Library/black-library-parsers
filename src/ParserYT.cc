@@ -22,8 +22,8 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 static constexpr const char YoutubeDlBaseString[] = "youtube-dl --no-overwrites --restrict-filenames --write-description --write-info-json --add-metadata ";
 
-ParserYT::ParserYT() :
-    IndexEntryParser(parser_t::YT_PARSER)
+ParserYT::ParserYT(const njson &config) :
+    IndexEntryParser(parser_t::YT_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::YT::source_name;
     source_url_ = BlackLibraryCommon::YT::source_url;

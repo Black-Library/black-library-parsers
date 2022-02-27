@@ -10,6 +10,7 @@
 
 #include <FileOperations.h>
 #include <LogOperations.h>
+#include <VersionOperations.h>
 
 #include <ParserXF.h>
 
@@ -23,8 +24,8 @@ namespace XF {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserXF::ParserXF(parser_t parser_type) :
-    LinkedListParser(parser_type)
+ParserXF::ParserXF(parser_t parser_type, const njson &config) :
+    LinkedListParser(parser_type, config)
 {
     source_name_ = BlackLibraryCommon::ERROR::source_name;
     source_url_ = BlackLibraryCommon::ERROR::source_url;
@@ -108,13 +109,8 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    const auto section_curl_result = network_adapter_.get()->NetworkRequest(working_url);
-    if (section_curl_result.has_error)
-    {
-        return output;
-    }
-
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) section_curl_result.html.c_str(), NULL, NULL,
+    const auto curl_request_result = CurlRequest(working_url);
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {
@@ -166,9 +162,10 @@ ParseSectionInfo ParserXF::ParseSection()
     last_update_date_ = GetUpdateDate(current_node->children);
 
     // skip saving content if before target start index
-    if (working_index < target_start_index_)
+    BlackLibraryCommon::LogDebug(parser_name_, "working index: {} start index: {}", working_index, target_start_index_);
+    if (working_index <= target_start_index_)
     {
-        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping filesave", target_start_index_, working_index);
+        BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping file save", target_start_index_, working_index);
         output.has_error = false;
         xmlFreeDoc(section_doc_tree);
         return output;
@@ -207,25 +204,58 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    const auto section_file_name = GetSectionFileName(working_index, sanatized_section_name);
+    std::string saved_version = BlackLibraryCommon::EmptyMD5Version;
+    bool skip_file_check = false;
 
-    FILE* section_output_file;
-    std::string file_path = local_des_ + section_file_name;
-    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
-    section_output_file = fopen(file_path.c_str(), "w+");
+    if (version_read_callback_)
+        saved_version = version_read_callback_(uuid_, index_);
 
-    if (section_output_file == NULL)
+    if (saved_version == BlackLibraryCommon::EmptyMD5Version)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
-        xmlFreeDoc(section_doc_tree);
+        BlackLibraryCommon::LogDebug(parser_name_, "No MD5 sum for: {} index: {}", uuid_, index_);
+    }
+
+    // dump content
+    auto section_content = SectionDumpContent(section_doc_tree, current_node);
+    xmlFreeDoc(section_doc_tree);
+
+    if (section_content.empty())
+    {
         return output;
     }
 
-    xmlElemDump(section_output_file, section_doc_tree, current_node);
+    // version check
+    auto sec_version = BlackLibraryCommon::GetMD5Hash(section_content);
+    BlackLibraryCommon::LogDebug(parser_name_, "Section UUID: {} index: {} checksum hash: {}", uuid_, index_, sec_version);
 
-    fclose(section_output_file);
+    if (saved_version == sec_version)
+    {
+        BlackLibraryCommon::LogDebug(parser_name_, "Version hash matches: {} index: {}, skip file save", uuid_, index_);
+        skip_file_check = true;
+    }
 
-    xmlFreeDoc(section_doc_tree);
+    // if we skip the file check we can just return after freeing the doc
+    if (skip_file_check)
+    {
+        output.has_error = false;
+        return output;
+    }
+
+    uint16_t version_num = 0;
+
+    if (version_read_num_callback_)
+        version_num = version_read_num_callback_(uuid_, index_);
+
+    const auto section_file_name = GetSectionFileName(working_index, sanatized_section_name, 0);
+
+    if (SectionFileSave(section_content, section_file_name))
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Failed section file save with UUID: {}", uuid_);
+        return output;
+    }
+
+    if (version_update_callback_)
+        version_update_callback_(uuid_, index_, sec_version, version_num);
 
     output.has_error = false;
 

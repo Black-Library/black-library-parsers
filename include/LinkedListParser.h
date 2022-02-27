@@ -16,7 +16,7 @@ namespace parsers {
 class LinkedListParser : public Parser
 {
 public:
-    explicit LinkedListParser(parser_t parser_type);
+    explicit LinkedListParser(parser_t parser_type, const njson &config);
 
 protected:
     int CalculateIndexBounds(const ParserJob &parser_job);

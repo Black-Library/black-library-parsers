@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <ConfigOperations.h>
+
 #include "BlockingQueue.h"
 #include "BlockingUnorderedMap.h"
 #include "ThreadPool.h"
@@ -27,7 +29,7 @@ namespace parsers {
 class ParserManager
 {
 public:
-    explicit ParserManager(const std::string &storage_dir, const std::string &config);
+    explicit ParserManager(const njson &config);
     ParserManager &operator = (ParserManager &&) = default;
 
     int Run();
@@ -41,9 +43,13 @@ public:
     int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number);
     int AddJob(const std::string &uuid, const std::string &url, const std::string &last_url, const size_t &start_number, const size_t &end_number,  const error_job_rep &is_error_job);
     bool GetDone();
+    bool StillWorkingOn(const std::string &uuid);
 
-    int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterDatabaseStatusCallback(const database_status_callback &callback);
+    int RegisterProgressNumberCallback(const progress_number_callback &callback);
+    int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionReadNumCallback(const version_read_num_callback &callback);
+    int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 private:
     int AddResult(ParserJobResult result);
@@ -56,8 +62,10 @@ private:
     BlockingQueue<ParserJobResult> result_queue_;
     progress_number_callback progress_number_callback_;
     database_status_callback database_status_callback_;
-    std::string config_;
-    std::string storage_dir_;
+    version_read_callback version_read_callback_;
+    version_read_num_callback version_read_num_callback_;
+    version_update_callback version_update_callback_;
+    njson config_;
     std::atomic_bool done_;
     std::atomic_bool initialized_;
 };

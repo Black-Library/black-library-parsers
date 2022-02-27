@@ -19,7 +19,7 @@ namespace SBF {
 class ParserSBF : public XF::ParserXF
 {
 public:
-    explicit ParserSBF();
+    explicit ParserSBF(const njson &config);
 
 };
 

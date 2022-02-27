@@ -21,8 +21,8 @@ namespace AO3 {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserAO3::ParserAO3() :
-    IndexEntryParser(parser_t::AO3_PARSER)
+ParserAO3::ParserAO3(const njson &config) :
+    IndexEntryParser(parser_t::AO3_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
@@ -144,7 +144,8 @@ ParseSectionInfo ParserAO3::ParseSection()
         }
     }
 
-    const auto section_file_name = GetSectionFileName(index_entry.index_num, title_);
+    const auto section_file_name = GetSectionFileName(index_entry.index_num, title_, 0);
+
     FILE* section_output_file;
     std::string file_path = local_des_ + section_file_name;
     BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
@@ -152,7 +153,7 @@ ParseSectionInfo ParserAO3::ParseSection()
 
     if (section_output_file == NULL)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Could not open file with name: {}", file_path);
+        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -160,6 +161,8 @@ ParseSectionInfo ParserAO3::ParseSection()
     xmlElemDump(section_output_file, section_doc_tree, workskin_result.seek_node);
     // TODO: figure out how to handle seg faults/other errors in threadpool/thread
     fclose(section_output_file);
+
+    xmlFreeDoc(section_doc_tree);
 
     output.has_error = false;
 

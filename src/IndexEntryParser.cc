@@ -18,8 +18,8 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-IndexEntryParser::IndexEntryParser(parser_t parser_type) : 
-    Parser(parser_type),
+IndexEntryParser::IndexEntryParser(parser_t parser_type, const njson &config) : 
+    Parser(parser_type, config),
     index_entries_()
 {
     parser_behavior_ = parser_behavior_t::INDEX_ENTRY;
@@ -93,6 +93,9 @@ void IndexEntryParser::SaveUpdateDate(ParserResult &parser_result)
         if (index_entry.time_published > parser_result.metadata.update_date)
             parser_result.metadata.update_date = index_entry.time_published;
     }
+
+    if (parser_result.metadata.update_date <= 0)
+        BlackLibraryCommon::LogError(parser_name_, "Failed to get update date for UUID: {}", uuid_);
 }
 
 } // namespace parsers

@@ -7,6 +7,8 @@
 #include <iostream>
 #include <signal.h>
 
+#include <ConfigOperations.h>
+
 #include <ParserManager.h>
 
 namespace BlackLibraryParsers = black_library::core::parsers;
@@ -15,23 +17,23 @@ BlackLibraryParsers::ParserManager *parser_manager;
 
 struct options
 {
-    std::string path = "";
-    bool initialize_db = false;
+    std::string config_path = "";
+    bool print_config = false;
 };
 
 static void Usage(const char *prog)
 {
     const char *p = strchr(prog, '/');
-    printf("usage: %s --(p)ath [-h]\n", p ? (p + 1) : prog);
+    printf("usage: %s --(c)onfig --[p]rint_config [-h]\n", p ? (p + 1) : prog);
 }
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
-    static const char *const optstr = "hp:";
+    static const char *const optstr = "c:hp";
     static const struct option long_opts[] = {
+        { "config", required_argument, 0, 'c' },
         { "help", no_argument, 0, 'h' },
-        { "path", required_argument, 0, 'p' },
-        { "verbose", no_argument, 0, 'v' },
+        { "print_config", no_argument, 0, 'p' },
         { 0, 0, 0, 0 }
     };
 
@@ -43,12 +45,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
     {
         switch (opt)
         {
+            case 'c':
+                opts->config_path = std::string(optarg);
+                break;
             case 'h':
                 Usage(argv[0]);
                 exit(0);
                 break;
             case 'p':
-                opts->path = std::string(optarg);
+                opts->print_config = true;
                 break;
             default:
                 exit(1);
@@ -90,9 +95,18 @@ int main(int argc, char* argv[])
     signal(SIGINT, SigHandler);
     signal(SIGTERM, SigHandler);
 
+    std::ifstream in_file(opts.config_path);
+    njson config;
+    in_file >> config;
+
+    if (opts.print_config)
+    {
+        std::cout << config.dump(4) << std::endl;
+    }
+
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    BlackLibraryParsers::ParserManager manager(opts.path, "");
+    BlackLibraryParsers::ParserManager manager(config);
 
     parser_manager = &manager;
 
@@ -123,7 +137,6 @@ int main(int argc, char* argv[])
     parser_manager->AddJob("some-uuid-23", "https://forums.spacebattles.com/threads/perchance-to-dream-mass-effect-commander.664360/", "https://forums.spacebattles.com/threads/perchance-to-dream-mass-effect-commander.664360/");
 
     parser_manager->AddJob("some-uuid-30", "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/", "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/");
-
 
     parser_manager->Run();
 
