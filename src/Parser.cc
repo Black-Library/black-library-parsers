@@ -25,10 +25,14 @@ namespace parsers {
 namespace BlackLibraryCommon = black_library::core::common;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Parser::Parser(parser_t parser_type) :
 =======
 Parser::Parser(parser_t parser_type, const njson &config) : 
 >>>>>>> bf14d330089a7191326c95290681a80df0b0f5eb
+=======
+Parser::Parser(parser_t parser_type, const njson &config) : 
+>>>>>>> tmp3
     progress_number_callback_(),
     version_read_callback_(),
     version_update_callback_(),
