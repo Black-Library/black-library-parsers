@@ -25,11 +25,25 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserFactory::ParserFactory()
+ParserFactory::ParserFactory(const njson &config)
 {
-    BlackLibraryCommon::InitRotatingLogger("parser_factory", "/mnt/black-library/log/", false);
+    njson nconfig = config["config"];
+
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    if (nconfig.contains("logger_path"))
+    {
+        logger_path = nconfig["logger_path"];
+    }
+
+    bool factory_log_level = BlackLibraryCommon::DefaultLogLevel;
+    if (nconfig.contains("factory_debug_log"))
+    {
+        factory_log_level = nconfig["factory_debug_log"];
+    }
+
+    BlackLibraryCommon::InitRotatingLogger("parser_factory", logger_path, factory_log_level);
     BlackLibraryCommon::LogInfo("parser_factory", "Initialize ParserFactory");
-    InitParserMap();
+    InitParserMap(config);
 }
 
 ParserFactory::~ParserFactory()
@@ -74,37 +88,37 @@ ParserFactoryResult ParserFactory::GetParserByType(parser_t parser_type)
     return result;
 }
 
-int ParserFactory::InitParserMap()
+int ParserFactory::InitParserMap(const njson &config)
 {
     parser_map_.emplace(parser_t::AO3_PARSER,
-    [](void){
+    [&](void){
         ParserFactoryResult result;
 
-        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<AO3::ParserAO3>());
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<AO3::ParserAO3>(config));
 
         return result;
     });
     parser_map_.emplace(parser_t::RR_PARSER,
-    [](void){
+    [&](void){
         ParserFactoryResult result;
 
-        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<RR::ParserRR>());
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<RR::ParserRR>(config));
 
         return result;
     });
     parser_map_.emplace(parser_t::SBF_PARSER,
-    [](void){
+    [&](void){
         ParserFactoryResult result;
 
-        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<SBF::ParserSBF>());
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<SBF::ParserSBF>(config));
 
         return result;
     });
     parser_map_.emplace(parser_t::SVF_PARSER,
-    [](void){
+    [&](void){
         ParserFactoryResult result;
 
-        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<SVF::ParserSVF>());
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<SVF::ParserSVF>(config));
 
         return result;
     });

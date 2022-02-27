@@ -20,7 +20,7 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const std::string &storage_dir, parser_t parser_type, size_t num_parsers) :
+ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, const njson &config, parser_t parser_type, size_t num_parsers) :
     pool_(num_parsers),
     job_queue_(),
     pool_results_(),
@@ -28,15 +28,41 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     progress_number_callback_(),
     job_status_callback_(),
     notify_callback_(),
-    storage_dir_(storage_dir),
-    worker_name_(""), 
+    version_read_callback_(),
+    version_read_num_callback_(),
+    version_update_callback_(),
+    storage_path_(BlackLibraryCommon::DefaultStoragePath),
+    worker_name_(""),
     parser_factory_(parser_factory),
     parser_type_(parser_type),
     done_(false)
 {
+    njson nconfig = config["config"];
+
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    if (nconfig.contains("logger_path"))
+    {
+        logger_path = nconfig["logger_path"];
+    }
+
+    bool logger_level = BlackLibraryCommon::DefaultLogLevel;
+    if (nconfig.contains("worker_debug_log"))
+    {
+        logger_level = nconfig["worker_debug_log"];
+    }
+
+    if (nconfig.contains("storage_path"))
+    {
+        storage_path_ = nconfig["storage_path"];
+    }
+
+    // okay to pop_back(), string isn't empty
+    if (storage_path_.back() == '/')
+        storage_path_.pop_back();
+
     worker_name_ = GetParserName(parser_type_) + "_worker";
 
-    BlackLibraryCommon::InitRotatingLogger(worker_name_, "/mnt/black-library/log/", false);
+    BlackLibraryCommon::InitRotatingLogger(worker_name_, logger_path, logger_level);
 
     BlackLibraryCommon::LogInfo(worker_name_, "Initialize parser worker: {} with pool size: {}", GetParserName(parser_type), pool_.GetSize());
 }
@@ -134,13 +160,13 @@ int ParserWorker::RunOnce()
 
             auto parser = factory_result.parser_result;
 
-            std::string local_file_path = storage_dir_ + '/' + parser_job.uuid + '/';
+            std::string local_file_path = storage_path_ + '/' + parser_job.uuid + '/';
 
             parser->SetLocalFilePath(local_file_path);
 
-            if (!BlackLibraryCommon::CheckFilePermission(storage_dir_))
+            if (!BlackLibraryCommon::CheckFilePermission(storage_path_))
             {
-                BlackLibraryCommon::LogError(worker_name_, "Failed to access storage directory: {}", storage_dir_);
+                BlackLibraryCommon::LogError(worker_name_, "Failed to access storage directory: {}", storage_path_);
                 return job_result;
             }
 
@@ -181,6 +207,15 @@ int ParserWorker::RunOnce()
             if (progress_number_callback_)
                 parser->RegisterProgressNumberCallback(progress_number_callback_);
 
+            if (version_read_callback_)
+                parser->RegisterVersionReadCallback(version_read_callback_);
+
+            if (version_read_num_callback_)
+                parser->RegisterVersionReadNumCallback(version_read_num_callback_);
+
+            if (version_update_callback_)
+                parser->RegisterVersionUpdateCallback(version_update_callback_);
+
             auto parser_result = parser->Parse(parser_job);
 
             if (parser_result.has_error)
@@ -202,6 +237,7 @@ int ParserWorker::RunOnce()
             job_result.metadata = parser_result.metadata;
             job_result.start_number = parser_job.start_number;
             job_result.end_number = parser_job.end_number;
+            job_result.is_error_job = parser_job.is_error_job;
 
             if (!parser_result.has_error)
                 job_result.has_error = false;
@@ -222,12 +258,12 @@ int ParserWorker::Stop()
     {
         if (result.valid())
         {
-            BlackLibraryCommon::LogWarn(worker_name_, "Stopping a job");
+            BlackLibraryCommon::LogDebug(worker_name_, "Stopping a job");
             result.wait();
         }
     }
 
-    BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker");
+    BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker with: {} remaining jobs", pool_results_.size());
 
     return 0;
 }
@@ -273,6 +309,27 @@ int ParserWorker::RegisterManagerNotifyCallback(const manager_notify_callback &c
 int ParserWorker::RegisterJobStatusCallback(const job_status_callback &callback)
 {
     job_status_callback_ = callback;
+
+    return 0;
+}
+
+int ParserWorker::RegisterVersionReadCallback(const version_read_callback &callback)
+{
+    version_read_callback_ = callback;
+
+    return 0;
+}
+
+int ParserWorker::RegisterVersionReadNumCallback(const version_read_num_callback &callback)
+{
+    version_read_num_callback_ = callback;
+
+    return 0;
+}
+
+int ParserWorker::RegisterVersionUpdateCallback(const version_update_callback &callback)
+{
+    version_update_callback_ = callback;
 
     return 0;
 }
