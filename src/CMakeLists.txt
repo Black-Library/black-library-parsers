@@ -68,17 +68,11 @@ add_executable(parser_manager_driver parser_manager_driver.cc)
 add_executable(thread_pool_example ThreadpoolExample.cc)
 add_executable(parser_tester Tester.cc)
 
-<<<<<<< HEAD
-target_link_libraries(parser_driver Parsers)
-target_link_libraries(parser_manager_driver Parsers)
-target_link_libraries(thread_pool_example Parsers)
-target_link_libraries(parser_tester Parsers)
-=======
 target_link_libraries(parser_driver blacklibraryparsers)
 target_link_libraries(parser_worker_driver blacklibraryparsers)
 target_link_libraries(parser_manager_driver blacklibraryparsers)
 target_link_libraries(thread_pool_example blacklibraryparsers)
->>>>>>> tmp2
+target_link_libraries(parser_tester blacklibraryparsers)
 
 set_target_properties(parser_driver PROPERTIES INSTALL_RPATH
     "$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
@@ -89,8 +83,4 @@ set_target_properties(parser_manager_driver PROPERTIES INSTALL_RPATH
 
 message("linker path: $LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib")
 
-<<<<<<< HEAD
-install(TARGETS parser_driver parser_manager_driver thread_pool_example parser_tester RUNTIME DESTINATION bin)
-=======
 install(TARGETS parser_driver parser_worker_driver parser_manager_driver thread_pool_example RUNTIME DESTINATION bin)
->>>>>>> tmp2

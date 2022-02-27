@@ -2,10 +2,10 @@
     #include <curl/curl.h>
 }*/
 
-#include <Parser.hh>
-//#include "ParsersConfig.h"
-#include <ParserAO3.hh>
-#include <ParserFFN.hh>
+#include <Parser.h>
+#include "ParsersConfig.h"
+#include <ParserAO3.h>
+#include <ParserFFN.h>
 
 int main(int argc, char* argv[]) {
 
