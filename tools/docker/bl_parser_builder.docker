@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install --no-install-recommends --yes\
     cmake \
     curl \
     git \
+    libcurlpp-dev \
     libsqlite3-dev \
+    libssl-dev \
     libxml2-dev \
     openssh-client \
     python3 \

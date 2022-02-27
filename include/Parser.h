@@ -17,6 +17,7 @@
 #include <libxml/HTMLparser.h>
 #include <libxml/tree.h>
 
+#include <ConfigOperations.h>
 #include <SourceInformation.h>
 
 #include "ParserCommon.h"
@@ -35,8 +36,8 @@ namespace parsers {
 class Parser
 {
 public:
-    Parser(parser_t parser_type);
-    Parser() : Parser(parser_t::ERROR_PARSER){};
+    Parser(parser_t parser_type, const njson &config);
+    // Parser() : Parser(parser_t::ERROR_PARSER, some base config?){}; TODO
     Parser(const Parser &parser);
     virtual ~Parser();
 
@@ -52,8 +53,13 @@ public:
     std::string GetSourceUrl();
 
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
+    int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionReadNumCallback(const version_read_num_callback &callback);
+    int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 protected:
+    std::string SectionDumpContent(const xmlDocPtr doc_ptr, const xmlNodePtr node_ptr);
+    bool SectionFileSave(const std::string &section_content, const std::string &section_file_name);
     virtual int CalculateIndexBounds(const ParserJob &parser_job);
     virtual void ExpendedAttempts();
     virtual void FindMetaData(xmlNodePtr root_node);
@@ -69,6 +75,9 @@ protected:
 
     std::shared_ptr<NetworkAdapter> network_ = std::make_shared<CurlAdapter>();
     progress_number_callback progress_number_callback_;
+    version_read_callback version_read_callback_;
+    version_read_num_callback version_read_num_callback_;
+    version_update_callback version_update_callback_;
     std::shared_ptr<ParserTimeGenerator> time_generator_;
 
     std::string uuid_;

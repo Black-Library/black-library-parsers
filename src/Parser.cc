@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <LogOperations.h>
+#include <VersionOperations.h>
 
 #include <Parser.h>
 #include <ShortTimeGenerator.h>
@@ -20,8 +21,14 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
+<<<<<<< HEAD
 Parser::Parser(parser_t parser_type) :
+=======
+Parser::Parser(parser_t parser_type, const njson &config) : 
+>>>>>>> bf14d330089a7191326c95290681a80df0b0f5eb
     progress_number_callback_(),
+    version_read_callback_(),
+    version_update_callback_(),
     time_generator_(std::make_shared<ShortTimeGenerator>()),
     uuid_(""),
     title_(GetParserName(parser_type) + "_title"),
@@ -38,9 +45,23 @@ Parser::Parser(parser_t parser_type) :
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false)
 {
+    njson nconfig = config["config"];
+
+    std::string logger_path = BlackLibraryCommon::DefaultLogPath;
+    if (nconfig.contains("logger_path"))
+    {
+        logger_path = nconfig["logger_path"];
+    }
+
+    bool logger_level = BlackLibraryCommon::DefaultLogLevel;
+    if (nconfig.contains("parser_debug_log"))
+    {
+        logger_level = nconfig["parser_debug_log"];
+    }
+
     parser_name_ = GetParserName(parser_type_);
 
-    BlackLibraryCommon::InitRotatingLogger(parser_name_, "/mnt/black-library/log/", false);
+    BlackLibraryCommon::InitRotatingLogger(parser_name_, logger_path, logger_level);
 }
 
 Parser::Parser(const Parser &parser) :
@@ -170,6 +191,55 @@ int Parser::RegisterProgressNumberCallback(const progress_number_callback &callb
     progress_number_callback_ = callback;
 
     return 0;
+}
+
+int Parser::RegisterVersionReadCallback(const version_read_callback &callback)
+{
+    version_read_callback_ = callback;
+
+    return 0;
+}
+
+int Parser::RegisterVersionReadNumCallback(const version_read_num_callback &callback)
+{
+    version_read_num_callback_ = callback;
+
+    return 0;
+}
+
+int Parser::RegisterVersionUpdateCallback(const version_update_callback &callback)
+{
+    version_update_callback_ = callback;
+
+    return 0;
+}
+
+std::string Parser::SectionDumpContent(const xmlDocPtr doc_ptr, const xmlNodePtr node_ptr)
+{
+    xmlBufferPtr section_buf = xmlBufferCreate();
+    xmlNodeDump(section_buf, doc_ptr, node_ptr, 0, 1);
+    const std::string section_content = std::string((char *) section_buf->content);
+    xmlFree(section_buf);
+
+    return section_content;
+}
+
+bool Parser::SectionFileSave(const std::string &section_content, const std::string &section_file_name)
+{
+    const std::string file_path = local_des_ + section_file_name;
+    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
+
+    std::ofstream ofs;
+    ofs.open(file_path);
+    if (!ofs.is_open())
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
+        return true;
+    }
+    ofs << section_content;
+    ofs.close();
+
+    return false;
 }
 
 int Parser::CalculateIndexBounds(const ParserJob &parser_job)

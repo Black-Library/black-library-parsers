@@ -11,6 +11,8 @@
 #include <queue>
 #include <vector>
 
+#include <ConfigOperations.h>
+
 #include "BlockingQueue.h"
 #include "ThreadPool.h"
 
@@ -26,7 +28,7 @@ namespace parsers {
 class ParserWorker
 {
 public:
-    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const std::string &storage_dir, parser_t parser_type, size_t num_parsers);
+    explicit ParserWorker(const std::shared_ptr<ParserFactory> parser_factory_, const njson &config, parser_t parser_type, size_t num_parsers);
     ParserWorker &operator = (ParserWorker &&) = default;
 
     int Run();
@@ -38,6 +40,9 @@ public:
     int RegisterProgressNumberCallback(const progress_number_callback &callback);
     int RegisterJobStatusCallback(const job_status_callback &callback);
     int RegisterManagerNotifyCallback(const manager_notify_callback &callback);
+    int RegisterVersionReadCallback(const version_read_callback &callback);
+    int RegisterVersionReadNumCallback(const version_read_num_callback &callback);
+    int RegisterVersionUpdateCallback(const version_update_callback &callback);
 
 private:
     void Init();
@@ -49,7 +54,10 @@ private:
     progress_number_callback progress_number_callback_;
     job_status_callback job_status_callback_;
     manager_notify_callback notify_callback_;
-    std::string storage_dir_;
+    version_read_callback version_read_callback_;
+    version_read_num_callback version_read_num_callback_;
+    version_update_callback version_update_callback_;
+    std::string storage_path_;
     std::string worker_name_;
     std::shared_ptr<ParserFactory> parser_factory_;
     std::mutex mutex_;

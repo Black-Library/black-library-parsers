@@ -7,6 +7,7 @@
 #include <FileOperations.h>
 #include <LogOperations.h>
 #include <TimeOperations.h>
+#include <VersionOperations.h>
 
 #include <ParserRR.h>
 
@@ -20,8 +21,8 @@ namespace RR {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserRR::ParserRR() :
-    IndexEntryParser(parser_t::RR_PARSER)
+ParserRR::ParserRR(const njson &config) :
+    IndexEntryParser(parser_t::RR_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::RR::source_name;
     source_url_ = BlackLibraryCommon::RR::source_url;
@@ -43,6 +44,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!td_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry td seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -52,6 +54,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!a_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry a seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -59,6 +62,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!NodeHasAttribute(current_node, "href"))
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry hrf seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -66,6 +70,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!url_result.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry url result for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -77,6 +82,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!index_entry_name_result.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry name content result for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -86,6 +92,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!time_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry time seek for UUID: {}", uuid_);
         return index_entry;
     }
 
@@ -93,10 +100,15 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     if (!time_attr_seek.found)
     {
+        BlackLibraryCommon::LogError(parser_name_, "Failed index entry time attribute seek for UUID: {}", uuid_);
         return index_entry;
     }
 
-    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%A, %B %d, %Y %I:%M %p");
+    BlackLibraryCommon::LogTrace(parser_name_, "time attribute seek result for UUID: {} : {}", uuid_, time_attr_seek.result);
+
+    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%m/%d/%Y %I:%M:%S %p");
+
+    BlackLibraryCommon::LogTrace(parser_name_, "index entry time for UUID: {} : {}", uuid_, index_entry.time_published);
 
     return index_entry;
 }
@@ -231,6 +243,7 @@ ParseSectionInfo ParserRR::ParseSection()
 
     output.length = length;
 
+    // generate section file name from index entry
     const auto section_name = GetRRIndexEntryTitle(index_entry);
 
     const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(section_name);
@@ -242,25 +255,58 @@ ParseSectionInfo ParserRR::ParseSection()
         return output;
     }
 
-    const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name);
+    std::string saved_version = BlackLibraryCommon::EmptyMD5Version;
+    bool skip_file_check = false;
 
-    FILE* section_output_file;
-    std::string file_path = local_des_ + section_file_name;
-    BlackLibraryCommon::LogDebug(parser_name_, "FILEPATH: {}", file_path);
-    section_output_file = fopen(file_path.c_str(), "w+");
+    if (version_read_callback_)
+        saved_version = version_read_callback_(uuid_, index_);
 
-    if (section_output_file == NULL)
+    if (saved_version == BlackLibraryCommon::EmptyMD5Version)
     {
-        BlackLibraryCommon::LogError(parser_name_, "Failed to open file with path: {}", file_path);
-        xmlFreeDoc(section_doc_tree);
+        BlackLibraryCommon::LogDebug(parser_name_, "No MD5 sum for: {} index: {}", uuid_, index_);
+    }
+
+    // dump content
+    auto section_content = SectionDumpContent(section_doc_tree, current_node);
+    xmlFreeDoc(section_doc_tree);
+
+    if (section_content.empty())
+    {
         return output;
     }
 
-    xmlElemDump(section_output_file, section_doc_tree, current_node);
+    // version check
+    auto sec_version = BlackLibraryCommon::GetMD5Hash(section_content);
+    BlackLibraryCommon::LogDebug(parser_name_, "Section UUID: {} index: {} checksum hash: {}", uuid_, index_, sec_version);
 
-    fclose(section_output_file);
+    if (saved_version == sec_version)
+    {
+        BlackLibraryCommon::LogDebug(parser_name_, "Version hash matches: {} index: {}, skip file save", uuid_, index_);
+        skip_file_check = true;
+    }
 
-    xmlFreeDoc(section_doc_tree);
+    // if we skip the file check we can just return after freeing the doc
+    if (skip_file_check)
+    {
+        output.has_error = false;
+        return output;
+    }
+
+    uint16_t version_num = 0;
+
+    if (version_read_num_callback_)
+        version_num = version_read_num_callback_(uuid_, index_);
+
+    const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name, version_num);
+
+    if (SectionFileSave(section_content, section_file_name))
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Failed section file save with UUID: {}", uuid_);
+        return output;
+    }
+
+    if (version_update_callback_)
+        version_update_callback_(uuid_, index_, sec_version, version_num);
 
     output.has_error = false;
 

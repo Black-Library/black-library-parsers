@@ -54,25 +54,29 @@ inline std::shared_ptr<Parser> ParserCast(T const &p)
 
 struct options
 {
+    std::string config_path = "";
     BlackLibraryParsers::parser_t source;
     size_t start_number = 1;
     size_t end_number = 0;
     uint8_t length;
+    bool print_config = false;
 };
 
 static void Usage(const char *prog)
 {
     const char *p = strchr(prog, '/');
-    printf("usage: %s --source_(t)arget source --(l)ength 0-2 --section_[s]tart (start number) --section_[e]nd (end number) [-h]\n", p ? (p + 1) : prog);
+    printf("usage: %s --(c)onfig --source_(t)arget source --(l)ength 0-2 --section_[s]tart (start number) --section_[e]nd (end number) [-h]\n", p ? (p + 1) : prog);
 }
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
-    static const char *const optstr = "e:hl:s:t:";
+    static const char *const optstr = "c:e:hl:ps:t:";
     static const struct option long_opts[] = {
+        { "config", required_argument, 0, 'c' },
         { "section_end", required_argument, 0, 'e' },
         { "help", no_argument, 0, 'h' },
         { "length", required_argument, 0, 'l' },
+        { "print_config", no_argument, 0, 'p' },
         { "section_start", required_argument, 0, 's' },
         { "source_target", required_argument, 0, 't' },
         { 0, 0, 0, 0 }
@@ -86,6 +90,9 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
     {
         switch (opt)
         {
+            case 'c':
+                opts->config_path = std::string(optarg);
+                break;
             case 'e':
                 if (atoi(optarg) < 0)
                 {
@@ -107,6 +114,9 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                     exit(1);
                 }
                 opts->length = atoi(optarg);
+                break;
+            case 'p':
+                opts->print_config = true;
                 break;
             case 's':
                 if (atoi(optarg) < 0)
@@ -180,6 +190,15 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    std::ifstream in_file(opts.config_path);
+    njson config;
+    in_file >> config;
+
+    if (opts.print_config)
+    {
+        std::cout << config.dump(4) << std::endl;
+    }
+
     std::unordered_map<std::string, std::string> url_map;
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::FFN_PARSER) + "0", std::string(FFN_SHORT_URL));
@@ -200,7 +219,7 @@ int main(int argc, char* argv[])
 
     if (opts.source == BlackLibraryParsers::parser_t::AO3_PARSER)
     {
-        parser = ParserCast(std::make_shared<ParserAO3>());
+        parser = ParserCast(std::make_shared<ParserAO3>(config));
     }
     else if (opts.source == BlackLibraryParsers::parser_t::FFN_PARSER)
     {
@@ -208,19 +227,19 @@ int main(int argc, char* argv[])
     }
     else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
     {
-        parser = ParserCast(std::make_shared<ParserRR>());
+        parser = ParserCast(std::make_shared<ParserRR>(config));
     }
     else if (opts.source == BlackLibraryParsers::parser_t::SBF_PARSER)
     {
-        parser = ParserCast(std::make_shared<ParserSBF>());
+        parser = ParserCast(std::make_shared<ParserSBF>(config));
     }
     else if (opts.source == BlackLibraryParsers::parser_t::SVF_PARSER)
     {
-        parser = ParserCast(std::make_shared<ParserSVF>());
+        parser = ParserCast(std::make_shared<ParserSVF>(config));
     }
     else if (opts.source == BlackLibraryParsers::parser_t::YT_PARSER)
     {
-        parser = ParserCast(std::make_shared<ParserYT>());
+        parser = ParserCast(std::make_shared<ParserYT>(config));
     }
     else
     {

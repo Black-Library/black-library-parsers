@@ -221,6 +221,9 @@ using database_status_callback = std::function<void(ParserJobResult result)>;
 using job_status_callback = std::function<void(const ParserJob &parser_job, job_status_t job_status)>;
 using manager_notify_callback = std::function<void(ParserJobResult result)>;
 using progress_number_callback = std::function<void(const std::string &uuid, size_t progress_num, bool error)>;
+using version_read_callback = std::function<std::string(const std::string &uuid, size_t index_num)>;
+using version_read_num_callback = std::function<uint16_t(const std::string &uuid, size_t index_num)>;
+using version_update_callback = std::function<void(const std::string &uuid, size_t index_num, const std::string &md5_sum, uint64_t version_num)>;
 
 std::string GenerateXmlDocTreeString(xmlNodePtr root_node);
 std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
@@ -228,7 +231,7 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth);
 std::string GetParserBehaviorName(parser_behavior_t behavior);
 std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
-std::string GetSectionFileName(const size_t &index_num, const std::string &section_name);
+std::string GetSectionFileName(const size_t &index_num, const std::string &section_name, const uint16_t &version_num);
 std::string GetSpaceString(size_t num_tabs);
 std::string GetStatusName(job_status_t job_status);
 ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value);

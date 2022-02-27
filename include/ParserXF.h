@@ -20,7 +20,7 @@ namespace XF {
 class ParserXF : public LinkedListParser
 {
 public:
-    explicit ParserXF(parser_t parser_type);
+    explicit ParserXF(parser_t parser_type, const njson &config);
 
 protected:
     void FindMetaData(xmlNodePtr root_node);

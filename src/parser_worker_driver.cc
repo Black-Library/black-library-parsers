@@ -3,10 +3,12 @@
  */
 
 #include <getopt.h>
+#include <signal.h>
 
 #include <iostream>
 #include <memory>
-#include <signal.h>
+
+#include <ConfigOperations.h>
 
 #include <Parser.h>
 #include <ParserCommon.h>
@@ -18,6 +20,8 @@ namespace BlackLibraryParsers = black_library::core::parsers;
 struct options
 {
     BlackLibraryParsers::parser_t source;
+    std::string config_path = "";
+    bool print_config = false;
 };
 
 BlackLibraryParsers::ParserWorker *parser_worker;
@@ -25,14 +29,16 @@ BlackLibraryParsers::ParserWorker *parser_worker;
 static void Usage(const char *prog)
 {
     const char *p = strchr(prog, '/');
-    printf("usage: %s --(s)ource_target [-h]\n", p ? (p + 1) : prog);
+    printf("usage: %s --(c)onfig --[p]rint_config --(s)ource_target [-h]\n", p ? (p + 1) : prog);
 }
 
 static int ParseOptions(int argc, char **argv, struct options *opts)
 {
-    static const char *const optstr = "hs:";
+    static const char *const optstr = "c:hps:";
     static const struct option long_opts[] = {
+        { "config", required_argument, 0, 'c' },
         { "help", no_argument, 0, 'h' },
+        { "print_config", no_argument, 0, 'p' },
         { "source_target", required_argument, 0, 's' },
         { 0, 0, 0, 0 }
     };
@@ -45,9 +51,15 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
     {
         switch (opt)
         {
+            case 'c':
+                opts->config_path = std::string(optarg);
+                break;
             case 'h':
                 Usage(argv[0]);
                 exit(0);
+                break;
+            case 'p':
+                opts->print_config = true;
                 break;
             case 's':
                 if (std::string(optarg) == "ao3")
@@ -111,20 +123,37 @@ int main(int argc, char* argv[])
     signal(SIGINT, SigHandler);
     signal(SIGTERM, SigHandler);
 
+    std::ifstream in_file(opts.config_path);
+    njson rconfig;
+    in_file >> rconfig;
+
+    if (opts.print_config)
+    {
+        std::cout << rconfig.dump(4) << std::endl;
+    }
+
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     using dummy_worker = BlackLibraryParsers::ParserWorker;
 
-    auto factory = std::make_shared<BlackLibraryParsers::ParserFactory>();
+    auto factory = std::make_shared<BlackLibraryParsers::ParserFactory>(rconfig);
 
-    dummy_worker dummy_worker_0(factory, "/mnt/black-library/store", BlackLibraryParsers::parser_t::ERROR_PARSER, 3);
+    njson nconfig = rconfig["config"];
+
+    std::string storage_path;
+    if (nconfig.contains("storage_path"))
+    {
+        storage_path = nconfig["storage_path"];
+    }
+
+    dummy_worker dummy_worker_0(factory, storage_path, BlackLibraryParsers::parser_t::ERROR_PARSER, 3);
 
     if (opts.source == BlackLibraryParsers::parser_t::ERROR_PARSER)
     {
         std::cout << "Failed to match parser source" << std::endl;
     }
 
-    dummy_worker dummy_worker_1(factory, "/mnt/black-library/store", opts.source, 2);
+    dummy_worker dummy_worker_1(factory, storage_path, opts.source, 2);
 
     parser_worker = &dummy_worker_1;
 
