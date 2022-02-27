@@ -1,10 +1,9 @@
 /**
- * ParserAO3.h
+ * ParserFFN.h
  */
 
-#include <Parser.hh>
-#ifndef __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
-#define __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
+#ifndef __BLACK_LIBRARY_CORE_PARSERS_FFN_PARSER_FFN_H__
+#define __BLACK_LIBRARY_CORE_PARSERS_FFN_PARSER_FFN_H__
 
 #include "IndexEntryParser.h"
 
@@ -14,28 +13,29 @@ namespace core {
 
 namespace parsers {
 
-namespace AO3 {
+namespace FFN {
 
-class ParserAO3 : public IndexEntryParser
+class ParserFFN : public IndexEntryParser
 {
 public:
-    explicit ParserAO3();
-    ~ParserAO3();
+    explicit ParserFFN();
 
 protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    virtual ParseSectionInfo ParseSection();
+    ParseSectionInfo ParseSection();
     std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 
-private:
+    std::string ParseTitle();
+    std::string ParseAuthor();
 
+private:
 };
 
-} // namespace AO3
+} // namespace FFN
 
 } // namespace parsers
 } // namespace core

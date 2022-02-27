@@ -1,10 +1,9 @@
 /**
- * ParserAO3.h
+ * ParserYTR.h
  */
 
-#include <Parser.hh>
-#ifndef __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
-#define __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
+#ifndef __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
+#define __BLACK_LIBRARY_CORE_PARSERS_YT_PARSER_YT_H__
 
 #include "IndexEntryParser.h"
 
@@ -14,29 +13,28 @@ namespace core {
 
 namespace parsers {
 
-namespace AO3 {
+namespace YT {
 
-class ParserAO3 : public IndexEntryParser
+class ParserYT : public IndexEntryParser
 {
 public:
-    explicit ParserAO3();
-    ~ParserAO3();
+    explicit ParserYT();
 
 protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);
     void FindIndexEntries(xmlNodePtr root_node);
     void FindMetaData(xmlNodePtr root_node);
-    virtual ParseSectionInfo ParseSection();
+    ParseSectionInfo ParseSection();
     std::string PreprocessTargetUrl(const ParserJob &parser_job);
 
-    ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
+    std::string GetYTIndexEntryTitle(const ParserIndexEntry &index_entry);
+    ParserXmlNodeSeek SeekToIndexEntryContent(xmlNodePtr root_node);
 
-private:
+    bool is_playlist;
 
 };
 
-} // namespace AO3
-
+} // namespace YT
 } // namespace parsers
 } // namespace core
 } // namespace black_library

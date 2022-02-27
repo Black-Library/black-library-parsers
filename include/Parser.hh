@@ -1,58 +1,102 @@
-#ifndef __PARSER_H__
-#define __PARSER_H__
+/**
+ * Parser.h
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
+#define __BLACK_LIBRARY_CORE_PARSERS_PARSER_H__
+
 #include <string.h>
 
 #include <atomic>
 #include <fstream>
-#include <iostream>
+#include <memory>
+#include <mutex>
 #include <string>
 
 #include <curl/curl.h>
 #include <libxml/HTMLparser.h>
-#include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include <Result.hh>
-#include <SourceInformation.hh>
+#include <SourceInformation.h>
 
-namespace librarycore {
+#include "ParserCommon.h"
+#include "ParserTimeGenerator.h"
+
+#include "CurlAdapter.h"
+#include "NetworkAdapter.h"
+#include "SeleniumAdapter.h"
+
+namespace black_library {
+
+namespace core {
+
+namespace parsers {
+
 class Parser
 {
 public:
-    Parser(std::string url);
-    Parser() : Parser(""){};
+    Parser(parser_t parser_type);
+    Parser() : Parser(parser_t::ERROR_PARSER){};
+    Parser(const Parser &parser);
     virtual ~Parser();
 
-    virtual Result Parse();
-    virtual Parser Copy();
-    std::string CurlRequest(std::string url);
-    xmlNode* GetElementAttr(xmlNode* root, std::string attr, std::string value);
+    virtual ParserResult Parse(const ParserJob &parser_job);
+    void Stop();
 
-    void SetUrl(std::string url);
-    void SetLocalFilePath(std::string local_des);
-    void ParseUrl();
+    void SetLocalFilePath(const std::string &local_des);
 
-    std::string GetLocalDes();
-    std::string GetTitle();
-    std::string GetUrl();
-    parser_rep GetSource();
+    bool GetDone();
+    parser_t GetParserType();
+    parser_behavior_t GetParserBehaviorType();
+    std::string GetSourceName();
+    std::string GetSourceUrl();
+
+    int RegisterProgressNumberCallback(const progress_number_callback &callback);
 
 protected:
-    virtual Result ParseChapter(int chap_num);
-    virtual Result ParseChapter(std::string url);
+    virtual int CalculateIndexBounds(const ParserJob &parser_job);
+    virtual void ExpendedAttempts();
+    virtual void FindMetaData(xmlNodePtr root_node);
+    virtual void ParseLoop(ParserResult &parser_result);
+    virtual ParseSectionInfo ParseSection();
+    virtual void PostParseLoop(ParserResult &parser_result);
+    virtual int PreParseLoop(xmlNodePtr root_node, const ParserJob &parser_job);
+    virtual std::string PreprocessTargetUrl(const ParserJob &parser_job);
+    virtual bool ReachedEnd();
+    virtual void SaveLastUrl(ParserResult &parser_result);
+    virtual void SaveMetaData(ParserResult &parser_result);
+    virtual void SaveUpdateDate(ParserResult &parser_result);
 
-    std::string local_des;
-    std::string title;
-    std::string url;
-    parser_rep source;
+    std::shared_ptr<NetworkAdapter> network_ = std::make_shared<CurlAdapter>();
+    progress_number_callback progress_number_callback_;
+    std::shared_ptr<ParserTimeGenerator> time_generator_;
+
+    std::string uuid_;
+    std::string title_;
+    std::string nickname_;
+    std::string source_name_;
+    std::string source_url_;
+    std::string author_;
+
+    std::string target_url_;
+    std::string local_des_;
+    std::string parser_name_;
+
+    size_t index_;
+    size_t end_index_;
+
+    std::mutex mutex_;
+    parser_t parser_type_;
+    parser_behavior_t parser_behavior_;
+    std::atomic_bool done_;
 
 private:
 };
 
 size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
 
-} // namespace librarycore
+} // namespace parsers
+} // namespace core
+} // namespace black_library
+
 #endif

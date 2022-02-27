@@ -1,0 +1,6 @@
+[submodule "ext/catch2"]
+	path = ext/catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "ext/black-library-common"]
+	path = ext/black-library-common
+	url = git@github.com:Black-Library/black-library-common.git

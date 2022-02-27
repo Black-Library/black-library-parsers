@@ -10,7 +10,7 @@ int main()
     ThreadPool pool(4);
     std::vector< std::future<int> > results;
 
-    for(int i = 0; i < 8; ++i) {
+    for(int i = 0; i < 16; ++i) {
         results.emplace_back(
             pool.enqueue([i] {
                 std::cout << "hello " << i << std::endl;
@@ -20,6 +20,15 @@ int main()
             })
         );
     }
+
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
+    std::cout << "other work" << std::endl;
 
     for(auto && result: results)
         std::cout << result.get() << ' ';
