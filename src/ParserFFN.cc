@@ -19,10 +19,16 @@ namespace FFN {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserFFN::ParserFFN() : IndexEntryParser(parser_t::FFN_PARSER)
+ParserFFN::ParserFFN(const njson &config) : 
+    IndexEntryParser(parser_t::FFN_PARSER, config)
 {
     source_url_ = BlackLibraryCommon::FFN::source_url;
     network_ = std::make_shared<SeleniumAdapter>(10);
+}
+
+ParserFFN::~ParserFFN()
+{
+    done_ = true;
 }
 
 ParserIndexEntry ParserFFN::ExtractIndexEntry(xmlNodePtr root_node) 
@@ -135,7 +141,10 @@ ParseSectionInfo ParserFFN::ParseSection() {
 
     const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(index_entry.name);
 
-    const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name);
+    uint16_t version_num = 0;
+    if (version_read_num_callback_)
+        version_num = version_read_num_callback_(uuid_, index_);
+    const auto section_file_name = GetSectionFileName(index_entry.index_num, sanatized_section_name, version_num);
 
     FILE* section_output_file;
     std::string file_path = local_des_ + section_file_name;

@@ -20,9 +20,14 @@ int main(int argc, char* argv[]) {
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    librarycore::FFN::ParserFFN parser;
-    parser.SetUrl("https://www.fanfiction.net/s/8019901");
-    parser.Parse();
+    njson j;
+    black_library::core::parsers::FFN::ParserFFN parser(j);
+    black_library::core::parsers::ParserJob testJob = {
+        "TESTUUID",
+        "https://www.fanfiction.net/s/8019901",
+        ""
+    };
+    parser.Parse(testJob);
 
     curl_global_cleanup();
 

@@ -18,7 +18,8 @@ namespace FFN {
 class ParserFFN : public IndexEntryParser
 {
 public:
-    explicit ParserFFN();
+    explicit ParserFFN(const njson &config);
+    ~ParserFFN();
 
 protected:
     ParserIndexEntry ExtractIndexEntry(xmlNodePtr root_node);

@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
     }
     else if (opts.source == BlackLibraryParsers::parser_t::FFN_PARSER)
     {
-        parser = ParserCast(std::make_shared<ParserFFN>());
+        parser = ParserCast(std::make_shared<ParserFFN>(config));
     }
     else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
     {

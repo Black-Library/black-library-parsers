@@ -110,7 +110,7 @@ ParseSectionInfo ParserXF::ParseSection()
     }
 
     const auto curl_request_result = network_.get()->NetworkRequest(working_url);
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {
