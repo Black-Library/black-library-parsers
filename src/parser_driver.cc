@@ -13,12 +13,18 @@
 #include <Parser.h>
 
 #include <ParserAO3.h>
+#include <ParserFFN.h>
 #include <ParserRR.h>
 #include <ParserSBF.h>
 #include <ParserSVF.h>
 #include <ParserYT.h>
 
 static constexpr const char AO3_SHORT_URL[] = "https://archiveofourown.org/works/505809";
+static constexpr const char FFN_SHORT_URL[]     = "https://www.fanfiction.net/s/13805484";
+static constexpr const char FFN_SHORTPLUS_URL[] = "https://www.fanfiction.net/s/13805484/";
+static constexpr const char FFN_MED_URL[]       = "https://www.fanfiction.net/s/13805484/5";
+static constexpr const char FFN_MEDPLUS_URL[]   = "https://www.fanfiction.net/s/13805484/5/";
+static constexpr const char FFN_LONG_URL[]      = "https://www.fanfiction.net/s/13805484/5/Clone-Effect";
 static constexpr const char RR_0_URL[] = "https://www.royalroad.com/fiction/15614/daedalus";
 static constexpr const char RR_SHORT_URL[] = "https://www.royalroad.com/fiction/17731/i-never-wanted-you-dead";
 static constexpr const char RR_LONG_URL[] = "https://www.royalroad.com/fiction/21220/mother-of-learning";
@@ -34,6 +40,7 @@ using ParserJob = BlackLibraryParsers::ParserJob;
 
 using Parser = BlackLibraryParsers::Parser;
 using ParserAO3 = BlackLibraryParsers::AO3::ParserAO3;
+using ParserFFN = BlackLibraryParsers::FFN::ParserFFN;
 using ParserRR = BlackLibraryParsers::RR::ParserRR;
 using ParserSBF = BlackLibraryParsers::SBF::ParserSBF;
 using ParserSVF = BlackLibraryParsers::SVF::ParserSVF;
@@ -125,6 +132,10 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 {
                     opts->source = BlackLibraryParsers::parser_t::AO3_PARSER;
                 }
+                else if (std::string(optarg) == "ffn")
+                {
+                    opts->source = BlackLibraryParsers::parser_t::FFN_PARSER;
+                }
                 else if (std::string(optarg) == "rr")
                 {
                     opts->source = BlackLibraryParsers::parser_t::RR_PARSER;
@@ -190,6 +201,11 @@ int main(int argc, char* argv[])
 
     std::unordered_map<std::string, std::string> url_map;
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::AO3_PARSER) + "1", std::string(AO3_SHORT_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::FFN_PARSER) + "0", std::string(FFN_SHORT_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::FFN_PARSER) + "1", std::string(FFN_SHORTPLUS_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::FFN_PARSER) + "2", std::string(FFN_MED_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::FFN_PARSER) + "3", std::string(FFN_MEDPLUS_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::FFN_PARSER) + "4", std::string(FFN_LONG_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "0", std::string(RR_0_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "1", std::string(RR_SHORT_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::RR_PARSER) + "2", std::string(RR_LONG_URL));
@@ -204,6 +220,10 @@ int main(int argc, char* argv[])
     if (opts.source == BlackLibraryParsers::parser_t::AO3_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserAO3>(config));
+    }
+    else if (opts.source == BlackLibraryParsers::parser_t::FFN_PARSER)
+    {
+        parser = ParserCast(std::make_shared<ParserFFN>(config));
     }
     else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
     {

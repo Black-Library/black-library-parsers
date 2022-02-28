@@ -24,6 +24,7 @@ ParserAO3::ParserAO3(const njson &config) :
 {
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
+    network_ = std::make_shared<SeleniumAdapter>();
 }
 
 ParserAO3::~ParserAO3()
@@ -88,9 +89,13 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto index_entry = index_entries_[index_];
 
     const auto url_adult = index_entry.data_url;
-    const auto index_entry_curl_result = CurlRequest(url_adult);
+    const auto index_entry_curl_result = network_.get()->NetworkRequest(url_adult);
+    if (index_entry_curl_result.has_error)
+    {
+        return output;
+    }
 
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (!section_doc_tree)
     {
@@ -130,7 +135,6 @@ ParseSectionInfo ParserAO3::ParseSection()
         ParserXmlContentResult w_result = GetXmlNodeContent(words_result.seek_node);
         if (w_result.found && strcmp(w_result.result.c_str(), ""))
         {
-            std::cout << w_result.result << std::endl;
             output.length = (size_t) std::stoi(w_result.result) / 1000;
         }
     }

@@ -23,6 +23,10 @@
 #include "ParserCommon.h"
 #include "ParserTimeGenerator.h"
 
+#include "CurlAdapter.h"
+#include "NetworkAdapter.h"
+#include "SeleniumAdapter.h"
+
 namespace black_library {
 
 namespace core {
@@ -39,8 +43,6 @@ public:
 
     virtual ParserResult Parse(const ParserJob &parser_job);
     void Stop();
-
-    std::string CurlRequest(const std::string &url);
 
     void SetLocalFilePath(const std::string &local_des);
 
@@ -71,6 +73,7 @@ protected:
     virtual void SaveMetaData(ParserResult &parser_result);
     virtual void SaveUpdateDate(ParserResult &parser_result);
 
+    std::shared_ptr<NetworkAdapter> network_ = std::make_shared<CurlAdapter>();
     progress_number_callback progress_number_callback_;
     version_read_callback version_read_callback_;
     version_read_num_callback version_read_num_callback_;

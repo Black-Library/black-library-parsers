@@ -178,16 +178,18 @@ inline std::ostream& operator << (std::ostream &o, const ParserJobResult &job_re
 
 struct ParserResult {
     ParserResultMetadata metadata;
-
-    std::string debug_string;
     error_job_rep is_error_job = false;
+    bool has_error = true;
+};
+
+struct NetworkRequestResult {
+    std::string html = "";
     bool has_error = true;
 };
 
 inline std::ostream& operator << (std::ostream &o, const ParserResult &parser_result)
 {
     o << "metadata: " << parser_result.metadata << " ";
-    o << "debug_string: " << parser_result.debug_string << " ";
     o << "is_error_job: " << parser_result.is_error_job << " ";
     o << "has_error: " << parser_result.has_error;
 

@@ -2,6 +2,7 @@
  * ParserAO3.h
  */
 
+#include <Parser.h>
 #ifndef __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
 #define __BLACK_LIBRARY_CORE_PARSERS_AO3_PARSER_AO3_H__
 
@@ -31,7 +32,7 @@ protected:
     ParserTimeResult GetPublishedTime(xmlNodePtr root_node);
 
 private:
-    
+
 };
 
 } // namespace AO3

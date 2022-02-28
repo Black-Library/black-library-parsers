@@ -41,3 +41,8 @@ install
 
 # Test files
 .html
+
+# Python Binaries
+*.pyc
+src/__pycache__
+src/geckodriver.log
