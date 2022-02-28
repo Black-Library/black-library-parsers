@@ -242,7 +242,6 @@ int Parser::CalculateIndexBounds(const ParserJob &parser_job)
 {
     index_ = parser_job.start_number - 1;
     end_index_ = parser_job.end_number -1;
-
     return 0;
 }
 
