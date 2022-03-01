@@ -76,7 +76,7 @@ void SigHandler(int sig)
         parser_manager->Stop();
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     struct options opts;
 
