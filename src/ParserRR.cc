@@ -106,7 +106,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     BlackLibraryCommon::LogTrace(parser_name_, "time attribute seek result for UUID: {} : {}", uuid_, time_attr_seek.result);
 
-    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%m/%d/%Y %I:%M:%S %p");
+    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%Y-%m-%dT%H:%M:%S");
 
     BlackLibraryCommon::LogTrace(parser_name_, "index entry time for UUID: {} : {}", uuid_, index_entry.time_published);
 
