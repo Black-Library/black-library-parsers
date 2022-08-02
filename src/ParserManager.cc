@@ -36,7 +36,7 @@ ParserManager::ParserManager(const njson &config) :
     done_(true),
     initialized_(false)
 {
-    njson nconfig = config["config"];
+    njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
     std::string logger_path = BlackLibraryCommon::DefaultLogPath;
     std::string storage_path = BlackLibraryCommon::DefaultStoragePath;
@@ -284,6 +284,22 @@ int ParserManager::AddJob(const std::string &uuid, const std::string &url, const
     job_queue_.push(parser_job);
 
     return 0;
+}
+
+std::vector<ParserJobStatusTracker> ParserManager::GetCurrentJobList()
+{
+    std::vector<ParserJobStatusTracker> job_list;
+    auto map_keys = current_jobs_.get_map_keys();
+
+    for (const auto &key : map_keys)
+    {
+        ParserJobStatusTracker tracker;
+        tracker.uuid = key.first;
+        tracker.is_error_job = key.second;
+        // tracker.job_status = current_jobs_.find(key);
+    }
+
+    return job_list;
 }
 
 bool ParserManager::GetDone()

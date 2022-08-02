@@ -96,6 +96,13 @@ struct ParserJobHash
     }
 };
 
+struct ParserJobStatusTracker
+{
+    std::string uuid;
+    job_status_t job_status;
+    error_job_rep is_error_job = false;
+};
+
 struct CurrentJobPairHash
 {
     std::size_t operator() (const std::pair<const std::string, error_job_rep> &pair) const

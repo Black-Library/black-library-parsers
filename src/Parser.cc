@@ -41,7 +41,7 @@ Parser::Parser(parser_t parser_type, const njson &config) :
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false)
 {
-    njson nconfig = config["config"];
+    njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
     std::string logger_path = BlackLibraryCommon::DefaultLogPath;
     if (nconfig.contains("logger_path"))

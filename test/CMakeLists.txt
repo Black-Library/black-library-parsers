@@ -1,5 +1,6 @@
 set(SOURCES_TESTS
     parser_test.cc
+    parser_manager_test.cc
     )
 
 string( REPLACE ".cc" "" BASENAMES_TESTS "${SOURCES_TESTS}" )

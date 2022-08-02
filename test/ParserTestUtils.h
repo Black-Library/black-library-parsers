@@ -13,19 +13,17 @@ namespace core {
 
 namespace parsers {
 
-static constexpr const char DefaultTestDBPath[] = "/tmp/catalog.db";
+static constexpr const char DefaultTestLogPath[] = "/tmp/log";
+static constexpr const char DefaultTestStoragePath[] = "/tmp/store";
 
-njson GenerateTestConfig()
+static constexpr const char RR_DUMMY_URL[] = "https://www.royalroad.com/fiction/00000/some-fiction";
+
+njson GenerateParserTestConfig()
 {
     njson j;
 
-
-    return j;
-}
-
-njson GenerateEmptyTestConfig()
-{
-    njson j;
+    j["config"]["logger_path"] = DefaultTestLogPath;
+    j["config"]["storage_path"] = DefaultTestStoragePath;
 
     return j;
 }
