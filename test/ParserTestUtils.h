@@ -24,6 +24,8 @@ njson GenerateParserTestConfig()
 
     j["config"]["logger_path"] = DefaultTestLogPath;
     j["config"]["storage_path"] = DefaultTestStoragePath;
+    j["config"]["worker_debug_log"] = true;
+    j["config"]["parser_debug_log"] = true;
 
     return j;
 }
