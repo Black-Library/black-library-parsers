@@ -223,6 +223,8 @@ int ParserManager::Stop()
 
     BlackLibraryCommon::LogInfo("parser_manager", "Stopped manager");
 
+    BlackLibraryCommon::CloseLogger("parser_manager");
+
     return 0;
 }
 
@@ -294,9 +296,11 @@ std::vector<ParserJobStatusTracker> ParserManager::GetCurrentJobList()
     for (const auto &key : map_keys)
     {
         ParserJobStatusTracker tracker;
-        tracker.uuid = key.first;
-        tracker.is_error_job = key.second;
-        // tracker.job_status = current_jobs_.find(key);
+        auto job = current_jobs_.find(key);
+        tracker.uuid = job->first.first;
+        tracker.is_error_job = job->first.second;
+        tracker.job_status = job->second;
+        job_list.emplace_back(tracker);
     }
 
     return job_list;

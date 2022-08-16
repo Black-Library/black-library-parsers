@@ -265,6 +265,8 @@ int ParserWorker::Stop()
 
     BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker with: {} remaining jobs", pool_results_.size());
 
+    BlackLibraryCommon::CloseLogger(worker_name_);
+
     return 0;
 }
 
