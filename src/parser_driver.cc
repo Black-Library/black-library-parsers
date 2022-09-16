@@ -27,6 +27,7 @@ static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/th
 static constexpr const char SVF_LONG_URL[] = "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/";
 static constexpr const char YT_SHORT_URL[] = "https://www.youtube.com/watch?v=GRHat19F2Kg";
 static constexpr const char YT_LONG_URL[] = "https://www.youtube.com/playlist?list=PLDb22nlVXGgdg_NR_-GtTrMnbMVmtSSXa";
+static constexpr const char EMPTY_URL[] = "";
 
 namespace BlackLibraryParsers = black_library::core::parsers;
 
@@ -125,6 +126,10 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 {
                     opts->source = BlackLibraryParsers::parser_t::AO3_PARSER;
                 }
+                if (std::string(optarg) == "empty")
+                {
+                    opts->source = BlackLibraryParsers::parser_t::ERROR_PARSER;
+                }
                 else if (std::string(optarg) == "rr")
                 {
                     opts->source = BlackLibraryParsers::parser_t::RR_PARSER;
@@ -198,12 +203,17 @@ int main(int argc, char *argv[])
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SVF_PARSER) + "2", std::string(SVF_LONG_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::YT_PARSER) + "1", std::string(YT_SHORT_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::YT_PARSER) + "2", std::string(YT_LONG_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::ERROR_PARSER) + "0", std::string(EMPTY_URL));
 
     std::shared_ptr<Parser> parser;
 
     if (opts.source == BlackLibraryParsers::parser_t::AO3_PARSER)
     {
         parser = ParserCast(std::make_shared<ParserAO3>(config));
+    }
+    else if (opts.source == BlackLibraryParsers::parser_t::ERROR_PARSER)
+    {
+        parser = std::make_shared<Parser>(BlackLibraryParsers::parser_t::ERROR_PARSER, config);
     }
     else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
     {

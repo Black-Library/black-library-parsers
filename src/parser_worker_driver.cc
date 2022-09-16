@@ -8,6 +8,8 @@
 #include <iostream>
 #include <memory>
 
+#include <libxml/HTMLparser.h>
+
 #include <ConfigOperations.h>
 
 #include <Parser.h>
@@ -124,36 +126,28 @@ int main(int argc, char *argv[])
     signal(SIGTERM, SigHandler);
 
     std::ifstream in_file(opts.config_path);
-    njson rconfig;
-    in_file >> rconfig;
+    njson nconfig;
+    in_file >> nconfig;
 
     if (opts.print_config)
     {
-        std::cout << rconfig.dump(4) << std::endl;
+        std::cout << nconfig.dump(4) << std::endl;
     }
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     using dummy_worker = BlackLibraryParsers::ParserWorker;
 
-    auto factory = std::make_shared<BlackLibraryParsers::ParserFactory>(rconfig);
+    auto factory = std::make_shared<BlackLibraryParsers::ParserFactory>(nconfig);
 
-    njson nconfig = rconfig["config"];
-
-    std::string storage_path;
-    if (nconfig.contains("storage_path"))
-    {
-        storage_path = nconfig["storage_path"];
-    }
-
-    dummy_worker dummy_worker_0(factory, storage_path, BlackLibraryParsers::parser_t::ERROR_PARSER, 3);
+    dummy_worker dummy_worker_0(factory, nconfig, BlackLibraryParsers::parser_t::ERROR_PARSER, 3);
 
     if (opts.source == BlackLibraryParsers::parser_t::ERROR_PARSER)
     {
         std::cout << "Failed to match parser source" << std::endl;
     }
 
-    dummy_worker dummy_worker_1(factory, storage_path, opts.source, 2);
+    dummy_worker dummy_worker_1(factory, nconfig, opts.source, 2);
 
     parser_worker = &dummy_worker_1;
 
@@ -222,6 +216,7 @@ int main(int argc, char *argv[])
     parser_worker->Run();
 
     curl_global_cleanup();
+    xmlCleanupParser();
 
     std::cout << "Tester exit successful" << std::endl;
 
