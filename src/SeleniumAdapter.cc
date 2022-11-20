@@ -14,7 +14,7 @@ namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-SeleniumAdapter::SeleniumAdapter(size_t wait_time) :NetworkAdapter(wait_time) {
+SeleniumAdapter::SeleniumAdapter(size_t wait_time) : NetworkAdapter(wait_time) {
     BlackLibraryCommon::InitRotatingLogger("SeleniumAdapter", "/mnt/black-library/log/", false);
 }
 

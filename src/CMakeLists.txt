@@ -14,7 +14,10 @@ if (REQUIRE_PYTHON)
         message(FATAL_ERROR "ERROR: Missing Python Deps: " ${PYTHON_DEPS_OUTPUT})
         return(1)
     endif()
-    add_compile_definitions(WITH_PYTHON)
+    # Needs to be enabled for Selenium parsing to work
+    # By default all parsers use curl, those parser which prefer
+    # selenium will only use it with python
+    # add_compile_definitions(WITH_PYTHON)
 else()
     message("REQUIRE_PYTHON OFF")
 endif()
@@ -43,10 +46,20 @@ add_library(blacklibraryparsers
 
     ReaderTimeGenerator.cc
     ShortTimeGenerator.cc
-    )
 
-target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
-target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+    NetworkAdapter.cc
+    CurlAdapter.cc
+    SeleniumAdapter.cc
+
+    SeleniumAdapter.py
+    )
+if (REQUIRE_PYTHON)
+    target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} ${PYTHON_LIBRARIES} pthread)
+    target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+else()
+    target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
+    target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+endif()
 
 install(
   TARGETS blacklibraryparsers

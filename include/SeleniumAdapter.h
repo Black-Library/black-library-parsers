@@ -20,6 +20,7 @@ namespace core {
 
 namespace parsers {
 
+
 class SeleniumAdapter : public NetworkAdapter
 {
 public:

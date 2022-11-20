@@ -40,7 +40,7 @@ Parser::Parser(parser_t parser_type, const njson &config) :
     parser_type_(parser_type),
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false),
-    networkAdapter_(std::make_shared(curlAdapter))
+    networkAdapter_(*curlAdapter_)
 {
     njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
