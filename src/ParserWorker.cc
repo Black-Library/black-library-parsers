@@ -37,7 +37,7 @@ ParserWorker::ParserWorker(const std::shared_ptr<ParserFactory> parser_factory, 
     parser_type_(parser_type),
     done_(false)
 {
-    njson nconfig = config["config"];
+    njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
     std::string logger_path = BlackLibraryCommon::DefaultLogPath;
     if (nconfig.contains("logger_path"))
@@ -264,6 +264,8 @@ int ParserWorker::Stop()
     }
 
     BlackLibraryCommon::LogInfo(worker_name_, "Stopped worker with: {} remaining jobs", pool_results_.size());
+
+    BlackLibraryCommon::CloseLogger(worker_name_);
 
     return 0;
 }

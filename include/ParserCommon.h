@@ -31,6 +31,8 @@ enum class job_status_t {
     _NUM_JOB_STATUS_TYPES_
 };
 
+std::string GetStatusName(job_status_t job_status);
+
 enum class parser_t {
     ERROR_PARSER,
     AO3_PARSER,
@@ -95,6 +97,22 @@ struct ParserJobHash
         return h1 ^ h2 ^ h3 ^ h4 ^ h5 ^ h6;
     }
 };
+
+struct ParserJobStatusTracker
+{
+    std::string uuid;
+    job_status_t job_status;
+    error_job_rep is_error_job = false;
+};
+
+inline std::ostream& operator << (std::ostream &o, const ParserJobStatusTracker &parser_job_status_tracker)
+{
+    o << "uuid: " << parser_job_status_tracker.uuid << " ";
+    o << "job_status: " << GetStatusName(parser_job_status_tracker.job_status) << " ";
+    o << "is_error_job: " << parser_job_status_tracker.is_error_job;
+
+    return o;
+}
 
 struct CurrentJobPairHash
 {
@@ -233,7 +251,6 @@ std::string GetParserName(parser_t rep);
 parser_t GetParserTypeByUrl(const std::string &url);
 std::string GetSectionFileName(const size_t &index_num, const std::string &section_name, const uint16_t &version_num);
 std::string GetSpaceString(size_t num_tabs);
-std::string GetStatusName(job_status_t job_status);
 ParserXmlNodeSeek SeekToNodeByElementAttr(xmlNodePtr root, std::string attr, std::string value);
 ParserXmlContentResult GetXmlNodeContent(xmlNodePtr root_node);
 ParserXmlAttributeResult GetXmlAttributeContentByName(xmlNodePtr root_node, const std::string &target_name);

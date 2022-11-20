@@ -59,7 +59,7 @@ Parser::Parser(parser_t parser_type, const njson &config) :
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false)
 {
-    njson nconfig = config["config"];
+    njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
     std::string logger_path = BlackLibraryCommon::DefaultLogPath;
     if (nconfig.contains("logger_path"))
@@ -234,7 +234,7 @@ std::string Parser::SectionDumpContent(const xmlDocPtr doc_ptr, const xmlNodePtr
     xmlBufferPtr section_buf = xmlBufferCreate();
     xmlNodeDump(section_buf, doc_ptr, node_ptr, 0, 1);
     const std::string section_content = std::string((char *) section_buf->content);
-    xmlFree(section_buf);
+    xmlBufferFree(section_buf);
 
     return section_content;
 }

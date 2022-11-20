@@ -96,7 +96,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
         return index_entry;
     }
 
-    auto time_attr_seek = GetXmlAttributeContentByName(time_seek.seek_node, "title");
+    auto time_attr_seek = GetXmlAttributeContentByName(time_seek.seek_node, "unixtime");
 
     if (!time_attr_seek.found)
     {
@@ -106,7 +106,7 @@ ParserIndexEntry ParserRR::ExtractIndexEntry(xmlNodePtr root_node)
 
     BlackLibraryCommon::LogTrace(parser_name_, "time attribute seek result for UUID: {} : {}", uuid_, time_attr_seek.result);
 
-    index_entry.time_published = BlackLibraryCommon::ParseTimet(time_attr_seek.result, "%m/%d/%Y %I:%M:%S %p");
+    index_entry.time_published = std::stoll(time_attr_seek.result);
 
     BlackLibraryCommon::LogTrace(parser_name_, "index entry time for UUID: {} : {}", uuid_, index_entry.time_published);
 

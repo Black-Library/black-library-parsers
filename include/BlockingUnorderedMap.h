@@ -10,6 +10,7 @@
 #include <functional>
 #include <mutex>
 #include <unordered_map>
+#include <vector>
 
 template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class BlockingUnorderedMap
@@ -59,6 +60,18 @@ public:
     {
         const std::lock_guard<std::mutex> lock(mutex_);
         return map_.find(key);
+    }
+
+    std::vector<Key> get_map_keys()
+    {
+        const std::lock_guard<std::mutex> lock(mutex_);
+        std::vector<Key> vec;
+        for (const auto& kv : map_)
+        {
+            vec.emplace_back(kv.first);
+        }
+
+        return vec;
     }
 
     bool count(Key key)

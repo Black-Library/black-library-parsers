@@ -27,7 +27,7 @@ namespace BlackLibraryCommon = black_library::core::common;
 
 ParserFactory::ParserFactory(const njson &config)
 {
-    njson nconfig = config["config"];
+    njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
     std::string logger_path = BlackLibraryCommon::DefaultLogPath;
     if (nconfig.contains("logger_path"))

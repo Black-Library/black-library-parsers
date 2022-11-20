@@ -33,6 +33,7 @@ static constexpr const char SBF_LONG_URL[] = "https://forums.spacebattles.com/th
 static constexpr const char SVF_LONG_URL[] = "https://forums.sufficientvelocity.com/threads/scientia-weaponizes-the-future.82203/";
 static constexpr const char YT_SHORT_URL[] = "https://www.youtube.com/watch?v=GRHat19F2Kg";
 static constexpr const char YT_LONG_URL[] = "https://www.youtube.com/playlist?list=PLDb22nlVXGgdg_NR_-GtTrMnbMVmtSSXa";
+static constexpr const char EMPTY_URL[] = "";
 
 namespace BlackLibraryParsers = black_library::core::parsers;
 
@@ -128,37 +129,35 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 opts->start_number = atoi(optarg);
                 break;
             case 't':
-                if (std::string(optarg) == "ao3")
+                switch (std::string(optarg))
                 {
-                    opts->source = BlackLibraryParsers::parser_t::AO3_PARSER;
+                    case "ao3":
+                        opts->source = BlackLibraryParsers::parser_t::AO3_PARSER;
+                        break;
+                    case "empty":
+                        opts->source = BlackLibraryParsers::parser_t::ERROR_PARSER;
+                        break;
+                    case "ffn":
+                        opts->source = BlackLibraryParsers::parser_t::FFN_PARSER;
+                        break;
+                    case "rr":
+                        opts->source = BlackLibraryParsers::parser_t::RR_PARSER;
+                        break;
+                    case "sbf":
+                        opts->source = BlackLibraryParsers::parser_t::SBF_PARSER;
+                        break;
+                    case "svf":
+                        opts->source = BlackLibraryParsers::parser_t::SVF_PARSER;
+                        break;
+                    case "yt":
+                        opts->source = BlackLibraryParsers::parser_t::YT_PARSER;;
+                        break;
+                    default:
+                        std::cout << "Failed to match source" << std::endl;
+                        Usage(argv[0]);
+                        exit(1);
+                        break;
                 }
-                else if (std::string(optarg) == "ffn")
-                {
-                    opts->source = BlackLibraryParsers::parser_t::FFN_PARSER;
-                }
-                else if (std::string(optarg) == "rr")
-                {
-                    opts->source = BlackLibraryParsers::parser_t::RR_PARSER;
-                }
-                else if (std::string(optarg) == "sbf")
-                {
-                    opts->source = BlackLibraryParsers::parser_t::SBF_PARSER;
-                }
-                else if (std::string(optarg) == "svf")
-                {
-                    opts->source = BlackLibraryParsers::parser_t::SVF_PARSER;
-                }
-                else if (std::string(optarg) == "yt")
-                {
-                    opts->source = BlackLibraryParsers::parser_t::YT_PARSER;
-                }
-                else
-                {
-                    std::cout << "Failed to match source" << std::endl;
-                    Usage(argv[0]);
-                    exit(1);
-                }
-                break;
             default:
                 exit(1);
                 break;
@@ -174,7 +173,7 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
     return 0;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     struct options opts;
 
@@ -214,39 +213,39 @@ int main(int argc, char* argv[])
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::SVF_PARSER) + "2", std::string(SVF_LONG_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::YT_PARSER) + "1", std::string(YT_SHORT_URL));
     url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::YT_PARSER) + "2", std::string(YT_LONG_URL));
+    url_map.emplace(BlackLibraryParsers::GetParserName(BlackLibraryParsers::parser_t::ERROR_PARSER) + "0", std::string(EMPTY_URL));
 
     std::shared_ptr<Parser> parser;
+    switch (opts.source)
+    {
+        case BlackLibraryParsers::parser_t::AO3_PARSER:
+            parser = ParserCast(std::make_shared<ParserAO3>(config));
+            break;
+        case BlackLibraryParsers::parser_t::ERROR_PARSER:
+            parser = std::make_shared<Parser>(BlackLibraryParsers::parser_t::ERROR_PARSER, config);
+            break;
+        case BlackLibraryParsers::parser_t::FFN_PARSER:
+            parser = ParserCast(std::make_shared<ParserFFN>());
+            break;
+        case BlackLibraryParsers::parser_t::RR_PARSER:
+            parser = ParserCast(std::make_shared<ParserRR>(config));
+            break;
+        case BlackLibraryParsers::parser_t::SBF_PARSER:
+            parser = ParserCast(std::make_shared<ParserSBF>(config));
+            break;
+        case BlackLibraryParsers::parser_t::SVF_PARSER:
+            parser = ParserCast(std::make_shared<ParserSVF>(config));
+            break;
+        case BlackLibraryParsers::parser_t::YT_PARSER:
+            parser = ParserCast(std::make_shared<ParserYT>(config));
+            break;
+        default:
+            std::cout << "Failed to match parser source" << std::endl;
+            Usage(argv[0]);
+            exit(1);
+            break;
+    }
 
-    if (opts.source == BlackLibraryParsers::parser_t::AO3_PARSER)
-    {
-        parser = ParserCast(std::make_shared<ParserAO3>(config));
-    }
-    else if (opts.source == BlackLibraryParsers::parser_t::FFN_PARSER)
-    {
-        parser = ParserCast(std::make_shared<ParserFFN>());
-    }
-    else if (opts.source == BlackLibraryParsers::parser_t::RR_PARSER)
-    {
-        parser = ParserCast(std::make_shared<ParserRR>(config));
-    }
-    else if (opts.source == BlackLibraryParsers::parser_t::SBF_PARSER)
-    {
-        parser = ParserCast(std::make_shared<ParserSBF>(config));
-    }
-    else if (opts.source == BlackLibraryParsers::parser_t::SVF_PARSER)
-    {
-        parser = ParserCast(std::make_shared<ParserSVF>(config));
-    }
-    else if (opts.source == BlackLibraryParsers::parser_t::YT_PARSER)
-    {
-        parser = ParserCast(std::make_shared<ParserYT>(config));
-    }
-    else
-    {
-        std::cout << "Failed to match parser source" << std::endl;
-        Usage(argv[0]);
-        exit(1);
-    }
 
     auto iter = url_map.find(BlackLibraryParsers::GetParserName(parser->GetParserType()) + std::to_string(opts.length));
 

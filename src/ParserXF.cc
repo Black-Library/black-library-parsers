@@ -163,7 +163,7 @@ ParseSectionInfo ParserXF::ParseSection()
 
     // skip saving content if before target start index
     BlackLibraryCommon::LogDebug(parser_name_, "working index: {} start index: {}", working_index, target_start_index_);
-    if (working_index <= target_start_index_)
+    if (working_index < target_start_index_)
     {
         BlackLibraryCommon::LogDebug(parser_name_, "Target start index: {} - current index: {} skipping file save", target_start_index_, working_index);
         output.has_error = false;

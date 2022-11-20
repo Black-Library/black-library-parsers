@@ -1,5 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include <FileOperations.h>
+
 #include <Parser.h>
 #include <ParserRR.h>
 
@@ -11,24 +13,27 @@ namespace core {
 
 namespace parsers {
 
-static constexpr const char RR_DUMMY_URL[] = "https://www.royalroad.com/fiction/00000/some-fiction";
 
 namespace BlackLibraryCommon = black_library::core::common;
 
 TEST_CASE( "Generic parser tests (pass)", "[single-file]" )
 {
-    auto config = GenerateTestConfig();
+    BlackLibraryCommon::MakeDirectories(DefaultTestStoragePath);
+    auto config = GenerateParserTestConfig();
     Parser parser(parser_t::ERROR_PARSER, config);
     parser.SetLocalFilePath("foo");
+    BlackLibraryCommon::RemovePath(DefaultTestStoragePath);
 }
 
 TEST_CASE( "RR parser tests (pass)", "[single-file]" )
 {
-    auto config = GenerateTestConfig();
+    BlackLibraryCommon::MakeDirectories(DefaultTestStoragePath);
+    auto config = GenerateParserTestConfig();
     RR::ParserRR parser(config);
     parser.SetLocalFilePath("foo");
-    REQUIRE(parser.GetParserType() == parser_t::RR_PARSER);
-    REQUIRE(parser.GetSourceUrl() == BlackLibraryCommon::RR::source_url);
+    REQUIRE( parser.GetParserType() == parser_t::RR_PARSER );
+    REQUIRE( parser.GetSourceUrl() == BlackLibraryCommon::RR::source_url );
+    BlackLibraryCommon::RemovePath(DefaultTestStoragePath);
 }
 
 } // namespace parsers

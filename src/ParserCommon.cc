@@ -41,11 +41,10 @@ std::string GenerateXmlDocTreeStringHelper(xmlNodePtr root_node, size_t depth)
         xmlAttrPtr attribute = cur_node->properties;
         while (attribute)
         {
-            const xmlChar *attr_name = attribute->name;
             xmlChar *attr_content = xmlNodeListGetString(cur_node->doc, attribute->children, 1);
-            if (attr_name !=NULL && attr_content != NULL)
+            if (attribute->name !=NULL && attr_content != NULL)
             {
-                attribute_content_string += std::string((char *) attr_name) + ": " + std::string((char *) attr_content) + " ";
+                attribute_content_string += std::string((char *) attribute->name) + ": " + std::string((char *) attr_content) + " ";
             }
             xmlFree(attr_content);
             attribute = attribute->next;
@@ -354,8 +353,9 @@ bool NodeHasAttributeContent(xmlNodePtr root_node, const std::string &target_con
         attr_content = xmlNodeListGetString(root_node->doc, attribute->children, 1);
         if (attr_content != NULL)
         {
-            // std::cout << "attr_content: " << std::string((char *)attr_content) << std::endl;
-            if (!target_content.compare(std::string((char *)attr_content)))
+            std::string compare = std::string((char *)attr_content);
+            // std::cout << "attr_content: " << compare << " - target: " << target_content << std::endl;
+            if (!compare.compare(0, target_content.size(), target_content))
                 found = true;
         }
         xmlFree(attr_content);
