@@ -1,5 +1,23 @@
 find_package(CURL REQUIRED)
 find_package(LibXml2 REQUIRED)
+if (REQUIRE_PYTHON)
+    message("REQUIRE_PYTHON ON")
+    find_package(PythonLibs 3 REQUIRED Development)
+
+    message(STATUS "Checking Python Deps")
+    execute_process(COMMAND python3 PythonCheckDeps.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE PYTHON_DEPS_OUTPUT)
+    message(STATUS "Finished Checking Python Deps")
+
+    if(NOT PYTHON_DEPS_OUTPUT STREQUAL "")
+        message(FATAL_ERROR "ERROR: Missing Python Deps: " ${PYTHON_DEPS_OUTPUT})
+        return(1)
+    endif()
+    add_compile_definitions(WITH_PYTHON)
+else()
+    message("REQUIRE_PYTHON OFF")
+endif()
 
 message(STATUS "LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
 

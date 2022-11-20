@@ -183,6 +183,11 @@ struct ParserJobResult {
     bool has_error = true;
 };
 
+struct NetworkRequestResult {
+    std::string html = "";
+    bool has_error = true;
+};
+
 inline std::ostream& operator << (std::ostream &o, const ParserJobResult &job_result)
 {
     o << "metadata: " << job_result.metadata << " ";
