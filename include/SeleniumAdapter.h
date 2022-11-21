@@ -27,10 +27,10 @@ public:
     SeleniumAdapter(size_t wait_time = 1);
     ~SeleniumAdapter() {};
 
-    NetworkRequestResult NetworkRequest(const std::string& url) override;
+    NetworkRequestResult NetworkRequest(const std::string& url) const override;
 
 private:
-    void PrintPythonError();
+    void PrintPythonError() const;
 };
 
 } // namespace parsers

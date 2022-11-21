@@ -148,7 +148,7 @@ static int ParseOptions(int argc, char **argv, struct options *opts)
                 }
                 else
                 {
-                    std::cout << "Failed to match source" << std::endl;
+                    std::cout << "Failed to match source: |" << std::string(optarg) << "|" << std::endl;
                     Usage(argv[0]);
                     exit(1);
                 }

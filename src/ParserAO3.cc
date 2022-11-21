@@ -22,6 +22,7 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserAO3::ParserAO3(const njson &config) :
     IndexEntryParser(parser_t::AO3_PARSER, config)
 {
+    networkAdapter_ = &seleniumAdapter_;
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
 }
@@ -92,7 +93,7 @@ ParseSectionInfo ParserAO3::ParseSection()
     if (network_result.has_error)
     {
         BlackLibraryCommon::LogError(parser_name_, "Unable to get html of url: {}", url_adult);
-        return parser_result;
+        return output;
     }
 
     xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) network_result.html.c_str(), NULL, NULL,

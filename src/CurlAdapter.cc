@@ -19,7 +19,7 @@ CurlAdapter::CurlAdapter(size_t wait_time) : NetworkAdapter(wait_time) {
 }
 
 
-NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) 
+NetworkRequestResult CurlAdapter::NetworkRequest(const std::string& url) const
 {
     NetworkRequestResult result;
 

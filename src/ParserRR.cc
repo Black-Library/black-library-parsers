@@ -209,7 +209,7 @@ ParseSectionInfo ParserRR::ParseSection()
     if (network_result.has_error)
     {
         BlackLibraryCommon::LogError(parser_name_, "Unable to get html of url: {}", index_entry_url);
-        return parser_result;
+        return output;
     }
 
     xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) network_result.html.c_str(), NULL, NULL,

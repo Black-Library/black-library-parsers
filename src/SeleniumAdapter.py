@@ -13,7 +13,7 @@ def NetworkRequest(url, wait_time =1) :
     options.add_argument("--disable-blink-features=AutomationControlled")
     driver = webdriver.Firefox(executable_path=driverpath, options=options)
     # Get all available cookies
-    print(driver.get_cookies())
+    # print(driver.get_cookies())
 
     driver.get(url)
     try:

@@ -20,6 +20,9 @@ namespace core {
 namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
+    
+const CurlAdapter Parser::curlAdapter_(1);
+const SeleniumAdapter Parser::seleniumAdapter_(1);
 
 Parser::Parser(parser_t parser_type, const njson &config) : 
     progress_number_callback_(),
@@ -40,7 +43,7 @@ Parser::Parser(parser_t parser_type, const njson &config) :
     parser_type_(parser_type),
     parser_behavior_(parser_behavior_t::ERROR),
     done_(false),
-    networkAdapter_(*curlAdapter_)
+    networkAdapter_(&curlAdapter_)
 {
     njson nconfig = BlackLibraryCommon::LoadConfig(config);
 

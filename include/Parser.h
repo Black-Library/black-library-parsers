@@ -97,12 +97,12 @@ protected:
     parser_behavior_t parser_behavior_;
     std::atomic_bool done_;
 
-    NetworkAdapter* networkAdapter_;
+    const NetworkAdapter* networkAdapter_;
     static const CurlAdapter curlAdapter_;
     static const SeleniumAdapter seleniumAdapter_;
     /* To use Selenium, put into the parser constructor
         #ifdef
-            networkAdapter_ = std::make_shared(Parser.seleniumAdapter);
+            networkAdapter_ = std::make_shared(Parser.seleniumAdapter_);
         #endif
     */
 private:

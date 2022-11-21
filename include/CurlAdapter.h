@@ -24,7 +24,7 @@ public:
     CurlAdapter(size_t wait_time = 1);
     ~CurlAdapter() {};
 
-    NetworkRequestResult NetworkRequest(const std::string& url) override;
+    NetworkRequestResult NetworkRequest(const std::string& url) const override;
 };
 
 size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);

@@ -24,7 +24,7 @@ public:
     NetworkAdapter(size_t wait_time = 1);
     virtual ~NetworkAdapter();
 
-    virtual NetworkRequestResult NetworkRequest(const std::string& url) = 0;
+    virtual NetworkRequestResult NetworkRequest(const std::string& url) const = 0;
 protected:
     size_t wait_time_;
 };
