@@ -1,5 +1,26 @@
 find_package(CURL REQUIRED)
 find_package(LibXml2 REQUIRED)
+if (REQUIRE_PYTHON)
+    message("REQUIRE_PYTHON ON")
+    find_package(PythonLibs 3 REQUIRED Development)
+
+    message(STATUS "Checking Python Deps")
+    execute_process(COMMAND python3 PythonCheckDeps.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE PYTHON_DEPS_OUTPUT)
+    message(STATUS "Finished Checking Python Deps")
+
+    if(NOT PYTHON_DEPS_OUTPUT STREQUAL "")
+        message(FATAL_ERROR "ERROR: Missing Python Deps: " ${PYTHON_DEPS_OUTPUT})
+        return(1)
+    endif()
+    # Needs to be enabled for Selenium parsing to work
+    # By default all parsers use curl, those parser which prefer
+    # selenium will only use it with python
+    # add_compile_definitions(WITH_PYTHON)
+else()
+    message("REQUIRE_PYTHON OFF")
+endif()
 
 message(STATUS "LibXml2 include dir: ${LIBXML2_INCLUDE_DIR}")
 
@@ -25,10 +46,20 @@ add_library(blacklibraryparsers
 
     ReaderTimeGenerator.cc
     ShortTimeGenerator.cc
-    )
 
-target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
-target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+    NetworkAdapter.cc
+    CurlAdapter.cc
+    SeleniumAdapter.cc
+
+    SeleniumAdapter.py
+    )
+if (REQUIRE_PYTHON)
+    target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} ${PYTHON_LIBRARIES} pthread)
+    target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+else()
+    target_link_libraries(blacklibraryparsers blacklibrarycommon ${CURL_LIBRARY} ${LIBXML2_LIBRARIES} pthread)
+    target_include_directories(blacklibraryparsers PUBLIC ${CURL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
+endif()
 
 install(
   TARGETS blacklibraryparsers

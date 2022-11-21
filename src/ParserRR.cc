@@ -205,8 +205,14 @@ ParseSectionInfo ParserRR::ParseSection()
     const auto index_entry_url = "https://" + source_url_ + index_entry.data_url;
     BlackLibraryCommon::LogDebug(parser_name_, "ParseSection: {} section_url: {} - {}", GetParserBehaviorName(parser_behavior_), index_entry_url, index_entry.name);
 
-    const auto curl_request_result = CurlRequest(index_entry_url);
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
+    const auto network_result = networkAdapter_->NetworkRequest(index_entry_url);
+    if (network_result.has_error)
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Unable to get html of url: {}", index_entry_url);
+        return output;
+    }
+
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) network_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {

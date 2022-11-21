@@ -22,6 +22,9 @@
 
 #include "ParserCommon.h"
 #include "ParserTimeGenerator.h"
+#include "NetworkAdapter.h"
+#include "CurlAdapter.h"
+#include "SeleniumAdapter.h"
 
 namespace black_library {
 
@@ -39,8 +42,6 @@ public:
 
     virtual ParserResult Parse(const ParserJob &parser_job);
     void Stop();
-
-    std::string CurlRequest(const std::string &url);
 
     void SetLocalFilePath(const std::string &local_des);
 
@@ -96,10 +97,16 @@ protected:
     parser_behavior_t parser_behavior_;
     std::atomic_bool done_;
 
+    const NetworkAdapter* networkAdapter_;
+    static const CurlAdapter curlAdapter_;
+    static const SeleniumAdapter seleniumAdapter_;
+    /* To use Selenium, put into the parser constructor
+        #ifdef
+            networkAdapter_ = std::make_shared(Parser.seleniumAdapter_);
+        #endif
+    */
 private:
 };
-
-size_t HandleCurlResponse(void* prt, size_t size, size_t nmemb, void* data);
 
 } // namespace parsers
 } // namespace core

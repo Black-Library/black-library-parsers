@@ -61,7 +61,6 @@ void ParserXF::FindMetaData(xmlNodePtr root_node)
         BlackLibraryCommon::LogError(parser_name_, "Failed message-inner seek for UUID: {}", uuid_);
         return;
     }
-
     current_node = message_inner_seek.seek_node;
 
     const auto message_userdetails_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
@@ -109,8 +108,14 @@ ParseSectionInfo ParserXF::ParseSection()
         return output;
     }
 
-    const auto curl_request_result = CurlRequest(working_url);
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
+    const auto network_result = networkAdapter_->NetworkRequest(working_url);
+    if (network_result.has_error)
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Unable to get html of url: {}", working_url);
+        return output;
+    }
+
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) network_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (section_doc_tree == NULL)
     {

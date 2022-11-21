@@ -22,6 +22,7 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserAO3::ParserAO3(const njson &config) :
     IndexEntryParser(parser_t::AO3_PARSER, config)
 {
+    networkAdapter_ = &seleniumAdapter_;
     source_name_ = BlackLibraryCommon::AO3::source_name;
     source_url_ = BlackLibraryCommon::AO3::source_url;
 }
@@ -88,9 +89,14 @@ ParseSectionInfo ParserAO3::ParseSection()
     const auto index_entry = index_entries_[index_];
 
     const auto url_adult = index_entry.data_url;
-    const auto index_entry_curl_result = CurlRequest(url_adult);
+    const auto network_result = networkAdapter_->NetworkRequest(url_adult);
+    if (network_result.has_error)
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Unable to get html of url: {}", url_adult);
+        return output;
+    }
 
-    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) index_entry_curl_result.c_str(), NULL, NULL,
+    xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) network_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (!section_doc_tree)
     {

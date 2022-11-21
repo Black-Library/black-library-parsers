@@ -1,0 +1,18 @@
+1668991066176	geckodriver	INFO	Listening on 127.0.0.1:40545
+1668991066179	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--disable-blink-features=AutomationControlled" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileZAqaF9"
+1668991066681	Marionette	INFO	Marionette enabled
+1668991066685	Marionette	INFO	Listening on port 37419
+1668991066919	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileZAqaF9/search.json.mozlz4", (void 0)))
+console.error: services.settings: 
+  main/whats-new-panel Signature failed  InvalidSignatureError: Invalid content signature (main/whats-new-panel)
+console.error: services.settings: 
+  main/whats-new-panel local data was corrupted
+console.warn: services.settings: main/whats-new-panel Signature verified failed. Retry from scratch
+console.error: services.settings: 
+  main/whats-new-panel Signature failed again InvalidSignatureError: Invalid content signature (main/whats-new-panel)
+JavaScript warning: https://pagead2.googlesyndication.com/bg/Cy76TGYNwlBdeFKzRh_Qc2a075RKB_J9dWAUlCdaUYI.js line 2 > eval line 7548 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+JavaScript warning: https://pagead2.googlesyndication.com/bg/Cy76TGYNwlBdeFKzRh_Qc2a075RKB_J9dWAUlCdaUYI.js line 2 > eval line 1834 > eval line 1 > eval line 1 > eval, line 1: WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER.
+1668991074608	Marionette	INFO	Stopped listening on port 37419
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.

@@ -20,6 +20,9 @@ namespace core {
 namespace parsers {
 
 namespace BlackLibraryCommon = black_library::core::common;
+    
+const CurlAdapter Parser::curlAdapter_(1);
+const SeleniumAdapter Parser::seleniumAdapter_(1);
 
 Parser::Parser(parser_t parser_type, const njson &config) : 
     progress_number_callback_(),
@@ -39,7 +42,8 @@ Parser::Parser(parser_t parser_type, const njson &config) :
     end_index_(0),
     parser_type_(parser_type),
     parser_behavior_(parser_behavior_t::ERROR),
-    done_(false)
+    done_(false),
+    networkAdapter_(&curlAdapter_)
 {
     njson nconfig = BlackLibraryCommon::LoadConfig(config);
 
@@ -89,9 +93,14 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 
     BlackLibraryCommon::LogDebug(parser_name_, "Start parser job: {} target_url: {}", parser_job, target_url_);
 
-    const auto curl_result = CurlRequest(target_url_);
+    const auto network_result = networkAdapter_->NetworkRequest(target_url_);
+    if (network_result.has_error)
+    {
+        BlackLibraryCommon::LogError(parser_name_, "Unable to get html of url: {}", parser_job.url);
+        return parser_result;
+    }
 
-    xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) curl_result.c_str(), NULL, NULL,
+    xmlDocPtr doc_tree = htmlReadDoc((xmlChar*) network_result.html.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
     if (doc_tree == NULL)
     {
@@ -145,40 +154,6 @@ ParserResult Parser::Parse(const ParserJob &parser_job)
 void Parser::Stop()
 {
     done_ = true;
-}
-
-std::string Parser::CurlRequest(const std::string &url)
-{
-    CURL* curl;
-    CURLcode res;
-
-    curl = curl_easy_init();
-
-    if (!curl)
-    {
-        BlackLibraryCommon::LogError(parser_name_, "Curl request failed, curl did not intialize");
-        return "";
-    }
-
-    std::string html_raw;
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, HandleCurlResponse);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &html_raw);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);
-
-    res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
-    {
-
-        BlackLibraryCommon::LogError(parser_name_, "Curl request failed: {}", curl_easy_strerror(res));
-        return "";
-    }
-
-    curl_easy_cleanup(curl);
-
-    return html_raw;
 }
 
 void Parser::SetLocalFilePath(const std::string &local_des)
@@ -405,20 +380,6 @@ void Parser::SaveUpdateDate(ParserResult &parser_result)
 {
     (void) parser_result;
     return;
-}
-
-// Credit: https://stackoverflow.com/questions/5525613/how-do-i-fetch-a-html-page-source-with-libcurl-in-c
-size_t HandleCurlResponse(void* ptr, size_t size, size_t nmemb, void* data)
-{
-    std::string* str = (std::string*) data;
-    char* sptr = (char*) ptr;
-
-    for (size_t x = 0; x < size * nmemb; ++x)
-    {
-        (*str) += sptr[x];
-    }
-
-    return size * nmemb;
 }
 
 } // namespace parsers
