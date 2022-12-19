@@ -20,6 +20,7 @@ add_library(blacklibraryparsers
     ParserRR.cc
     ParserSBF.cc
     ParserSVF.cc
+    ParserWP.cc
     ParserXF.cc
     ParserYT.cc
 

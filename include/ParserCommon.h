@@ -40,6 +40,7 @@ enum class parser_t {
     RR_PARSER,
     SBF_PARSER,
     SVF_PARSER,
+    WP_PARSER,
     XF_PARSER,
     YT_PARSER,
 

@@ -127,6 +127,9 @@ std::string GetParserName(parser_t rep)
     case parser_t::SVF_PARSER:
         return "svf_parser";
         break;
+    case parser_t::WP_PARSER:
+        return "wp_parser";
+        break;
     case parser_t::XF_PARSER:
         return "xf_parser";
         break;
@@ -163,6 +166,10 @@ parser_t GetParserTypeByUrl(const std::string &url)
     else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::SVF::source_url))
     {
         rep = parser_t::SVF_PARSER;
+    }
+    else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::WP::source_url))
+    {
+        rep = parser_t::WP_PARSER;
     }
     else if (BlackLibraryCommon::ContainsString(url, BlackLibraryCommon::RR::source_url))
     {
