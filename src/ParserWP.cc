@@ -27,8 +27,8 @@ namespace BlackLibraryCommon = black_library::core::common;
 ParserWP::ParserWP(parser_t parser_type, const njson &config) :
     LinkedListParser(parser_type, config)
 {
-    source_name_ = BlackLibraryCommon::ERROR::source_name;
-    source_url_ = BlackLibraryCommon::ERROR::source_url;
+    source_name_ = BlackLibraryCommon::WP::source_name;
+    source_url_ = BlackLibraryCommon::WP::source_url;
 }
 
 void ParserWP::FindMetaData(xmlNodePtr root_node)
@@ -87,6 +87,7 @@ ParseSectionInfo ParserWP::ParseSection()
         return output;
     }
 
+    // Get html
     const auto curl_request_result = CurlRequest(working_url);
     xmlDocPtr section_doc_tree = htmlReadDoc((xmlChar*) curl_request_result.c_str(), NULL, NULL,
         HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
@@ -101,10 +102,9 @@ ParseSectionInfo ParserWP::ParseSection()
     xmlNodePtr length_node = NULL;
     size_t length = 0;
 
-    const auto target_post = GetTargetPost(working_url);
-
-    const auto p_body_main_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
-        pattern_seek_t::XML_ATTRIBUTE, "class=p-body-main  ");
+    // Get main Section
+    const auto p_body_main_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "main",
+        pattern_seek_t::XML_ATTRIBUTE, "id=main");
     if (!p_body_main_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed p-body-main seek for UUID: {}", uuid_);
@@ -113,16 +113,6 @@ ParseSectionInfo ParserWP::ParseSection()
     }
 
     current_node = p_body_main_seek.seek_node;
-
-    const auto section_post_seek = SeekToSectionPost(current_node, target_post);
-    if (!section_post_seek.found)
-    {
-        BlackLibraryCommon::LogError(parser_name_, "Failed post seek for UUID: {}", uuid_);
-        xmlFreeDoc(section_doc_tree);
-        return output;
-    }
-
-    current_node = section_post_seek.seek_node;
 
     // get title
     const auto section_title = GetSectionTitle(current_node->children);
@@ -149,10 +139,9 @@ ParseSectionInfo ParserWP::ParseSection()
         return output;
     }
 
-    // reset current node to threadmark header
-    current_node = root_node->children;
-
-    const auto section_content_seek = SeekToSectionContent(current_node, target_post);
+    // Get story content node
+    const auto section_content_seek = SeekToNodeByPattern(current_node, pattern_seek_t::XML_NAME, "div",
+        pattern_seek_t::XML_ATTRIBUTE, "class=entry-content");
     if (!section_content_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed section content seek for UUID: {}", uuid_);
@@ -171,13 +160,11 @@ ParseSectionInfo ParserWP::ParseSection()
 
     output.length = length;
 
-    const auto section_name = GetXFTitle(section_title);
-
-    const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(section_name);
+    const auto sanatized_section_name = BlackLibraryCommon::SanitizeFileName(section_title);
 
     if (sanatized_section_name.empty())
     {
-        BlackLibraryCommon::LogError(parser_name_, "Unable to generate section name from: {}", section_name);
+        BlackLibraryCommon::LogError(parser_name_, "Unable to generate section name from: {}", section_title);
         xmlFreeDoc(section_doc_tree);
         return output;
     }
@@ -258,8 +245,8 @@ std::string ParserWP::GetNextUrl(xmlNodePtr root_node)
     if (!body_seek.found)
     {
 
-        BlackLibraryCommon::LogWarn(parser_name_, "Failed body seek for UUID: {}", uuid_);
-        return;
+        BlackLibraryCommon::LogError(parser_name_, "Failed body seek for UUID: {}", uuid_);
+        return "";
     }
     current_node = body_seek.seek_node;
 
@@ -268,7 +255,7 @@ std::string ParserWP::GetNextUrl(xmlNodePtr root_node)
     if (!div_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed get next div seek for UUID: {}", uuid_);
-        return;
+        return "";
     }
     current_node = div_seek.seek_node;
 
@@ -276,7 +263,7 @@ std::string ParserWP::GetNextUrl(xmlNodePtr root_node)
     if (!a_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed get next link seek for UUID: {}", uuid_);
-        return;
+        return "";
     }
     current_node = a_seek.seek_node;
 
@@ -284,7 +271,7 @@ std::string ParserWP::GetNextUrl(xmlNodePtr root_node)
     if (!link_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to get next nav link for UUID: {}", uuid_);
-        return;
+        return "";
     }
 
     return link_seek.result;
@@ -298,8 +285,8 @@ std::string ParserWP::GetSectionTitle(xmlNodePtr root_node)
     if (!body_seek.found)
     {
 
-        BlackLibraryCommon::LogWarn(parser_name_, "Failed body seek for UUID: {}", uuid_);
-        return;
+        BlackLibraryCommon::LogError(parser_name_, "Failed body seek for UUID: {}", uuid_);
+        return "";
     }
     current_node = body_seek.seek_node;
 
@@ -308,7 +295,7 @@ std::string ParserWP::GetSectionTitle(xmlNodePtr root_node)
     if (!title_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed get h1 section title seek for UUID: {}", uuid_);
-        return;
+        return "";
     }
     current_node = title_seek.seek_node;
 
@@ -316,7 +303,7 @@ std::string ParserWP::GetSectionTitle(xmlNodePtr root_node)
     if (!title_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to get title content for UUID: {}", uuid_);
-        return;
+        return "";
     }
 
     return link_seek.result;
@@ -330,8 +317,8 @@ time_t ParserWP::GetUpdateDate(xmlNodePtr root_node)
     if (!body_seek.found)
     {
 
-        BlackLibraryCommon::LogWarn(parser_name_, "Failed body seek for UUID: {}", uuid_);
-        return;
+        BlackLibraryCommon::LogError(parser_name_, "Failed body seek for UUID: {}", uuid_);
+        return 0;
     }
     current_node = body_seek.seek_node;
 
@@ -340,7 +327,7 @@ time_t ParserWP::GetUpdateDate(xmlNodePtr root_node)
     if (!time_seek.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed update time seek for UUID: {}", uuid_);
-        return;
+        return 0;
     }
     current_node = time_seek.seek_node;
 
@@ -348,7 +335,7 @@ time_t ParserWP::GetUpdateDate(xmlNodePtr root_node)
     if (!time_content_result.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to get time content for UUID: {}", uuid_);
-        return;
+        return 0;
 
     }
     struct tm tm;
@@ -358,7 +345,7 @@ time_t ParserWP::GetUpdateDate(xmlNodePtr root_node)
     if (strptime(time_content_result.result, "%Y-%m-%dT%H:%M:%S", &tm) == NULL)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to parse time content for UUID: {}", uuid_);
-        return;
+        return 0;
     }
 
     tm.tm_isdst = -1;
