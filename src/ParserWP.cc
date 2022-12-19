@@ -232,7 +232,7 @@ std::string ParserWP::PreprocessTargetUrl(const ParserJob &parser_job)
     return parser_job.last_url;
 }
 
-std::string ParserWP::GetFirstUrl(xmlNodePtr root_node, const std::string &data_url)
+std::string ParserWP::GetFirstUrl(xmlNodePtr, const std::string &data_url)
 {
     return data_url;
 }
@@ -299,14 +299,14 @@ std::string ParserWP::GetSectionTitle(xmlNodePtr root_node)
     }
     current_node = title_seek.seek_node;
 
-    const auto title_seek = GetXmlNodeContent(current_node);
-    if (!title_seek.found)
+    const auto title_seek_content = GetXmlNodeContent(current_node);
+    if (!title_seek_content.found)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to get title content for UUID: {}", uuid_);
         return "";
     }
 
-    return link_seek.result;
+    return title_seek_content.result;
 }
 
 time_t ParserWP::GetUpdateDate(xmlNodePtr root_node)
@@ -339,10 +339,8 @@ time_t ParserWP::GetUpdateDate(xmlNodePtr root_node)
 
     }
     struct tm tm;
-    time_t t;
 
-    "2015-09-16T20:47:54+00:00";
-    if (strptime(time_content_result.result, "%Y-%m-%dT%H:%M:%S", &tm) == NULL)
+    if (strptime(time_content_result.result.c_str(), "%Y-%m-%dT%H:%M:%S", &tm) == NULL)
     {
         BlackLibraryCommon::LogError(parser_name_, "Failed to parse time content for UUID: {}", uuid_);
         return 0;
