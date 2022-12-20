@@ -88,6 +88,7 @@ ParserManager::ParserManager(const njson &config) :
     AddWorker(parser_t::RR_PARSER, worker_count);
     AddWorker(parser_t::SBF_PARSER, worker_count);
     AddWorker(parser_t::SVF_PARSER, worker_count);
+    AddWorker(parser_t::WP_PARSER, worker_count);
 
     for (auto & worker : worker_map_)
     {

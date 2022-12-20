@@ -14,6 +14,7 @@
 #include <ParserRR.h>
 #include <ParserSBF.h>
 #include <ParserSVF.h>
+#include <ParserWP.h>
 
 #include <ParserFactory.h>
 
@@ -119,6 +120,14 @@ int ParserFactory::InitParserMap(const njson &config)
         ParserFactoryResult result;
 
         result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<SVF::ParserSVF>(config));
+
+        return result;
+    });
+    parser_map_.emplace(parser_t::WP_PARSER,
+    [&](void){
+        ParserFactoryResult result;
+
+        result.parser_result = std::static_pointer_cast<Parser>(std::make_shared<WP::ParserWP>(config));
 
         return result;
     });

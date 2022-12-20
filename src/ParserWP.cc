@@ -24,8 +24,8 @@ namespace WP {
 
 namespace BlackLibraryCommon = black_library::core::common;
 
-ParserWP::ParserWP(parser_t parser_type, const njson &config) :
-    LinkedListParser(parser_type, config)
+ParserWP::ParserWP(const njson &config) :
+    LinkedListParser(parser_t::WP_PARSER, config)
 {
     source_name_ = BlackLibraryCommon::WP::source_name;
     source_url_ = BlackLibraryCommon::WP::source_url;

@@ -20,7 +20,7 @@ namespace WP {
 class ParserWP : public LinkedListParser
 {
 public:
-    explicit ParserWP(parser_t parser_type, const njson &config);
+    explicit ParserWP(const njson &config);
 
 protected:
     void FindMetaData(xmlNodePtr root_node);
